@@ -1,8 +1,154 @@
 'use client'
-import { X, ExternalLink, CheckCircle2 } from 'lucide-react'
+
+import { useEffect, useRef } from 'react'
+import { X, ExternalLink, CheckCircle2, ShieldCheck, Clock, User } from 'lucide-react'
 import { Claim } from '@/lib/types'
-export default function SourceInspectorDrawer({ claim, onClose }: { claim?: Claim; onClose: () => void }) {
+
+export default function SourceInspectorDrawer({
+  claim,
+  onClose,
+}: {
+  claim?: Claim
+  onClose: () => void
+}) {
+  const drawerRef = useRef<HTMLDivElement>(null)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (!claim) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    closeButtonRef.current?.focus()
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [claim, onClose])
+
   if (!claim) return null
+
   const source = claim.sourceQuotes[0]
-  return <div className="fixed inset-0 z-50 bg-black/60" onClick={onClose}><aside onClick={(e) => e.stopPropagation()} className="absolute right-0 top-0 h-full w-full max-w-xl overflow-y-auto border-l border-slate-800 bg-slate-950 p-6 shadow-2xl"><div className="flex items-start justify-between"><div><p className="text-xs uppercase tracking-widest text-indigo-300">Source inspector</p><h2 className="mt-2 text-lg font-bold">{source.title}</h2></div><button onClick={onClose} className="rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-white"><X /></button></div><div className="mt-5 flex items-center gap-2 rounded-xl border border-emerald-400/20 bg-emerald-400/5 p-3 text-sm text-emerald-300"><CheckCircle2 size={17} />{claim.status === 'quoted_verified' ? 'Exact substring verified' : `Status: ${claim.status.replaceAll('_', ' ')}`}</div><div className="mt-6 rounded-xl border border-slate-800 bg-slate-900 p-4"><p className="mb-3 text-xs text-slate-500">Claim</p><p className="text-sm">{claim.statement}</p></div><div className="mt-4 rounded-xl border border-amber-400/30 bg-slate-900 p-4"><p className="mb-3 text-xs text-amber-300">Cited passage</p><p className="font-mono text-sm leading-6 text-slate-200"><mark className="rounded bg-amber-300/30 px-1 text-amber-100">{source.exactSnippet}</mark></p></div><div className="mt-5 space-y-2 text-xs text-slate-500"><p>Author: {source.author}</p><p>Captured: {new Date(source.timestamp).toLocaleString()}</p><a href={source.uri} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-indigo-300 hover:text-indigo-200">Open original <ExternalLink size={13} /></a></div></aside></div>
+  const isExactVerified = claim.status === 'quoted_verified'
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-[2px]"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="source-inspector-title"
+    >
+      <aside
+        ref={drawerRef}
+        onClick={(e) => e.stopPropagation()}
+        className="h-full w-full max-w-xl overflow-y-auto border-l border-[#E6E6E6] bg-[#FFFFFF] p-6 shadow-2xl flex flex-col justify-between"
+      >
+        <div>
+          <div className="flex items-start justify-between border-b border-[#F0F0F0] pb-4">
+            <div>
+              <span className="text-xs font-semibold uppercase tracking-wider text-[#6B6B6B]">
+                Source Evidence Inspector
+              </span>
+              <h2
+                id="source-inspector-title"
+                className="mt-1 text-base font-semibold text-[#0A0A0A]"
+              >
+                {source?.title || 'Ground Truth Evidence'}
+              </h2>
+            </div>
+            <button
+              ref={closeButtonRef}
+              onClick={onClose}
+              className="min-hit flex h-11 w-11 items-center justify-center rounded-[6px] border border-[#D4D4D4] bg-white text-[#6B6B6B] hover:border-[#0A0A0A] hover:text-[#0A0A0A]"
+              aria-label="Close source inspector drawer"
+            >
+              <X size={18} />
+            </button>
+          </div>
+
+          {/* Verification Status Pill */}
+          <div className="mt-4 flex items-center justify-between rounded-[6px] border border-[#E6E6E6] bg-[#F2F4F7] p-3 text-xs">
+            <div className="flex items-center gap-2">
+              <ShieldCheck size={16} className={isExactVerified ? 'text-[#1D5FBF]' : 'text-[#6B6B6B]'} />
+              <span className="font-semibold text-[#0A0A0A]">
+                {isExactVerified
+                  ? 'Exact Substring Verified (Deterministic Match)'
+                  : `Verification Status: ${claim.status.replaceAll('_', ' ')}`}
+              </span>
+            </div>
+            <span className="font-mono text-[11px] text-[#6B6B6B]">
+              {claim.verificationMethod}
+            </span>
+          </div>
+
+          {/* Handover Claim Statement */}
+          <div className="mt-4 rounded-[6px] border border-[#E6E6E6] bg-white p-4">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#6B6B6B]">
+              Handover Claim Statement ({claim.id})
+            </span>
+            <p className="mt-1.5 text-sm leading-relaxed text-[#0A0A0A]">
+              {claim.statement}
+            </p>
+          </div>
+
+          {/* Verbatim Source Evidence Snippet */}
+          {source && (
+            <div className="mt-4 rounded-[6px] border border-[#E6E6E6] bg-[#F2F4F7]/60 p-4">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#6B6B6B]">
+                Verbatim Source Snippet ({source.sourceId})
+              </span>
+              <div className="mt-2 rounded-[4px] border-l-2 border-[#1D5FBF] bg-white p-3 font-mono text-xs leading-relaxed text-[#0A0A0A]">
+                <mark className="bg-[#1D5FBF]/10 font-bold text-[#0A0A0A] px-1 py-0.5 rounded">
+                  {source.exactSnippet}
+                </mark>
+              </div>
+            </div>
+          )}
+
+          {/* Provenance Metadata */}
+          {source && (
+            <div className="mt-4 space-y-2 rounded-[6px] border border-[#E6E6E6] bg-white p-4 text-xs text-[#6B6B6B]">
+              <div className="flex items-center gap-2">
+                <User size={13} className="text-[#0A0A0A]" />
+                <span>Author: <strong className="text-[#0A0A0A]">{source.author}</strong></span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock size={13} className="text-[#0A0A0A]" />
+                <span>Captured Timestamp: <strong className="text-[#0A0A0A]">{new Date(source.timestamp).toUTCString()}</strong></span>
+              </div>
+              <div>
+                Clearance Required: <span className="font-mono text-[#0A0A0A]">{source.requiredClearanceLevel}</span>
+              </div>
+              <div className="pt-2">
+                <a
+                  href={source.uri}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 font-medium text-[#1D5FBF] hover:underline"
+                >
+                  <span>Open origin record</span>
+                  <ExternalLink size={12} />
+                </a>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="mt-6 pt-4 border-t border-[#F0F0F0]">
+          <button
+            onClick={onClose}
+            className="btn-secondary w-full min-hit"
+          >
+            Close Inspector (Esc)
+          </button>
+        </div>
+      </aside>
+    </div>
+  )
 }

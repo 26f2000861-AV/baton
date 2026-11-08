@@ -1,11 +1,152 @@
 'use client'
-import { useState } from 'react'
-import { X, MessageSquareText } from 'lucide-react'
+
+import { useState, useEffect, useRef } from 'react'
+import { X, MessageSquareText, Check, ChevronRight } from 'lucide-react'
 import { LeaverInterviewQuestion } from '@/lib/types'
-export default function LeaverInterviewModal({ questions, onAnswer, onClose }: { questions: LeaverInterviewQuestion[]; onAnswer: (id: string, text: string) => void; onClose: () => void }) {
-  const pending = questions.filter((q) => q.status === 'pending_answer'); const [index, setIndex] = useState(0); const [answer, setAnswer] = useState('')
+
+export default function LeaverInterviewModal({
+  questions,
+  onAnswer,
+  onClose,
+}: {
+  questions: LeaverInterviewQuestion[]
+  onAnswer: (id: string, text: string) => void
+  onClose: () => void
+}) {
+  const pending = questions.filter((q) => q.status === 'pending_answer')
+  const [index, setIndex] = useState(0)
+  const [answer, setAnswer] = useState('')
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    closeButtonRef.current?.focus()
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [onClose])
+
   const question = pending[index]
-  if (!question) return <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-5"><div className="rounded-2xl border border-emerald-400/30 bg-slate-950 p-8 text-center"><p className="text-emerald-300">Interview complete</p><button onClick={onClose} className="mt-4 rounded-lg bg-slate-800 px-4 py-2 text-sm">Close</button></div></div>
-  const submit = () => { if (!answer.trim()) return; onAnswer(question.id, answer.trim()); setAnswer(''); setIndex((i) => i + 1) }
-  return <div className="fixed inset-0 z-50 bg-black/70 p-4"><div className="mx-auto mt-10 max-w-2xl rounded-2xl border border-slate-800 bg-slate-950 p-6 shadow-2xl"><div className="flex justify-between"><div><p className="flex items-center gap-2 text-xs uppercase tracking-widest text-amber-300"><MessageSquareText size={15} />Focus interview · Alex Chen</p><h2 className="mt-2 text-xl font-bold">Close the gaps AI cannot know</h2></div><button onClick={onClose}><X className="text-slate-400" /></button></div><div className="mt-8"><p className="text-xs text-slate-500">QUESTION {index + 1} OF {pending.length}</p><p className="mt-3 text-lg leading-7">{question.promptText}</p><p className="mt-4 rounded-xl bg-slate-900 p-3 font-mono text-xs leading-5 text-slate-400">{question.groundingContext.snippetText}</p><textarea value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder="Answer in your own words…" rows={5} className="mt-5 w-full resize-none rounded-xl border border-slate-700 bg-slate-900 p-4 text-sm outline-none focus:border-amber-400" /><button onClick={submit} className="mt-4 w-full rounded-xl bg-amber-400 px-4 py-3 text-sm font-bold text-slate-950 hover:bg-amber-300">Submit & continue</button></div></div></div>
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!answer.trim() || !question) return
+    onAnswer(question.id, answer.trim())
+    setAnswer('')
+    if (index >= pending.length - 1) {
+      setIndex(0)
+    }
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4 backdrop-blur-[2px]"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="leaver-interview-title"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-2xl rounded-[8px] border border-[#E6E6E6] bg-[#FFFFFF] p-6 shadow-2xl"
+      >
+        <div className="flex items-start justify-between border-b border-[#F0F0F0] pb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold uppercase tracking-wider text-[#6B6B6B]">
+                Leaver Focus Interview
+              </span>
+              <span className="monochrome-pill">
+                Alex Chen (Staff Engineer)
+              </span>
+            </div>
+            <h2 id="leaver-interview-title" className="mt-1 text-base font-semibold text-[#0A0A0A]">
+              Capture undocumented rationale and access credentials before Nov 11
+            </h2>
+          </div>
+          <button
+            ref={closeButtonRef}
+            onClick={onClose}
+            className="min-hit flex h-11 w-11 items-center justify-center rounded-[6px] border border-[#D4D4D4] bg-white text-[#6B6B6B] hover:border-[#0A0A0A] hover:text-[#0A0A0A]"
+            aria-label="Close interview dialog"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {!question ? (
+          <div className="mt-6 rounded-[6px] border border-[#E6E6E6] bg-[#F2F4F7] p-8 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#EEEEEE] text-[#0A0A0A]">
+              <Check size={24} />
+            </div>
+            <h3 className="mt-3 text-sm font-semibold text-[#0A0A0A]">
+              All priority interview questions answered
+            </h3>
+            <p className="mt-1 text-xs text-[#6B6B6B]">
+              Alex Chen has attested responses for the 72h token TTL and Stripe 2FA root backup credentials. All answers are preserved in the ledger.
+            </p>
+            <button
+              onClick={onClose}
+              className="btn-primary min-hit mt-5 px-6 text-xs"
+            >
+              Return to Handover Ledger
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={submit} className="mt-5 space-y-4">
+            <div className="flex items-center justify-between text-xs text-[#6B6B6B]">
+              <span className="font-semibold text-[#0A0A0A]">
+                QUESTION {index + 1} OF {pending.length}
+              </span>
+              <span className="font-mono">Category: {question.category}</span>
+            </div>
+
+            <div className="rounded-[6px] border border-[#E6E6E6] bg-[#F2F4F7]/40 p-4">
+              <p className="text-sm font-semibold text-[#0A0A0A]">
+                {question.promptText}
+              </p>
+              <div className="mt-2.5 rounded-[4px] border-l-2 border-[#0A0A0A] bg-white p-2.5 font-mono text-[11px] text-[#0A0A0A]">
+                Grounding: &ldquo;{question.groundingContext.snippetText}&rdquo;
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="leaver-response-input" className="block text-xs font-semibold text-[#0A0A0A]">
+                Attested response (Logged as official statement by Alex Chen):
+              </label>
+              <textarea
+                id="leaver-response-input"
+                rows={4}
+                value={answer}
+                onChange={(e) => setAnswer(e.target.value)}
+                placeholder="State your technical reason, ticket reference, or key handover location..."
+                className="mt-1.5 w-full rounded-[6px] border border-[#D4D4D4] bg-white p-3 text-xs text-[#0A0A0A] placeholder-[#767676] outline-none transition focus:border-[#0A0A0A]"
+              />
+            </div>
+
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="btn-secondary min-hit text-xs"
+              >
+                Close
+              </button>
+              <button
+                type="submit"
+                disabled={!answer.trim()}
+                className="btn-primary min-hit text-xs px-5"
+              >
+                <span>Submit attestation</span>
+                <ChevronRight size={14} />
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  )
 }

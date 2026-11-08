@@ -1,6 +1,173 @@
 'use client'
-import { AlertTriangle, ArrowUpRight, Clock3 } from 'lucide-react'
+
+import { AlertTriangle, GitCompare, ShieldAlert, Check, ExternalLink } from 'lucide-react'
 import { ContradictionItem } from '@/lib/types'
-export default function PillarRisks({ contradictions, onContradiction }: { contradictions: ContradictionItem[]; onContradiction: (id: string) => void }) {
-  return <section id="risks" className="space-y-4"><div><p className="text-xs font-semibold uppercase tracking-[.2em] text-rose-300">04 / Where the risk sits</p><h2 className="mt-1 text-2xl font-bold">Make the dangerous unknowns visible</h2></div><div className="grid gap-3 md:grid-cols-3"><div className="rounded-xl border border-rose-400/20 bg-rose-400/5 p-4"><AlertTriangle className="text-rose-300" size={18} /><p className="mt-3 text-sm font-semibold">1 critical contradiction</p><p className="mt-1 text-xs text-slate-400">Needs lead settlement</p></div><div className="rounded-xl border border-amber-400/20 bg-amber-400/5 p-4"><Clock3 className="text-amber-300" size={18} /><p className="mt-3 text-sm font-semibold">2 expiring access items</p><p className="mt-1 text-xs text-slate-400">Before Dec 1, 2026</p></div><div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4"><ArrowUpRight className="text-cyan-300" size={18} /><p className="mt-3 text-sm font-semibold">Risk queue is auditable</p><p className="mt-1 text-xs text-slate-400">Every decision keeps its evidence</p></div></div>{contradictions.map((c) => <button key={c.id} onClick={() => onContradiction(c.id)} className="w-full rounded-2xl border border-rose-400/30 bg-rose-400/5 p-5 text-left hover:bg-rose-400/10"><div className="flex items-center justify-between"><span className="text-xs font-semibold uppercase tracking-wider text-rose-300">Contradiction settlement queue</span><span className="rounded-full bg-rose-400/15 px-2 py-1 text-xs text-rose-200">{c.status === 'open_unresolved' ? 'Open' : 'Settled'}</span></div><h3 className="mt-3 font-semibold">{c.entityName} · {c.attributeName}</h3><p className="mt-2 text-sm text-slate-400">{c.sourceA.extractedValue} <span className="text-rose-300">vs</span> {c.sourceB.extractedValue}</p><p className="mt-4 text-xs text-indigo-300">Open side-by-side evidence →</p></button>)}</section>
+
+export default function PillarRisks({
+  contradictions,
+  isAccepted,
+  onContradiction,
+  onInspect,
+  onAccept,
+}: {
+  contradictions: ContradictionItem[]
+  isAccepted: boolean
+  onContradiction: (id: string) => void
+  onInspect: (claimId: string) => void
+  onAccept: () => void
+}) {
+  const unresolvedCount = contradictions.filter((c) => c.status === 'open_unresolved').length
+
+  return (
+    <section id="risks" className="space-y-4">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <span className="text-xs font-semibold uppercase tracking-wider text-[#6B6B6B]">
+            04 / Pillar
+          </span>
+          <h2 className="mt-0.5 text-xl font-semibold tracking-tight text-[#0A0A0A]">
+            Risk and contradiction queue
+          </h2>
+          <p className="mt-1 text-xs text-[#6B6B6B]">
+            Where do git commits and chat discussions disagree, and what failure modes are unhandled?
+          </p>
+        </div>
+        <button
+          onClick={onAccept}
+          disabled={isAccepted}
+          className={`min-hit flex items-center gap-1.5 rounded-[6px] px-3 py-2 text-xs font-semibold transition ${
+            isAccepted
+              ? 'border border-[#E6E6E6] bg-[#EEEEEE] text-[#0A0A0A]'
+              : 'border border-[#0A0A0A] bg-[#141414] text-white hover:bg-[#2a2a2a]'
+          }`}
+          aria-label={isAccepted ? 'Risks section accepted' : 'Accept risks'}
+        >
+          <Check size={14} />
+          {isAccepted ? 'Section accepted' : 'Accept risks'}
+        </button>
+      </div>
+
+      {/* Contradiction Settlement Cards */}
+      <div className="space-y-4">
+        {contradictions.map((c) => {
+          const isOpen = c.status === 'open_unresolved'
+          return (
+            <article
+              key={c.id}
+              className="ledger-panel border-l-4 border-l-[#0A0A0A] transition hover:border-[#0A0A0A]"
+            >
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="rounded bg-[#EEEEEE] px-2 py-0.5 font-mono text-[11px] font-semibold text-[#0A0A0A]">
+                      DISAGREEMENT · {c.id.toUpperCase()}
+                    </span>
+                    <span className="monochrome-pill">
+                      {isOpen ? 'Conflict' : 'Settled'}
+                    </span>
+                    <span className="text-xs font-medium text-[#6B6B6B]">
+                      {c.severity === 'critical_blocker' ? 'Critical blocker' : 'Operational warning'}
+                    </span>
+                  </div>
+                  <h3 className="mt-2 text-base font-semibold text-[#0A0A0A]">
+                    {c.entityName} — {c.attributeName}
+                  </h3>
+                  <p className="mt-1 text-xs text-[#6B6B6B]">
+                    Discrepancy detected between production PR merge notice and real-time incident Slack channel.
+                  </p>
+                </div>
+
+                {/* Direct action to compare and resolve */}
+                <button
+                  onClick={() => onContradiction(c.id)}
+                  className="min-hit flex items-center gap-1.5 rounded-[6px] border border-[#0A0A0A] bg-[#141414] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#2a2a2a]"
+                  aria-label={`Compare and settle contradiction ${c.id}`}
+                >
+                  <GitCompare size={14} />
+                  <span>{isOpen ? 'Compare & settle contradiction' : 'View settlement audit note'}</span>
+                </button>
+              </div>
+
+              {/* Side-by-side evidence preview */}
+              <div className="mt-4 grid gap-3 sm:grid-cols-2 text-xs">
+                <div className="rounded-[6px] border border-[#E6E6E6] bg-[#F2F4F7]/60 p-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-[#0A0A0A]">Source A (GitHub PR #204)</span>
+                    <span className="font-mono text-[11px] text-[#6B6B6B]">pr_204</span>
+                  </div>
+                  <p className="mt-1.5 font-medium text-[#0A0A0A]">
+                    {c.sourceA.extractedValue}
+                  </p>
+                  <blockquote className="mt-2 border-l-2 border-[#D4D4D4] pl-2 font-mono text-[11px] text-[#6B6B6B]">
+                    &ldquo;{c.sourceA.exactQuote}&rdquo;
+                  </blockquote>
+                </div>
+
+                <div className="rounded-[6px] border border-[#E6E6E6] bg-[#F2F4F7]/60 p-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-[#0A0A0A]">Source B (Slack #payment-eng)</span>
+                    <span className="font-mono text-[11px] text-[#6B6B6B]">slack_payment_eng</span>
+                  </div>
+                  <p className="mt-1.5 font-medium text-[#0A0A0A]">
+                    {c.sourceB.extractedValue}
+                  </p>
+                  <blockquote className="mt-2 border-l-2 border-[#D4D4D4] pl-2 font-mono text-[11px] text-[#6B6B6B]">
+                    &ldquo;{c.sourceB.exactQuote}&rdquo;
+                  </blockquote>
+                </div>
+              </div>
+
+              {/* Baton pass line */}
+              <div className="mt-4 pt-3 border-t border-[#F0F0F0]">
+                <div className="baton-pass-line">
+                  <span className="text-xs text-[#6B6B6B]">
+                    {isOpen ? 'Requires lead settlement decision' : 'Resolved with human audit note'}
+                  </span>
+                  <div className="pass-rule" />
+                  <button
+                    onClick={() => onInspect(c.associatedClaimId)}
+                    className="min-hit flex items-center gap-1 font-mono text-xs text-[#0A0A0A] hover:underline"
+                    aria-label="Inspect claim 09 evidence"
+                  >
+                    <span>claim_09</span>
+                    <ExternalLink size={12} className="text-[#6B6B6B]" />
+                  </button>
+                </div>
+              </div>
+            </article>
+          )
+        })}
+
+        {/* Operational Risk Ledger */}
+        <div className="rounded-[8px] border border-[#E6E6E6] bg-[#FFFFFF] p-4">
+          <div className="flex items-center gap-2 border-b border-[#F0F0F0] pb-2.5">
+            <ShieldAlert size={16} className="text-[#0A0A0A]" />
+            <h3 className="text-sm font-semibold text-[#0A0A0A]">
+              Operational failure modes & mitigation checklist
+            </h3>
+          </div>
+          <div className="mt-3 divide-y divide-[#F0F0F0] text-xs">
+            <div className="py-2.5 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <p className="font-semibold text-[#0A0A0A]">Thundering herd outage on merchant gateways</p>
+                <p className="text-[#6B6B6B]">Outbound retries lack jitter backoff; failing partner servers will crash upon restart.</p>
+              </div>
+              <span className="rounded bg-[#EEEEEE] px-2 py-1 font-mono text-[11px] text-[#0A0A0A]">
+                Mitigation: Adopt PR #214
+              </span>
+            </div>
+            <div className="py-2.5 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <p className="font-semibold text-[#0A0A0A]">Stripe settlement webhook signature invalidation</p>
+                <p className="text-[#6B6B6B]">Secret key scheduled for bi-annual rotation on Dec 1, 2026. Missed rotation will drop settlements.</p>
+              </div>
+              <span className="rounded bg-[#EEEEEE] px-2 py-1 font-mono text-[11px] text-[#0A0A0A]">
+                Mitigation: Secrets Manager rotation on Dec 1
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
 }

@@ -1,22 +1,122 @@
 'use client'
 
-import { RotateCcw, ShieldCheck, ChevronDown } from 'lucide-react'
+import { RotateCcw, ChevronDown, MessageSquare, ShieldAlert } from 'lucide-react'
 import { useHandover } from '@/lib/store'
 import { PersonaRole } from '@/lib/types'
 
-export default function Header({ onInterview, onExposure }: { onInterview?: () => void; onExposure?: () => void }) {
-  const { activePersona, setActivePersonaRole, resetDemoData, withheldCount } = useHandover()
+export default function Header({
+  onInterview,
+  onExposure,
+}: {
+  onInterview?: () => void
+  onExposure?: () => void
+}) {
+  const { activePersona, setActivePersonaRole, resetDemoData, withheldCount, questions } =
+    useHandover()
+
+  const pendingQuestionsCount = questions.filter((q) => q.status === 'pending_answer').length
+
   return (
-    <header className="sticky top-0 z-30 border-b border-slate-800 bg-slate-950/90 px-5 py-4 backdrop-blur">
-      <div className="mx-auto flex max-w-7xl items-center gap-4">
-        <div className="flex items-center gap-3"><div className="rounded-xl bg-indigo-500 p-2 text-xl font-black">B</div><div><div className="text-lg font-bold tracking-tight">Baton</div><div className="text-[10px] uppercase tracking-[.25em] text-slate-500">GIT LOST</div></div></div>
-        <div className="hidden h-8 w-px bg-slate-800 md:block" />
-        <div className="hidden rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs text-cyan-300 md:block">FinTrack / Payment Core</div>
-        <div className="ml-auto flex items-center gap-2">
-          {activePersona.role === 'leaver' && onInterview && <button onClick={onInterview} className="hidden rounded-lg border border-amber-400/30 px-3 py-2 text-xs text-amber-200 sm:block">Focus interview</button>}
-          {activePersona.role === 'lead' && onExposure && <button onClick={onExposure} className="hidden rounded-lg border border-fuchsia-400/30 px-3 py-2 text-xs text-fuchsia-200 sm:block">Exposure diff ({withheldCount})</button>}
-          <label className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-xs"><span>{activePersona.avatar}</span><select value={activePersona.role} onChange={(e) => setActivePersonaRole(e.target.value as PersonaRole)} className="bg-transparent text-slate-200 outline-none"><option value="successor">Successor · Priya</option><option value="leaver">Leaver · Alex</option><option value="lead">Lead · Vikram</option></select><ChevronDown size={13} /></label>
-          <button title="Reset demo data" onClick={resetDemoData} className="rounded-lg border border-slate-700 p-2 text-slate-400 hover:text-white"><RotateCcw size={16} /></button>
+    <header className="sticky top-0 z-20 border-b border-[#E6E6E6] bg-[#FFFFFF] px-4 py-3 sm:px-6">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+        {/* Left: Baton identity & scope */}
+        <div className="flex items-center gap-3">
+          {/* Baton-derived outline mark: architectural glyph */}
+          <div
+            className="flex h-9 w-9 items-center justify-center rounded-[6px] border-[1.5px] border-[#0A0A0A] bg-white text-sm font-bold tracking-tight text-[#0A0A0A]"
+            aria-label="Baton Logo"
+            title="Baton Accountable Engineering Handover"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 18 18"
+              fill="none"
+              stroke="#0A0A0A"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M4 2.5h5a3.5 3.5 0 0 1 0 7H4V2.5z" />
+              <path d="M4 9.5h5.5a3.5 3.5 0 0 1 0 7H4V9.5z" />
+            </svg>
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold tracking-tight text-[#0A0A0A]">Baton</span>
+              <span className="rounded bg-[#EEEEEE] px-1.5 py-0.5 text-[10px] font-semibold text-[#6B6B6B]">
+                HANDOVER LEDGER
+              </span>
+            </div>
+            <p className="text-xs text-[#6B6B6B]">FinTrack / Payment Core Service</p>
+          </div>
+        </div>
+
+        {/* Right: Actions, Persona Switcher & Reset */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Leaver Focus Interview Action */}
+          <button
+            onClick={onInterview}
+            className="min-hit flex items-center gap-1.5 rounded-[6px] border border-[#D4D4D4] bg-white px-3 py-2 text-xs font-medium text-[#0A0A0A] transition hover:bg-[#EEEEEE] hover:border-[#0A0A0A]"
+            title="Open Gap-Driven Leaver Focus Interview"
+            aria-label="Open Leaver Focus Interview"
+          >
+            <MessageSquare size={14} className="text-[#0A0A0A]" />
+            <span className="hidden sm:inline">Leaver interview</span>
+            {pendingQuestionsCount > 0 && (
+              <span className="rounded-full bg-[#EEEEEE] px-1.5 py-0.2 text-[10px] font-bold text-[#0A0A0A]">
+                {pendingQuestionsCount}
+              </span>
+            )}
+          </button>
+
+          {/* Clearance Exposure Diff Action */}
+          <button
+            onClick={onExposure}
+            className="min-hit flex items-center gap-1.5 rounded-[6px] border border-[#D4D4D4] bg-white px-3 py-2 text-xs font-medium text-[#0A0A0A] transition hover:bg-[#EEEEEE] hover:border-[#0A0A0A]"
+            title="Open Clearance Exposure Diff"
+            aria-label="Open Clearance Exposure Diff"
+          >
+            <ShieldAlert size={14} className="text-[#0A0A0A]" />
+            <span className="hidden sm:inline">Clearance diff</span>
+            {withheldCount > 0 && (
+              <span className="rounded-full bg-[#EEEEEE] px-1.5 py-0.2 text-[10px] font-bold text-[#0A0A0A]">
+                {withheldCount}
+              </span>
+            )}
+          </button>
+
+          {/* Persona Switcher */}
+          <div className="relative">
+            <label
+              htmlFor="persona-select"
+              className="min-hit flex cursor-pointer items-center gap-2 rounded-[6px] border border-[#D4D4D4] bg-white px-3 py-2 text-xs text-[#0A0A0A] hover:border-[#0A0A0A]"
+            >
+              <span className="text-sm">{activePersona.avatar}</span>
+              <select
+                id="persona-select"
+                value={activePersona.role}
+                onChange={(e) => setActivePersonaRole(e.target.value as PersonaRole)}
+                className="min-h-[44px] cursor-pointer appearance-none bg-transparent pr-4 font-medium text-[#0A0A0A] outline-none"
+                aria-label="Select active persona"
+              >
+                <option value="successor">Successor · Priya</option>
+                <option value="leaver">Leaver · Alex</option>
+                <option value="lead">Lead · Vikram</option>
+              </select>
+              <ChevronDown size={13} className="pointer-events-none text-[#6B6B6B]" />
+            </label>
+          </div>
+
+          {/* Reset Demo Data Button */}
+          <button
+            title="Reset demo data to initial state"
+            aria-label="Reset demo data"
+            onClick={resetDemoData}
+            className="min-hit flex h-11 w-11 items-center justify-center rounded-[6px] border border-[#D4D4D4] bg-white text-[#6B6B6B] transition hover:border-[#0A0A0A] hover:text-[#0A0A0A]"
+          >
+            <RotateCcw size={15} />
+          </button>
         </div>
       </div>
     </header>

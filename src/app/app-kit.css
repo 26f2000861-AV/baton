@@ -1,0 +1,391 @@
+/* tasteskill v2.5 app.css (MIT License, Copyright (c) 2026 Leonxlnx): https://github.com/Leonxlnx/taste-skill. Keep this line in every copy. */
+/* Achromatic Ledger Theme for Baton Engineering Handover */
+
+@font-face {
+  font-family: 'Geist';
+  src: url('/fonts/Geist[wght].ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('/fonts/GeistMono[wght].ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Achromatic ledger tokens */
+  --ground: #F2F4F7;
+  --surface: #FFFFFF;
+  --raised: #EEEEEE;
+  --active: #E6E6E6;
+  --border: #E6E6E6;
+  --border-strong: #D4D4D4;
+  --rule: #F0F0F0;
+  --control: #D4D4D4;
+  --text: #0A0A0A;
+  --muted: #6B6B6B;
+  --faint: #767676;
+  --accent: #1D5FBF;          /* Sole blue hue: principal evidence data element (<1%) */
+  --primary: #141414;         /* Near-black primary action */
+  --primary-ink: #FFFFFF;
+
+  /* Explicit monochrome status labels */
+  --pill-positive-bg: #EEEEEE;
+  --pill-positive-ink: #0A0A0A;
+  --pill-negative-bg: #EEEEEE;
+  --pill-negative-ink: #0A0A0A;
+  --pill-warning-bg: #EEEEEE;
+  --pill-warning-ink: #0A0A0A;
+  --pill-neutral-bg: #EEEEEE;
+  --pill-neutral-ink: #0A0A0A;
+
+  --chart-1: #1D5FBF;
+  --chart-2: #8A8A8A;
+  --chart-3: #141414;
+  --chart-muted: #D4D4D4;
+  --grid: var(--rule);
+  --axis-ink: var(--muted);
+  --ink: var(--text);
+
+  --font: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --fs-title: 24px;
+  --fs-section: 16px;
+  --fs-kpi: 26px;
+  --fs-body: 14px;
+  --fs-small: 12px;
+
+  --sidebar-width: 55px;
+  --pad: 24px;
+  --gap: 16px;
+  --card-pad: 20px;
+  --radius-card: 8px;
+  --radius-control: 6px;
+  --control-height: 44px;      /* Interactive hit areas at least 44x44px */
+  --row-height: 48px;
+  --nav-row: 44px;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --t-press: 120ms;
+  --t-hover: 150ms;
+  --t-ui: 200ms;
+}
+
+/* Reset and basic typography */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  font-family: var(--font);
+  background: var(--ground);
+  color: var(--text);
+}
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, p, figure, ul, ol, dl, dd {
+  margin: 0;
+}
+
+ul[class], ol[class] {
+  padding: 0;
+  list-style: none;
+}
+
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Focus and accessibility */
+:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.num, table, .kpi-value, .font-mono, code, kbd {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 44x44 minimum hit area */
+.min-hit {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* App shell: 55px rail on desktop */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--ground);
+}
+
+.icon-rail {
+  width: 55px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 0;
+  gap: 8px;
+}
+
+.canvas-area {
+  margin-left: 55px;
+  flex: 1;
+  min-width: 0;
+  padding: 24px 32px 64px;
+}
+
+/* Baton Monogram outline mark */
+.baton-mark {
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid var(--text);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.04em;
+  color: var(--text);
+  background: var(--surface);
+  margin-bottom: 8px;
+}
+
+/* Baton pass line: 1px horizontal rule connecting claim to source key */
+.baton-pass-line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.pass-rule {
+  flex: 1;
+  height: 1px;
+  background: var(--border-strong);
+}
+
+.evidence-key {
+  font-family: var(--font-mono), "Geist Mono", monospace;
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.evidence-signal {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* Panels */
+.ledger-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: var(--card-pad);
+  box-shadow: none;
+}
+
+/* Monochrome status pills */
+.monochrome-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: var(--pill-neutral-bg);
+  color: var(--pill-neutral-ink);
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+/* Buttons */
+.btn-primary {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: var(--radius-control);
+  background: var(--primary);
+  color: var(--primary-ink);
+  border: 1px solid transparent;
+  font-weight: 600;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color var(--t-hover) ease, transform var(--t-press) var(--ease-out);
+}
+.btn-primary:hover:not(:disabled) {
+  background: #2a2a2a;
+}
+.btn-primary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.btn-primary:disabled {
+  background: var(--raised);
+  color: var(--muted);
+  border-color: var(--border);
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  font-weight: 500;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color var(--t-hover) ease, border-color var(--t-hover) ease;
+}
+.btn-secondary:hover:not(:disabled) {
+  background: var(--raised);
+  border-color: var(--text);
+}
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* KPIs divided strip */
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+.kpi-item {
+  padding: 16px 20px;
+  border-right: 1px solid var(--border);
+}
+.kpi-item:last-child {
+  border-right: none;
+}
+
+.kpi-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.kpi-num {
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.15;
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  color: var(--text);
+}
+
+.kpi-sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* Mobile bottom bar */
+.mobile-bottom-nav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .icon-rail {
+    display: none;
+  }
+  .canvas-area {
+    margin-left: 0;
+    padding: 16px 16px 80px;
+  }
+  .mobile-bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    z-index: 40;
+    justify-content: space-around;
+    align-items: center;
+  }
+  .mobile-bottom-nav button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    font-size: 10px;
+    color: var(--muted);
+    background: transparent;
+    border: none;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 4px 6px;
+  }
+  .mobile-bottom-nav button.active {
+    color: var(--text);
+    font-weight: 600;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
