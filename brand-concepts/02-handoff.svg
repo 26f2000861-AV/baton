@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="100" viewBox="0 0 320 100">
+  <g transform="translate(14 17)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 17h18l15 17-15 17H8z" stroke="#131416" stroke-width="3.5"/>
+    <path d="M66 17H48L33 34l15 17h18z" stroke="#1B6C80" stroke-width="3.5"/>
+    <path d="M27 34h21" stroke="#131416" stroke-width="2"/>
+    <circle cx="38" cy="34" r="4" fill="#1B6C80" stroke="none"/>
+  </g>
+  <text x="106" y="57" font-family="Space Grotesk, Arial, sans-serif" font-size="35" font-weight="600" fill="#131416">Baton</text>
+</svg>

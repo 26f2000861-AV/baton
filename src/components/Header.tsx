@@ -3,6 +3,7 @@
 import { RotateCcw, ChevronDown, MessageSquare, ShieldAlert } from 'lucide-react'
 import { useHandover } from '@/lib/store'
 import { PersonaRole } from '@/lib/types'
+import BatonMark from './BatonMark'
 
 export default function Header({
   onInterview,
@@ -21,26 +22,7 @@ export default function Header({
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
         {/* Left: Baton identity & scope */}
         <div className="flex items-center gap-3">
-          {/* Baton-derived outline mark: architectural glyph */}
-          <div
-            className="flex h-9 w-9 items-center justify-center rounded-[6px] border-[1.5px] border-[#0A0A0A] bg-white text-sm font-bold tracking-tight text-[#0A0A0A]"
-            aria-label="Baton Logo"
-            title="Baton Accountable Engineering Handover"
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 18 18"
-              fill="none"
-              stroke="#0A0A0A"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M4 2.5h5a3.5 3.5 0 0 1 0 7H4V2.5z" />
-              <path d="M4 9.5h5.5a3.5 3.5 0 0 1 0 7H4V9.5z" />
-            </svg>
-          </div>
+          <BatonMark />
           <div>
             <div className="flex items-center gap-2">
               <span className="text-sm font-semibold tracking-tight text-[#0A0A0A]">Baton</span>

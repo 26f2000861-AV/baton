@@ -8,6 +8,7 @@ export default function ContradictionModal({
   item,
   onResolve,
   onClose,
+  isClosing = false,
 }: {
   item?: ContradictionItem
   onResolve: (
@@ -15,6 +16,7 @@ export default function ContradictionModal({
     note: string
   ) => void
   onClose: () => void
+  isClosing?: boolean
 }) {
   const [note, setNote] = useState('')
   const closeButtonRef = useRef<HTMLButtonElement>(null)
@@ -42,7 +44,7 @@ export default function ContradictionModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4 backdrop-blur-[2px]"
+      className={`fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4 backdrop-blur-[2px]${isClosing ? ' is-closing' : ''}`}
       onClick={onClose}
       role="dialog"
       aria-modal="true"

@@ -500,3 +500,33 @@ export const INITIAL_QUESTIONS: LeaverInterviewQuestion[] = [
     status: 'pending_answer',
   },
 ]
+
+// Seed integrity checks keep the dashboard's repeated counts and dates aligned.
+console.assert(INITIAL_CLAIMS.length === 10, 'Seed should contain 10 source claims, including one restricted HR claim.')
+console.assert(
+  INITIAL_CLAIMS.filter((claim) => claim.id !== 'claim_10').length === 9 &&
+    INITIAL_CLAIMS.find((claim) => claim.id === 'claim_10')?.sourceQuotes[0]?.requiredClearanceLevel === 'restricted_hr_legal',
+  'Successor-facing overview should count 9 claims and withhold the HR-restricted record.'
+)
+console.assert(INITIAL_DECISIONS.length === 2, 'Seed should contain 2 architecture decisions.')
+console.assert(INITIAL_UNFINISHED.length === 2, 'Seed should contain 2 unfinished work items.')
+console.assert(INITIAL_OWNERSHIP.length === 2, 'Seed should contain 2 ownership records.')
+console.assert(INITIAL_CONTRADICTIONS.length === 1, 'Seed should contain 1 routing contradiction.')
+console.assert(INITIAL_QUESTIONS.length === 2, 'Seed should contain 2 leaver interview questions.')
+console.assert(
+  INITIAL_CONTRADICTIONS[0]?.sourceA.extractedValue.includes('SQS FIFO') &&
+    INITIAL_CONTRADICTIONS[0]?.sourceB.extractedValue.includes('RabbitMQ') &&
+    INITIAL_CONTRADICTIONS[0]?.sourceA.timestamp.startsWith('2026-10-14') &&
+    INITIAL_CONTRADICTIONS[0]?.sourceB.timestamp.startsWith('2026-11-02'),
+  'Routing conflict should preserve both source values.'
+)
+console.assert(
+  INITIAL_OWNERSHIP.map((asset) => asset.credentialsAndAccess.transferDeadlineDate).join(',') ===
+    '2026-11-10,2026-11-11',
+  'Ownership transfer dates should remain Nov 10 and Nov 11, 2026.'
+)
+console.assert(
+  INITIAL_CLAIMS.find((claim) => claim.id === 'claim_07')?.statement.includes('Dec 1, 2026'),
+  'Credential rotation date should remain Dec 1, 2026.'
+)
+console.assert(new Set(['decisions', 'unfinished', 'ownership', 'risks']).size === 4, 'Sign-off should track four distinct sections.')

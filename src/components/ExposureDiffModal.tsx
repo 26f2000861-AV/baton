@@ -6,6 +6,7 @@ import { X, Lock, ShieldAlert, Check } from 'lucide-react'
 export default function ExposureDiffModal({
   details,
   onClose,
+  isClosing = false,
 }: {
   details: {
     claimId: string
@@ -14,6 +15,7 @@ export default function ExposureDiffModal({
     reason: string
   }[]
   onClose: () => void
+  isClosing?: boolean
 }) {
   const closeButtonRef = useRef<HTMLButtonElement>(null)
 
@@ -30,7 +32,7 @@ export default function ExposureDiffModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4 backdrop-blur-[2px]"
+      className={`fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4 backdrop-blur-[2px]${isClosing ? ' is-closing' : ''}`}
       onClick={onClose}
       role="dialog"
       aria-modal="true"

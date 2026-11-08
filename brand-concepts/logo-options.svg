@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="470" viewBox="0 0 1200 470">
+  <rect width="1200" height="470" rx="24" fill="#F2F5F7"/>
+  <text x="42" y="52" font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#5D5F60" letter-spacing="1">BATON · LOGO DIRECTIONS</text>
+  <g transform="translate(32 80)">
+    <rect width="360" height="350" rx="16" fill="#fff" stroke="#E1E5E8"/>
+    <text x="24" y="34" font-family="Arial,sans-serif" font-size="12" font-weight="700" fill="#5D5F60">01 · THE RELAY</text>
+    <g transform="translate(143 78)" fill="none" stroke="#131416" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4h25a17 17 0 0 1 0 34H12zM12 38h27a17 17 0 0 1 0 34H12z"/><path d="M5 38h59" stroke="#1B6C80" stroke-width="4"/><circle cx="64" cy="38" r="4" fill="#1B6C80" stroke="none"/></g>
+    <text x="180" y="274" text-anchor="middle" font-family="Space Grotesk,Arial,sans-serif" font-size="33" font-weight="700" fill="#131416">Baton</text><text x="180" y="301" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="#5D5F60">Pass the work forward</text><text x="180" y="329" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="#8A9094">Baton mark, with a shared handoff line</text>
+  </g>
+  <g transform="translate(420 80)">
+    <rect width="360" height="350" rx="16" fill="#fff" stroke="#E1E5E8"/>
+    <text x="24" y="34" font-family="Arial,sans-serif" font-size="12" font-weight="700" fill="#5D5F60">02 · THE HANDOFF</text>
+    <g transform="translate(138 91)" fill="none" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 17h18l15 17-15 17H8z" stroke="#131416"/><path d="M66 17H48L33 34l15 17h18z" stroke="#1B6C80"/><path d="M27 34h21" stroke="#131416" stroke-width="2"/><circle cx="38" cy="34" r="4" fill="#1B6C80" stroke="none"/></g>
+    <text x="180" y="274" text-anchor="middle" font-family="Space Grotesk,Arial,sans-serif" font-size="33" font-weight="700" fill="#131416">Baton</text><text x="180" y="301" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="#5D5F60">Clear ownership, every step</text><text x="180" y="329" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="#8A9094">Two sides joined at the transfer point</text>
+  </g>
+  <g transform="translate(808 80)">
+    <rect width="360" height="350" rx="16" fill="#fff" stroke="#E1E5E8"/>
+    <text x="24" y="34" font-family="Arial,sans-serif" font-size="12" font-weight="700" fill="#5D5F60">03 · THE LEDGER</text>
+    <g transform="translate(147 88)" fill="none" stroke="#131416" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v58"/><path d="M23 17h42M23 35h33M23 53h24"/><circle cx="63" cy="17" r="4" fill="#1B6C80" stroke="none"/><path d="m52 50 6 6 12-14" stroke="#1B6C80" stroke-width="3.5"/></g>
+    <text x="180" y="274" text-anchor="middle" font-family="Space Grotesk,Arial,sans-serif" font-size="33" font-weight="700" fill="#131416">Baton</text><text x="180" y="301" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="#5D5F60">Evidence attached to every claim</text><text x="180" y="329" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="#8A9094">Ledger rows with one verified source</text>
+  </g>
+</svg>

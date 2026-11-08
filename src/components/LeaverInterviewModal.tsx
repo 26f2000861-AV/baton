@@ -8,10 +8,12 @@ export default function LeaverInterviewModal({
   questions,
   onAnswer,
   onClose,
+  isClosing = false,
 }: {
   questions: LeaverInterviewQuestion[]
   onAnswer: (id: string, text: string) => void
   onClose: () => void
+  isClosing?: boolean
 }) {
   const pending = questions.filter((q) => q.status === 'pending_answer')
   const [index, setIndex] = useState(0)
@@ -43,7 +45,7 @@ export default function LeaverInterviewModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4 backdrop-blur-[2px]"
+      className={`fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4 backdrop-blur-[2px]${isClosing ? ' is-closing' : ''}`}
       onClick={onClose}
       role="dialog"
       aria-modal="true"
