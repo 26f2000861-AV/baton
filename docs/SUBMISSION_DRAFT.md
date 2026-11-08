@@ -16,7 +16,7 @@
 ---
 
 ## 2. Source-Code Repository Link
-- **Public GitHub Repository:** `[To be added: e.g. https://github.com/adityaverma/baton-handover]`  
+- **Public GitHub Repository:** https://github.com/26f2000861-AV/baton  
 - **Stack:** Fullstack Next.js 14 App Router, TypeScript, Tailwind CSS, Google Gemini 1.5/2.0 API.
 
 ---
