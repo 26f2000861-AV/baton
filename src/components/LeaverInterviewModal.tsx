@@ -1,0 +1,11 @@
+'use client'
+import { useState } from 'react'
+import { X, MessageSquareText } from 'lucide-react'
+import { LeaverInterviewQuestion } from '@/lib/types'
+export default function LeaverInterviewModal({ questions, onAnswer, onClose }: { questions: LeaverInterviewQuestion[]; onAnswer: (id: string, text: string) => void; onClose: () => void }) {
+  const pending = questions.filter((q) => q.status === 'pending_answer'); const [index, setIndex] = useState(0); const [answer, setAnswer] = useState('')
+  const question = pending[index]
+  if (!question) return <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-5"><div className="rounded-2xl border border-emerald-400/30 bg-slate-950 p-8 text-center"><p className="text-emerald-300">Interview complete</p><button onClick={onClose} className="mt-4 rounded-lg bg-slate-800 px-4 py-2 text-sm">Close</button></div></div>
+  const submit = () => { if (!answer.trim()) return; onAnswer(question.id, answer.trim()); setAnswer(''); setIndex((i) => i + 1) }
+  return <div className="fixed inset-0 z-50 bg-black/70 p-4"><div className="mx-auto mt-10 max-w-2xl rounded-2xl border border-slate-800 bg-slate-950 p-6 shadow-2xl"><div className="flex justify-between"><div><p className="flex items-center gap-2 text-xs uppercase tracking-widest text-amber-300"><MessageSquareText size={15} />Focus interview · Alex Chen</p><h2 className="mt-2 text-xl font-bold">Close the gaps AI cannot know</h2></div><button onClick={onClose}><X className="text-slate-400" /></button></div><div className="mt-8"><p className="text-xs text-slate-500">QUESTION {index + 1} OF {pending.length}</p><p className="mt-3 text-lg leading-7">{question.promptText}</p><p className="mt-4 rounded-xl bg-slate-900 p-3 font-mono text-xs leading-5 text-slate-400">{question.groundingContext.snippetText}</p><textarea value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder="Answer in your own words…" rows={5} className="mt-5 w-full resize-none rounded-xl border border-slate-700 bg-slate-900 p-4 text-sm outline-none focus:border-amber-400" /><button onClick={submit} className="mt-4 w-full rounded-xl bg-amber-400 px-4 py-3 text-sm font-bold text-slate-950 hover:bg-amber-300">Submit & continue</button></div></div></div>
+}
