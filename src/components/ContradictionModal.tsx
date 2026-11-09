@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect, useRef, type ReactNode } from 'react'
+import { useState, useRef, type ReactNode } from 'react'
 import { X, GitPullRequest, MessageSquare, AlertTriangle, Check } from 'lucide-react'
 import { ContradictionItem } from '@/lib/types'
+import { useFocusTrap } from '@/hooks/useFocusTrap'
 
 export default function ContradictionModal({
   item,
@@ -19,24 +20,15 @@ export default function ContradictionModal({
   isClosing?: boolean
 }) {
   const [note, setNote] = useState('')
+  const containerRef = useRef<HTMLDivElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
 
-  useEffect(() => {
-    if (!item) return
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose()
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    closeButtonRef.current?.focus()
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [item, onClose])
+  useFocusTrap({
+    containerRef,
+    initialFocusRef: closeButtonRef,
+    isActive: Boolean(item),
+    onClose,
+  })
 
   if (!item) return null
 
@@ -44,6 +36,8 @@ export default function ContradictionModal({
 
   return (
     <div
+      ref={containerRef}
+      tabIndex={-1}
       className={`fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4 backdrop-blur-[2px]${isClosing ? ' is-closing' : ''}`}
       onClick={onClose}
       role="dialog"
@@ -74,7 +68,7 @@ export default function ContradictionModal({
           <button
             ref={closeButtonRef}
             onClick={onClose}
-            className="min-hit flex h-11 w-11 items-center justify-center rounded-[6px] border border-[#D4D4D4] bg-white text-[#6B6B6B] hover:border-[#0A0A0A] hover:text-[#0A0A0A]"
+            className="min-hit flex h-11 w-11 items-center justify-center rounded-[6px] border border-[#D4D4D4] bg-white text-[#6B6B6B] hover:border-[#0A0A0A] hover:text-[#0A0A0A] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
             aria-label="Close contradiction modal"
           >
             <X size={18} />
@@ -119,7 +113,7 @@ export default function ContradictionModal({
                 : 'State why this source is canonical, or clarify if both engines are operating in fallback mode...'
             }
             rows={2}
-            className="mt-2 w-full rounded-[6px] border border-[#D4D4D4] bg-white p-3 text-xs text-[#0A0A0A] placeholder-[#767676] outline-none transition focus:border-[#0A0A0A]"
+            className="mt-2 w-full rounded-[6px] border border-[#D4D4D4] bg-white p-3 text-xs text-[#0A0A0A] placeholder-[#767676] outline-none transition focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 focus-visible:border-[var(--accent)]"
           />
 
           {!isAlreadySettled && (
@@ -127,7 +121,7 @@ export default function ContradictionModal({
               <button
                 disabled={!note.trim()}
                 onClick={() => onResolve('accept_source_a', note)}
-                className="btn-primary min-hit text-xs"
+                className="btn-primary min-hit text-xs focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
               >
                 <Check size={14} />
                 <span>Accept Source A (SQS FIFO)</span>
@@ -136,7 +130,7 @@ export default function ContradictionModal({
               <button
                 disabled={!note.trim()}
                 onClick={() => onResolve('accept_source_b', note)}
-                className="btn-primary min-hit text-xs"
+                className="btn-primary min-hit text-xs focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
               >
                 <Check size={14} />
                 <span>Accept Source B (RabbitMQ Fallback)</span>
@@ -145,7 +139,7 @@ export default function ContradictionModal({
               <button
                 disabled={!note.trim()}
                 onClick={() => onResolve('clarification_note', note)}
-                className="btn-secondary min-hit text-xs"
+                className="btn-secondary min-hit text-xs focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
               >
                 <span>Annotate Dual Scope / Temporary Fallback</span>
               </button>

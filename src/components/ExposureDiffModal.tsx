@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
-import { X, Lock, ShieldAlert, Check } from 'lucide-react'
+import { useRef } from 'react'
+import { X } from 'lucide-react'
+import { useFocusTrap } from '@/hooks/useFocusTrap'
 
 export default function ExposureDiffModal({
   details,
@@ -17,21 +18,20 @@ export default function ExposureDiffModal({
   onClose: () => void
   isClosing?: boolean
 }) {
+  const containerRef = useRef<HTMLDivElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose()
-      }
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    closeButtonRef.current?.focus()
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [onClose])
+  useFocusTrap({
+    containerRef,
+    initialFocusRef: closeButtonRef,
+    isActive: true,
+    onClose,
+  })
 
   return (
     <div
+      ref={containerRef}
+      tabIndex={-1}
       className={`fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4 backdrop-blur-[2px]${isClosing ? ' is-closing' : ''}`}
       onClick={onClose}
       role="dialog"
@@ -57,7 +57,7 @@ export default function ExposureDiffModal({
           <button
             ref={closeButtonRef}
             onClick={onClose}
-            className="min-hit flex h-11 w-11 items-center justify-center rounded-[6px] border border-[#D4D4D4] bg-white text-[#6B6B6B] hover:border-[#0A0A0A] hover:text-[#0A0A0A]"
+            className="min-hit flex h-11 w-11 items-center justify-center rounded-[6px] border border-[#D4D4D4] bg-white text-[#6B6B6B] hover:border-[#0A0A0A] hover:text-[#0A0A0A] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
             aria-label="Close exposure diff dialog"
           >
             <X size={18} />
@@ -100,7 +100,7 @@ export default function ExposureDiffModal({
         <div className="mt-6 flex justify-end pt-3 border-t border-[#F0F0F0]">
           <button
             onClick={onClose}
-            className="btn-secondary min-hit text-xs px-5"
+            className="btn-secondary min-hit text-xs px-5 focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
           >
             Close Diff
           </button>

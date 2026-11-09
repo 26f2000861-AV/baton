@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
-import { X, ExternalLink, CheckCircle2, ShieldCheck, Clock, User } from 'lucide-react'
+import { useRef } from 'react'
+import { X, ExternalLink, ShieldCheck, Clock, User } from 'lucide-react'
 import { Claim } from '@/lib/types'
+import { useFocusTrap } from '@/hooks/useFocusTrap'
 
 export default function SourceInspectorDrawer({
   claim,
@@ -13,25 +14,16 @@ export default function SourceInspectorDrawer({
   onClose: () => void
   isClosing?: boolean
 }) {
+  const containerRef = useRef<HTMLDivElement>(null)
   const drawerRef = useRef<HTMLDivElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
 
-  useEffect(() => {
-    if (!claim) return
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose()
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    closeButtonRef.current?.focus()
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [claim, onClose])
+  useFocusTrap({
+    containerRef,
+    initialFocusRef: closeButtonRef,
+    isActive: Boolean(claim),
+    onClose,
+  })
 
   if (!claim) return null
 
@@ -40,6 +32,8 @@ export default function SourceInspectorDrawer({
 
   return (
     <div
+      ref={containerRef}
+      tabIndex={-1}
       className={`drawer-overlay${isClosing ? ' is-closing' : ''}`}
       onClick={onClose}
       role="dialog"
@@ -67,7 +61,7 @@ export default function SourceInspectorDrawer({
             <button
               ref={closeButtonRef}
               onClick={onClose}
-              className="min-hit flex h-11 w-11 items-center justify-center rounded-[6px] border border-[#D4D4D4] bg-white text-[#6B6B6B] hover:border-[#0A0A0A] hover:text-[#0A0A0A]"
+              className="min-hit flex h-11 w-11 items-center justify-center rounded-[6px] border border-[#D4D4D4] bg-white text-[#6B6B6B] hover:border-[#0A0A0A] hover:text-[#0A0A0A] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
               aria-label="Close source inspector drawer"
             >
               <X size={18} />
@@ -132,7 +126,7 @@ export default function SourceInspectorDrawer({
                   href={source.uri}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 font-medium text-[#1D5FBF] hover:underline"
+                  className="inline-flex items-center gap-1.5 font-medium text-[#1D5FBF] hover:underline focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
                 >
                   <span>Open origin record</span>
                   <ExternalLink size={12} />
@@ -145,7 +139,7 @@ export default function SourceInspectorDrawer({
         <div className="mt-6 pt-4 border-t border-[#F0F0F0]">
           <button
             onClick={onClose}
-            className="btn-secondary w-full min-hit"
+            className="btn-secondary w-full min-hit focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
           >
             Close Inspector (Esc)
           </button>

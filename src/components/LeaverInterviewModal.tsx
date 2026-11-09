@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
-import { X, MessageSquareText, Check, ChevronRight } from 'lucide-react'
+import { useState, useRef } from 'react'
+import { X, Check, ChevronRight } from 'lucide-react'
 import { LeaverInterviewQuestion } from '@/lib/types'
+import { useFocusTrap } from '@/hooks/useFocusTrap'
 
 export default function LeaverInterviewModal({
   questions,
@@ -18,18 +19,15 @@ export default function LeaverInterviewModal({
   const pending = questions.filter((q) => q.status === 'pending_answer')
   const [index, setIndex] = useState(0)
   const [answer, setAnswer] = useState('')
+  const containerRef = useRef<HTMLDivElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose()
-      }
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    closeButtonRef.current?.focus()
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [onClose])
+  useFocusTrap({
+    containerRef,
+    initialFocusRef: closeButtonRef,
+    isActive: true,
+    onClose,
+  })
 
   const question = pending[index]
 
@@ -45,6 +43,8 @@ export default function LeaverInterviewModal({
 
   return (
     <div
+      ref={containerRef}
+      tabIndex={-1}
       className={`fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4 backdrop-blur-[2px]${isClosing ? ' is-closing' : ''}`}
       onClick={onClose}
       role="dialog"
@@ -72,7 +72,7 @@ export default function LeaverInterviewModal({
           <button
             ref={closeButtonRef}
             onClick={onClose}
-            className="min-hit flex h-11 w-11 items-center justify-center rounded-[6px] border border-[#D4D4D4] bg-white text-[#6B6B6B] hover:border-[#0A0A0A] hover:text-[#0A0A0A]"
+            className="min-hit flex h-11 w-11 items-center justify-center rounded-[6px] border border-[#D4D4D4] bg-white text-[#6B6B6B] hover:border-[#0A0A0A] hover:text-[#0A0A0A] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
             aria-label="Close interview dialog"
           >
             <X size={18} />
@@ -92,7 +92,7 @@ export default function LeaverInterviewModal({
             </p>
             <button
               onClick={onClose}
-              className="btn-primary min-hit mt-5 px-6 text-xs"
+              className="btn-primary min-hit mt-5 px-6 text-xs focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
             >
               Return to Handover Ledger
             </button>
@@ -125,7 +125,7 @@ export default function LeaverInterviewModal({
                 value={answer}
                 onChange={(e) => setAnswer(e.target.value)}
                 placeholder="State your technical reason, ticket reference, or key handover location..."
-                className="mt-1.5 w-full rounded-[6px] border border-[#D4D4D4] bg-white p-3 text-xs text-[#0A0A0A] placeholder-[#767676] outline-none transition focus:border-[#0A0A0A]"
+                className="mt-1.5 w-full rounded-[6px] border border-[#D4D4D4] bg-white p-3 text-xs text-[#0A0A0A] placeholder-[#767676] outline-none transition focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 focus-visible:border-[var(--accent)]"
               />
             </div>
 
@@ -133,14 +133,14 @@ export default function LeaverInterviewModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="btn-secondary min-hit text-xs"
+                className="btn-secondary min-hit text-xs focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
               >
                 Close
               </button>
               <button
                 type="submit"
                 disabled={!answer.trim()}
-                className="btn-primary min-hit text-xs px-5"
+                className="btn-primary min-hit text-xs px-5 focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
               >
                 <span>Submit attestation</span>
                 <ChevronRight size={14} />

@@ -83,7 +83,7 @@ export default function SuccessorSignoffBar({
                   key={id}
                   onClick={() => onAccept(id)}
                   disabled={isSecAccepted}
-                  className={`min-hit flex items-center gap-1.5 rounded-[6px] border px-3 py-1.5 text-xs font-medium capitalize transition ${
+                  className={`min-hit flex items-center gap-1.5 rounded-[6px] border px-3 py-1.5 text-xs font-medium capitalize transition focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 ${
                     isSecAccepted
                       ? 'border-[#0A0A0A] bg-[#EEEEEE] text-[#0A0A0A]'
                       : 'border-[#D4D4D4] bg-white text-[#6B6B6B] hover:border-[#0A0A0A] hover:text-[#0A0A0A]'
@@ -109,12 +109,12 @@ export default function SuccessorSignoffBar({
               value={queryText}
               onChange={(e) => setQueryText(e.target.value)}
               placeholder="e.g. Need clarification on PostgreSQL connection pool timeout during failover..."
-              className="min-h-[44px] flex-1 rounded-[6px] border border-[#D4D4D4] bg-[#FFFFFF] px-3 py-2 text-xs text-[#0A0A0A] placeholder-[#767676] outline-none transition focus:border-[#0A0A0A]"
+              className="min-h-[44px] flex-1 rounded-[6px] border border-[#D4D4D4] bg-[#FFFFFF] px-3 py-2 text-xs text-[#0A0A0A] placeholder-[#767676] outline-none transition focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 focus-visible:border-[var(--accent)]"
             />
             <button
               type="submit"
               disabled={!queryText.trim()}
-              className="btn-secondary min-hit min-w-[44px]"
+              className="btn-secondary min-hit min-w-[44px] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
               aria-label="Submit query"
             >
               <Send size={14} />
@@ -138,7 +138,7 @@ export default function SuccessorSignoffBar({
           <button
             onClick={handleFinalSignoff}
             disabled={!allAccepted || signoffCompleted || isCommitting}
-            className={`btn-primary min-hit px-6 transition-all duration-200 ${
+            className={`btn-primary min-hit px-6 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 ${
               isCommitting ? 'scale-[0.98] opacity-80' : ''
             } ${
               signoffCompleted ? 'bg-[#EEEEEE] text-[#0A0A0A] border-[#0A0A0A]' : ''
