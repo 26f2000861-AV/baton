@@ -32,6 +32,9 @@ export type InkOrbitHeroProps = {
   sculptureLabel?: string
   /** Under the sculpture. Empty hides it. */
   sculptureHint?: string
+  /** Show corner readouts (heading, label, hint, seed). Defaults to false. */
+  hud?: boolean
+  sculptureHud?: boolean
   /** Minimum height of the hero panel. Must be a definite length. */
   minHeight?: string
   className?: string
@@ -73,6 +76,8 @@ export default function InkOrbitHero({
   onReforge,
   sculptureLabel = "FORGE · 3D",
   sculptureHint = "Drag to rotate · Click to reforge",
+  hud,
+  sculptureHud = false,
   minHeight = "min(620px, 100svh)",
   className = "",
   style,
@@ -199,6 +204,7 @@ export default function InkOrbitHero({
                 onReforge={onReforge}
                 label={sculptureLabel}
                 hint={sculptureHint}
+                hud={hud ?? sculptureHud}
               />
             </div>
           </div>

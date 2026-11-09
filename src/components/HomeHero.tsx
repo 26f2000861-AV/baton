@@ -22,6 +22,7 @@ export default function HomeHero() {
       secondaryCta={null}
       demoSteps={[]}
       proof={null}
+      hud={false}
     />
   )
 }
