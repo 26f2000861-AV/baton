@@ -126,7 +126,7 @@ export default function InkOrbitHero({
 
   return (
     <div className={"ih-root " + className} data-theme={dark ? "dark" : "light"} style={style}>
-      <style>{IH_CSS}</style>
+      <style dangerouslySetInnerHTML={{ __html: IH_CSS }} />
       <div className="ih-shell">
         <section className="ih-sec ih-hero" aria-label="Intro" style={{ minHeight }}>
           <div className="ih-hero-copy">
@@ -942,7 +942,7 @@ function InkOrbitSculpture({
         color: faint,
       }}
     >
-      <style>{IOS_CSS}</style>
+      <style dangerouslySetInnerHTML={{ __html: IOS_CSS }} />
       <canvas
         ref={canvasRef}
         role="img"
