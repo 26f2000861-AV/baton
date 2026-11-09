@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import InkOrbitHero from '@/components/ui/ink-orbit-hero'
 import BatonMark from '@/components/BatonMark'
-import { ArrowRight, ShieldCheck, GitPullRequest, FileText, CheckCircle2 } from 'lucide-react'
+import { ArrowRight, ShieldCheck, GitPullRequest, FileText } from 'lucide-react'
 
 export default function HomeHero() {
   const router = useRouter()
@@ -23,10 +23,6 @@ export default function HomeHero() {
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="hidden items-center gap-2 rounded-full border border-[#262626] bg-[#121212] px-3 py-1 text-xs text-[#8d8d8d] sm:inline-flex">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#22c55e] animate-pulse" />
-              Round 2 Build
-            </span>
             <Link
               href="/workspace"
               className="inline-flex items-center gap-1.5 rounded border border-[#363636] bg-[#efefef] px-3.5 py-1.5 text-xs font-semibold text-[#121212] transition-all hover:bg-white hover:shadow-[0_0_14px_rgba(255,255,255,0.2)]"
@@ -54,11 +50,7 @@ export default function HomeHero() {
           onPrimary={() => router.push('/workspace')}
           secondaryCta="Inspect Routing Conflict"
           onSecondary={() => router.push('/workspace#conflict')}
-          proof={{
-            value: "100%",
-            before: "Deterministic verification on",
-            after: "FinTrack production claims",
-          }}
+          proof={null}
           sculptureLabel="PAYMENT-CORE-V2"
           sculptureHint="Drag to inspect topology"
           hud={true}
@@ -127,21 +119,6 @@ export default function HomeHero() {
           </Link>
         </div>
       </div>
-
-      {/* Footer Strip */}
-      <footer className="border-t border-[#1e1e1e] bg-[#0b0b0b] px-4 py-3 text-xs text-[#8d8d8d] sm:px-6">
-        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-3 font-mono text-[11px]">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 size={12} className="text-[#22c55e]" />
-            <span>SHA-256 Ledger: <code className="text-[#c9c9c9]">f7a9...4b12</code></span>
-            <span className="text-[#363636]">•</span>
-            <span>Alex Chen (Staff Eng) &rarr; Priya Sharma</span>
-          </div>
-          <div className="text-[#5d5d5d]">
-            CodersInPune Hackathon Round 2 Build
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }
