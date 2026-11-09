@@ -20,7 +20,7 @@ export type InkOrbitHeroProps = {
   description?: string
   primaryCta?: string
   onPrimary?: () => void
-  secondaryCta?: string
+  secondaryCta?: string | null
   /** Called when the secondary button is pressed (the demo dialog still opens unless `demoSteps` is empty). */
   onSecondary?: () => void
   /** The steps the demo dialog plays through. `[]` = no dialog. */
