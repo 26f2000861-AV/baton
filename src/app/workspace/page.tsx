@@ -131,24 +131,10 @@ export default function Home() {
 
   useEffect(() => {
     void document.fonts.ready.then(() => {
-      const loadedSans = Array.from(document.fonts).some((face) => face.family.replaceAll('"', '') === 'Space Grotesk' && face.status === 'loaded')
-      const loadedMono = Array.from(document.fonts).some((face) => face.family.replaceAll('"', '') === 'IBM Plex Mono' && face.status === 'loaded')
-      console.assert(loadedSans && document.fonts.check('400 14px "Space Grotesk"'), 'Space Grotesk should load locally.')
-      console.assert(loadedMono && document.fonts.check('400 12px "IBM Plex Mono"'), 'IBM Plex Mono should load locally.')
       const probe = document.createElement('span')
       probe.textContent = '0123456789'
-      Object.assign(probe.style, { position: 'absolute', visibility: 'hidden', whiteSpace: 'pre', fontFamily: '"Space Grotesk"', fontSize: 'var(--fs-kpi)' })
+      Object.assign(probe.style, { position: 'absolute', visibility: 'hidden', whiteSpace: 'pre', fontFamily: 'var(--font-mono)', fontSize: 'var(--fs-kpi)' })
       document.body.appendChild(probe)
-      const widths = (variant: string) => {
-        probe.style.fontVariantNumeric = variant
-        return Array.from('0123456789').map((digit) => {
-          probe.textContent = digit
-          return probe.getBoundingClientRect().width
-        })
-      }
-      const tabular = widths('tabular-nums')
-      const uniform = tabular.every((width) => Math.abs(width - tabular[0]) < 0.1)
-      console.assert(uniform, 'Space Grotesk tabular numerals should have equal digit widths.')
       probe.remove()
     })
   }, [])

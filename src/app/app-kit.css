@@ -1,85 +1,55 @@
 /* tasteskill v2.5 app.css (MIT License, Copyright (c) 2026 Leonxlnx): https://github.com/Leonxlnx/taste-skill. Keep this line in every copy. */
-/* Achromatic Ledger Theme for Baton Engineering Handover */
+/* Achromatic Ink Ledger Theme for Baton Engineering Handover - Unified with Landing Page */
 
-@font-face {
-  font-family: 'Space Grotesk';
-  src: url('/fonts/SpaceGrotesk-wght.woff2') format('woff2');
-  font-weight: 300 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'IBM Plex Sans';
-  src: url('/fonts/IBMPlexSans[wdth,wght].ttf') format('truetype');
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'IBM Plex Mono';
-  src: url('/fonts/IBMPlexMono-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'IBM Plex Mono';
-  src: url('/fonts/IBMPlexMono-Medium.ttf') format('truetype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Baton dark ledger */
-  --ground: #070B11;
-  --ground-gradient: radial-gradient(ellipse at 50% -18%, #173441 0%, #101d29 38%, #0a111a 72%, #070b11 100%);
-  --surface: #0c141e;
-  --raised: #111e2a;
-  --active: #1a2a36;
-  --border: #253543;
-  --border-strong: #3a5263;
-  --rule: #1c2a36;
-  --control: #415b6d;
-  --text: #edf4f7;
-  --muted: #a5b5c0;
-  --faint: #8195a3;
-  --accent: #65c5d0;
-  --positive: #75d5a5;
-  --negative: #ff8c96;
-  --warning: #f0c983;
-  --primary: #1d6673;
-  --primary-ink: #f2fcfd;
+  /* Baton dark ledger - unified with Landing Page achromatic ink theme */
+  --ground: #0b0b0b;
+  --ground-gradient: #0b0b0b;
+  --surface: #121212;
+  --raised: #181818;
+  --active: #1e1e1e;
+  --border: #262626;
+  --border-strong: #363636;
+  --rule: #1e1e1e;
+  --control: #363636;
+  --text: #eeeeee;
+  --muted: #8d8d8d;
+  --faint: #5d5d5d;
+  --accent: #efefef;
+  --positive: #22c55e;
+  --negative: #ef4444;
+  --warning: #f59e0b;
+  --primary: #efefef;
+  --primary-ink: #121212;
   --background: var(--ground);
   --foreground: var(--text);
-  --secondary: var(--active);
+  --secondary: var(--raised);
   --secondary-foreground: var(--text);
   --muted-surface: var(--raised);
-  --destructive-foreground: #2c1015;
+  --destructive-foreground: #ef4444;
 
   /* Quiet status labels with readable text */
-  --pill-positive-bg: #17352b;
-  --pill-positive-ink: #a7ecc6;
-  --pill-negative-bg: #3b2028;
-  --pill-negative-ink: #ffc1c6;
-  --pill-warning-bg: #392f1c;
-  --pill-warning-ink: #f3d596;
-  --pill-neutral-bg: #1a2a36;
-  --pill-neutral-ink: #d2e0e7;
+  --pill-positive-bg: #14281c;
+  --pill-positive-ink: #4ade80;
+  --pill-negative-bg: #2d1619;
+  --pill-negative-ink: #f87171;
+  --pill-warning-bg: #2c2010;
+  --pill-warning-ink: #fbbf24;
+  --pill-neutral-bg: #1e1e1e;
+  --pill-neutral-ink: #d4d4d4;
 
-  --chart-1: #65c5d0;
-  --chart-2: #8ba2b1;
-  --chart-3: #d4b26e;
-  --chart-muted: #425565;
+  --chart-1: #eeeeee;
+  --chart-2: #8d8d8d;
+  --chart-3: #c9c9c9;
+  --chart-muted: #363636;
   --grid: var(--rule);
   --axis-ink: var(--muted);
   --ink: var(--text);
 
-  --font: "Space Grotesk", system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", monospace;
+  --font: "Manrope", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
   --fs-title: 22px;
   --fs-section: 16px;
@@ -91,10 +61,10 @@
   --pad: 24px;
   --gap: 24px;
   --card-pad: 24px;
-  --radius-card: 8px;
-  --radius-control: 6px;
+  --radius-card: 4px;
+  --radius-control: 4px;
   --radius-pill: 999px;
-  --radius-sheet: 16px;
+  --radius-sheet: 4px;
   --sheet-inset: 8px;
   --control-height: 32px;
   --row-height: 48px;
@@ -292,7 +262,8 @@ a {
   transition: background-color var(--t-hover) ease, transform var(--t-press) var(--ease-out);
 }
 .btn-primary:hover:not(:disabled) {
-  background: #2a2a2a;
+  background: #ffffff;
+  color: var(--primary-ink);
 }
 .btn-primary:active:not(:disabled) {
   transform: translateY(1px);
