@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import InkOrbitHero from '@/components/ui/ink-orbit-hero'
 import BatonMark from '@/components/BatonMark'
-import { ArrowRight, ShieldCheck, GitPullRequest, FileText } from 'lucide-react'
+import { ShieldCheck, GitPullRequest, FileText } from 'lucide-react'
 
 export default function HomeHero() {
   const router = useRouter()
@@ -20,16 +20,6 @@ export default function HomeHero() {
               <span className="font-semibold tracking-tight text-[#eeeeee]">Baton</span>
               <span className="text-[11px] font-mono text-[#8d8d8d]">Payment Core Handover Ledger</span>
             </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href="/workspace"
-              className="inline-flex items-center gap-1.5 rounded border border-[#363636] bg-[#efefef] px-3.5 py-1.5 text-xs font-semibold text-[#121212] transition-all hover:bg-white hover:shadow-[0_0_14px_rgba(255,255,255,0.2)]"
-            >
-              Enter Workspace
-              <ArrowRight size={13} />
-            </Link>
           </div>
         </div>
       </header>
