@@ -57,10 +57,13 @@ baton/
 ├── src/
 │   ├── app/
 │   │   ├── layout.tsx                # Root layout with Tailwind CSS & typography
-│   │   ├── page.tsx                  # Main Handover Dashboard (The 4 Pillars)
-│   │   └── api/verify/route.ts       # Substring exact-match & Gemini entailment
+│   │   ├── page.tsx                  # Landing page & interactive ink ledger hero
+│   │   ├── workspace/
+│   │   │   ├── layout.tsx            # Workspace layout wrapper
+│   │   │   └── page.tsx              # Main Handover Dashboard (The 4 Pillars & Persona Switcher)
+│   │   └── api/verify/route.ts       # Substring exact-match & Gemini entailment API
 │   ├── components/
-│   │   ├── Header.tsx                # Persona switcher, case info, demo reset
+│   │   ├── HomeHero.tsx              # Landing page hero component
 │   │   ├── PillarDecisions.tsx       # Decisions Already Taken timeline
 │   │   ├── PillarUnfinished.tsx      # First 30 Days triage roadmap
 │   │   ├── PillarOwnership.tsx       # Ownership matrix & "Who to Ask" cards
@@ -79,7 +82,7 @@ baton/
 │   └── data/
 │       ├── rawSources.ts             # Raw synthetic GitHub PRs, Slack threads, Linear tickets
 │       └── seedCase.ts               # FinTrack Payment Core pre-seeded claim ledger
-└── docs/                             # Functional specifications & submission draft
+└── docs/                             # Functional specifications & submission deliverables
 ```
 
 ---

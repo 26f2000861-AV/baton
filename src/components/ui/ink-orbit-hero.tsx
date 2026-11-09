@@ -1,56 +1,40 @@
 "use client"
 
-// The hero from ink-orbit-saas-template, standalone: a hatched page, a banded
-// headline whose serif line cycles through phrases with a blur, a lede, a
-// primary and a bracketed "watch demo" button that opens a live workflow-run
-// dialog, a row of drawn faces, and — beside it — the generative 3D ink
-// sculpture you can drag, tilt and click to reforge.
-
 import React from "react"
 import { ArrowRight, Check, Play, X } from "lucide-react"
 
 export type InkDemoStep = { label: string; detail: string }
 
 export type InkOrbitHeroProps = {
-  /** `auto` follows prefers-color-scheme. */
   theme?: "light" | "dark" | "auto"
   titleTop?: string
-  /** The serif line. Several entries cycle. */
   titleAccent?: string[]
   description?: string
   primaryCta?: string
   onPrimary?: () => void
   secondaryCta?: string | null
-  /** Called when the secondary button is pressed (the demo dialog still opens unless `demoSteps` is empty). */
   onSecondary?: () => void
-  /** The steps the demo dialog plays through. `[]` = no dialog. */
   demoSteps?: InkDemoStep[]
-  /** "Loved by <value> teams". `null` hides the row. */
   proof?: { before: string; value: string; after: string; avatars?: string[] } | null
   sculptureSeed?: number
   onReforge?: (seed: number) => void
   sculptureLabel?: string
-  /** Under the sculpture. Empty hides it. */
   sculptureHint?: string
-  /** Show corner readouts (heading, label, hint, seed). Defaults to false. */
   hud?: boolean
   sculptureHud?: boolean
-  /** Minimum height of the hero panel. Must be a definite length. */
   minHeight?: string
   className?: string
   style?: React.CSSProperties
 }
 
-/* --------------------------------------------------------------- defaults */
-
-const D_ACCENTS = ["Intelligent Automation", "Adaptive Workflows", "Autonomous Agents"]
-const D_STEPS: InkDemoStep[] = [
-  { label: "Ingest", detail: "Pulling 2,184 rows from Sheets, CRM and support inbox" },
-  { label: "Classify", detail: "Tagging intents and routing to the right owners" },
-  { label: "Predict", detail: "Forecasting next-week churn risk across 312 accounts" },
-  { label: "Report", detail: "Drafting the weekly ops report with charts and highlights" },
-  { label: "Notify", detail: "Posting the summary to #ops and emailing 6 stakeholders" },
+const DEFAULT_ACCENTS = [
+  "Source-Backed Claims",
+  "Deterministic Proofs",
+  "Contradiction Resolvers",
+  "Successor Sign-Offs",
 ]
+
+const DEFAULT_STEPS: InkDemoStep[] = []
 
 const DEFAULT_AVATARS = [
   "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=64&h=64&q=80",
@@ -59,24 +43,22 @@ const DEFAULT_AVATARS = [
   "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=64&h=64&q=80",
 ]
 
-/* -------------------------------------------------------------- component */
-
 export default function InkOrbitHero({
   theme = "auto",
-  titleTop = "Build Faster With",
-  titleAccent = D_ACCENTS,
-  description = "NeuraForge AI helps you automate workflows, generate insights, and scale your productivity with next-generation machine intelligence.",
-  primaryCta = "Start Free Trial",
+  titleTop = "Accountable Handover With",
+  titleAccent = DEFAULT_ACCENTS,
+  description = "Baton turns high-stakes engineering handovers into cryptographic, source-backed claim ledgers with zero unverified tribal knowledge.",
+  primaryCta = "Enter Handover Workspace",
   onPrimary,
-  secondaryCta = "Watch Demo",
+  secondaryCta = null,
   onSecondary,
-  demoSteps = D_STEPS,
-  proof = { before: "Loved by", value: "12,400+", after: "teams" },
+  demoSteps = DEFAULT_STEPS,
+  proof = null,
   sculptureSeed = 7,
   onReforge,
-  sculptureLabel = "FORGE · 3D",
-  sculptureHint = "Drag to rotate · Click to reforge",
-  hud,
+  sculptureLabel = "",
+  sculptureHint = "",
+  hud = false,
   sculptureHud = false,
   minHeight = "min(620px, 100svh)",
   className = "",
@@ -215,8 +197,6 @@ export default function InkOrbitHero({
   )
 }
 
-/* ---------------------------------------------------------------- pieces */
-
 function Brackets() {
   return (
     <>
@@ -309,11 +289,6 @@ function DemoDialog({ steps, onClose, reduced }: { steps: InkDemoStep[]; onClose
   )
 }
 
-/* ------------------------------------------------------------- sculpture */
-
-/* ------------------------------------------------------------------ logic */
-
-// #region logic
 function clamp(v: number, a: number, b: number): number {
   return Math.min(b, Math.max(a, v))
 }
@@ -353,21 +328,20 @@ function rgba(a: string, b: string, t: number, alpha: number): string {
   return mixHex(a, b, t).replace("rgb(", "rgba(").replace(")", "," + alpha + ")")
 }
 
-// the next seed after a reforge: a Lehmer step, kept to five digits for the HUD
+// Lehmer step for pseudo-random state progression
 function nextSeed(seed: number): number {
   const s = Math.abs(Math.floor(seed)) || 1
   const n = ((s * 48271 + 11) % 2147483647) % 100000
   return n === s ? (n + 7919) % 100000 : n
 }
 
-// yaw in radians → a compass heading 0–359 for the HUD
+// Yaw angle converted to 0–359 degrees
 function headingOf(yaw: number): number {
   const d = Math.round((yaw * 180) / Math.PI) % 360
   return (d + 360) % 360
 }
 
-/* ink loops + bridges, sampled to a fixed-size point cloud so any two seeds
-   with the same counts can morph grain-for-grain */
+// Point cloud geometry generation for continuous particle interpolation
 type Cloud = { core: Float32Array; grain: Float32Array; spikes: Float32Array }
 const CORE_N = 2800
 const GRAIN_N = 16000
@@ -499,9 +473,6 @@ function project(x: number, y: number, z: number, yaw: number, pitch: number, f:
   const s = f / (f - z2)
   return [x1 * s, y2 * s, z2, s]
 }
-// #endregion logic
-
-/* -------------------------------------------------------------- component */
 
 type InkOrbitSculptureProps = {
   /** Must be a definite length — the canvas fills this box. */
