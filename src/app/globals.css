@@ -25,7 +25,8 @@ button:disabled { cursor: not-allowed; }
 
 .framed-app { display: grid; grid-template-columns: var(--sidebar-width) minmax(0, 1fr); min-height: 100vh; background: transparent; }
 .sidebar { position: sticky; top: 0; display: flex; flex-direction: column; width: var(--sidebar-width); height: 100vh; padding: var(--pad) 16px; background: transparent; }
-.brand-lockup { display: flex; min-height: 48px; align-items: center; gap: 12px; color: var(--text); }
+.brand-lockup { display: flex; min-height: 48px; align-items: center; gap: 12px; color: var(--text); transition: opacity var(--t-hover) var(--ease-out); cursor: pointer; }
+.brand-lockup:hover { opacity: 0.85; }
 .brand-mark { display: grid; width: 34px; height: 34px; flex: none; place-items: center; border: 1px solid var(--border-strong); border-radius: var(--radius-control); background: var(--surface); color: var(--text); }
 .brand-mark svg { width: 26px; height: 26px; flex: none; }
 .brand-mark.compact { width: 28px; height: 28px; }
@@ -284,7 +285,8 @@ h1 { color: var(--text); font-size: var(--fs-title); font-weight: 600; line-heig
   .sidebar { display: none; }
   .workspace { padding-left: var(--sheet-inset); }
   .topbar { grid-template-columns: auto minmax(0, 1fr) minmax(180px, 1fr) max-content 44px; }
-  .topbar-title { display: flex; min-width: 0; align-items: center; gap: 8px; color: var(--text); font-size: var(--fs-body); font-weight: 500; }
+  .topbar-title { display: flex; min-width: 0; align-items: center; gap: 8px; color: var(--text); font-size: var(--fs-body); font-weight: 500; cursor: pointer; transition: opacity var(--t-hover) var(--ease-out); }
+  .topbar-title:hover { opacity: 0.85; }
   .topbar-brand-copy { display: grid; min-width: 0; gap: 1px; }
   .topbar-brand-copy > span { font-weight: 600; }
   .topbar-brand-copy small { overflow: hidden; color: var(--muted); font-size: var(--fs-small); font-weight: 400; text-overflow: ellipsis; white-space: nowrap; }

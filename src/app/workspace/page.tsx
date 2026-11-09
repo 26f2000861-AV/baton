@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
+import Link from 'next/link'
 import {
   AlertTriangle, ArrowDownUp, CheckSquare, ChevronDown, CircleHelp,
   FileText, GitCommit, GitPullRequest, LayoutDashboard, Menu, MessageSquare,
@@ -250,10 +251,10 @@ export default function Home() {
   return (
     <div className="framed-app">
       <aside className="sidebar" aria-label="Baton workspace">
-        <a className="brand-lockup" href="#/" onClick={(event) => { event.preventDefault(); navigate('overview') }}>
+        <Link className="brand-lockup" href="/" title="Return to landing page" aria-label="Baton - Return to landing page">
           <BatonMark />
           <span><strong>Baton</strong><small>FinTrack / Payment Core</small></span>
-        </a>
+        </Link>
         <p className="nav-caption">Handover</p>
         <nav className="side-nav" aria-label="Handover views">
           {routes.map(({ id, label, hash, icon: Icon }) => (
@@ -273,12 +274,12 @@ export default function Home() {
       <div className="workspace">
         <header className="topbar">
           <button className="mobile-menu-button" aria-label={menuOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={menuOpen} aria-controls="mobile-navigation" onClick={() => { if (!menuOpen) rememberFocus(); setMenuOpen((open) => !open) }}>{menuOpen ? <X size={19} /> : <Menu size={19} />}</button>
-          <div className="topbar-title"><BatonMark compact /><div className="topbar-brand-copy"><span>Baton</span><small>{title}</small></div></div>
+          <Link href="/" className="topbar-title" title="Return to landing page" aria-label="Baton - Return to landing page"><BatonMark compact /><div className="topbar-brand-copy"><span>Baton</span><small>{title}</small></div></Link>
           <label className="global-search"><Search size={15} /><input ref={searchInputRef} value={search} onFocus={() => { if (route !== 'claims') navigate('claims') }} onChange={(event) => setSearch(event.target.value)} placeholder="Search claims and sources" aria-label="Search claims and sources" /><kbd>Ctrl K</kbd></label>
           <label className="persona-control"><span className="sr-only">Reviewer</span><select value={activePersona.role} onChange={(event) => handlePersonaChange(event.target.value as 'successor' | 'leaver' | 'lead')} aria-label="Select reviewer"><option value="successor">Priya Sharma · Successor</option><option value="leaver">Alex Chen · Leaver</option><option value="lead">Vikram Malhotra · Lead</option></select><ChevronDown size={14} /></label>
           <button className="icon-action" aria-label="Help and workflow guide" title="Help" onClick={() => navigate('signoff')}><CircleHelp size={17} /></button>
         </header>
-        {menuOpen && <div id="mobile-navigation" className="mobile-menu" role="dialog" aria-modal="true" aria-label="Baton navigation"><p className="nav-caption">FinTrack / Payment Core</p>{routes.map(({ id, label, hash, icon: Icon }) => <a key={id} href={hash} aria-current={route === id ? 'page' : undefined} className={route === id ? 'selected' : undefined} onClick={(event) => { event.preventDefault(); navigate(id) }}><Icon size={17} />{label}</a>)}<button onClick={() => navigate('interview')}><MessageSquare size={17} />Leaver interview</button><button onClick={() => navigate('exposure')}><ShieldAlert size={17} />Exposure diff</button></div>}
+        {menuOpen && <div id="mobile-navigation" className="mobile-menu" role="dialog" aria-modal="true" aria-label="Baton navigation"><Link href="/" className="nav-caption flex items-center gap-2 hover:text-[#eeeeee]" onClick={() => setMenuOpen(false)}><strong>Baton</strong> / FinTrack</Link>{routes.map(({ id, label, hash, icon: Icon }) => <a key={id} href={hash} aria-current={route === id ? 'page' : undefined} className={route === id ? 'selected' : undefined} onClick={(event) => { event.preventDefault(); navigate(id) }}><Icon size={17} />{label}</a>)}<button onClick={() => navigate('interview')}><MessageSquare size={17} />Leaver interview</button><button onClick={() => navigate('exposure')}><ShieldAlert size={17} />Exposure diff</button></div>}
         <main className={`sheet${clearancePulse ? ' clearance-pulse' : ''}`}>
           <div className="sheet-content">
             <div className="page-heading">
