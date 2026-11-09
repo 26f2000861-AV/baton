@@ -123,7 +123,7 @@ export default function PillarOwnership({
                 </div>
 
                 {asset.credentialsAndAccess.adminAccessRequiresTransfer && (
-                  <div className="mt-3 rounded-[6px] border-l-2 border-[#0A0A0A] bg-[#F2F4F7] p-3 text-xs text-[#0A0A0A]">
+                  <div className="mt-3 rounded-[6px] border border-[#363636] bg-[#181818] p-3 text-xs text-[#eeeeee]">
                     <div className="flex items-center gap-2 font-semibold">
                       <KeyRound size={14} className="text-[#0A0A0A]" />
                       <span>Admin access transfer deadline: {asset.credentialsAndAccess.transferDeadlineDate}</span>

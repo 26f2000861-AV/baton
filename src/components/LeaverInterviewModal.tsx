@@ -110,7 +110,7 @@ export default function LeaverInterviewModal({
               <p className="text-sm font-semibold text-[#0A0A0A]">
                 {question.promptText}
               </p>
-              <div className="mt-2.5 rounded-[4px] border-l-2 border-[#0A0A0A] bg-white p-2.5 font-mono text-[11px] text-[#0A0A0A]">
+              <div className="mt-2.5 rounded-[4px] border border-[#363636] bg-[#181818] p-2.5 font-mono text-[11px] text-[#eeeeee]">
                 Grounding: &ldquo;{question.groundingContext.snippetText}&rdquo;
               </div>
             </div>

@@ -17,6 +17,7 @@ export default function SuccessorSignoffBar({
 }) {
   const [queryText, setQueryText] = useState('')
   const [signoffCompleted, setSignoffCompleted] = useState(false)
+  const [isCommitting, setIsCommitting] = useState(false)
 
   const acceptedCount = Object.values(states).filter((s) => s.isAccepted).length
   const allAccepted = acceptedCount === 4
@@ -30,8 +31,16 @@ export default function SuccessorSignoffBar({
   }
 
   const handleFinalSignoff = () => {
-    if (allAccepted) {
-      setSignoffCompleted(true)
+    if (allAccepted && !isCommitting && !signoffCompleted) {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        setSignoffCompleted(true)
+        return
+      }
+      setIsCommitting(true)
+      window.setTimeout(() => {
+        setIsCommitting(false)
+        setSignoffCompleted(true)
+      }, 260)
     }
   }
 
@@ -128,15 +137,19 @@ export default function SuccessorSignoffBar({
           </div>
           <button
             onClick={handleFinalSignoff}
-            disabled={!allAccepted || signoffCompleted}
-            className={`btn-primary min-hit px-6 ${
+            disabled={!allAccepted || signoffCompleted || isCommitting}
+            className={`btn-primary min-hit px-6 transition-all duration-200 ${
+              isCommitting ? 'scale-[0.98] opacity-80' : ''
+            } ${
               signoffCompleted ? 'bg-[#EEEEEE] text-[#0A0A0A] border-[#0A0A0A]' : ''
             }`}
             aria-label="Issue final handover sign-off certificate"
           >
             <Check size={16} />
             <span>
-              {signoffCompleted
+              {isCommitting
+                ? 'Stamping Certificate...'
+                : signoffCompleted
                 ? 'Handover Accepted & Signed'
                 : 'Accept Handover & Commit Certificate'}
             </span>
@@ -144,9 +157,10 @@ export default function SuccessorSignoffBar({
         </div>
 
         {signoffCompleted && (
-          <div className="mt-4 rounded-[6px] border border-[#0A0A0A] bg-[#EEEEEE] p-4 text-xs text-[#0A0A0A]">
-            <p className="font-semibold">
-              ✓ Baton Handover Certificate Issued — Reference: BTC-2026-11-FINTRACK
+          <div className="certificate-seal mt-4 rounded-[6px] border border-[#0A0A0A] bg-[#EEEEEE] p-4 text-xs text-[#0A0A0A]">
+            <p className="font-semibold flex items-center gap-2">
+              <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-[#0A0A0A] text-[#EEEEEE] text-[10px]">✓</span>
+              <span>Baton Handover Certificate Issued — Reference: BTC-2026-11-FINTRACK</span>
             </p>
             <p className="mt-1 text-[#6B6B6B]">
               Successor Priya Sharma has assumed primary operational custody of Payment Core. Departing engineer Alex Chen access revocation scheduled for Nov 11, 2026.

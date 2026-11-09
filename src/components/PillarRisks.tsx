@@ -54,7 +54,7 @@ export default function PillarRisks({
           return (
             <article
               key={c.id}
-              className="ledger-panel border-l-4 border-l-[#0A0A0A] transition hover:border-[#0A0A0A]"
+              className="ledger-panel border border-[#363636] transition hover:border-[#eeeeee]"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
@@ -98,7 +98,7 @@ export default function PillarRisks({
                   <p className="mt-1.5 font-medium text-[#0A0A0A]">
                     {c.sourceA.extractedValue}
                   </p>
-                  <blockquote className="mt-2 border-l-2 border-[#D4D4D4] pl-2 font-mono text-[11px] text-[#6B6B6B]">
+                  <blockquote className="mt-2 rounded-[4px] border border-[#262626] bg-[#181818] p-2 font-mono text-[11px] text-[#8d8d8d]">
                     &ldquo;{c.sourceA.exactQuote}&rdquo;
                   </blockquote>
                 </div>
@@ -111,7 +111,7 @@ export default function PillarRisks({
                   <p className="mt-1.5 font-medium text-[#0A0A0A]">
                     {c.sourceB.extractedValue}
                   </p>
-                  <blockquote className="mt-2 border-l-2 border-[#D4D4D4] pl-2 font-mono text-[11px] text-[#6B6B6B]">
+                  <blockquote className="mt-2 rounded-[4px] border border-[#262626] bg-[#181818] p-2 font-mono text-[11px] text-[#8d8d8d]">
                     &ldquo;{c.sourceB.exactQuote}&rdquo;
                   </blockquote>
                 </div>

@@ -68,7 +68,7 @@ export default function PillarDecisions({
                   {d.context}
                 </p>
 
-                <div className="mt-4 rounded-[6px] border-l-2 border-[#0A0A0A] bg-[#F2F4F7] p-3 text-xs text-[#0A0A0A]">
+                <div className="mt-4 rounded-[6px] border border-[#363636] bg-[#181818] p-3 text-xs text-[#eeeeee]">
                   <span className="block text-[11px] font-semibold text-[#6B6B6B]">Decision taken</span>
                   <p className="mt-0.5 font-medium">{d.decisionTaken}</p>
                 </div>

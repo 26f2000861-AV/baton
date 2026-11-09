@@ -15,6 +15,7 @@ import BatonMark from '../../components/BatonMark'
 import ContradictionModal from '../../components/ContradictionModal'
 import LeaverInterviewModal from '../../components/LeaverInterviewModal'
 import ExposureDiffModal from '../../components/ExposureDiffModal'
+import SourceInspectorDrawer from '../../components/SourceInspectorDrawer'
 import { useHandover } from '../../lib/store'
 
 const routes = [
@@ -48,6 +49,8 @@ export default function Home() {
   const [claimsUpdating, setClaimsUpdating] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const [selectedClaimId, setSelectedClaimId] = useState('claim_09')
+  const [drawerClaimId, setDrawerClaimId] = useState<string | null>(null)
+  const [clearancePulse, setClearancePulse] = useState(false)
   const [selectedConflictId, setSelectedConflictId] = useState<string | null>(null)
   const [interviewOpen, setInterviewOpen] = useState(false)
   const [exposureOpen, setExposureOpen] = useState(false)
@@ -142,12 +145,13 @@ export default function Home() {
   const rememberFocus = () => {
     returnFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
   }
-  const closeDialog = (kind: 'interview' | 'exposure' | 'conflict') => {
+  const closeDialog = (kind: 'interview' | 'exposure' | 'conflict' | 'drawer') => {
     if (dialogCloseTimerRef.current !== null) return
     const finishClose = () => {
       if (kind === 'interview') setInterviewOpen(false)
       if (kind === 'exposure') setExposureOpen(false)
       if (kind === 'conflict') setSelectedConflictId(null)
+      if (kind === 'drawer') setDrawerClaimId(null)
       setClosingDialog('')
       dialogCloseTimerRef.current = null
       returnFocusRef.current?.focus()
@@ -179,6 +183,7 @@ export default function Home() {
   }
   const closeInterview = () => closeDialog('interview')
   const closeExposure = () => closeDialog('exposure')
+  const closeDrawer = () => closeDialog('drawer')
   const openConflict = (id: string) => {
     rememberFocus()
     setSelectedConflictId(id)
@@ -188,10 +193,20 @@ export default function Home() {
   }
 
   const openSource = (id: string) => {
+    rememberFocus()
     setSelectedClaimId(id)
-    navigate('source')
+    setDrawerClaimId(id)
+  }
+
+  const handlePersonaChange = (role: 'successor' | 'leaver' | 'lead') => {
+    setActivePersonaRole(role)
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setClearancePulse(true)
+      window.setTimeout(() => setClearancePulse(false), 360)
+    }
   }
   const activeClaim = claims.find((claim) => claim.id === selectedClaimId) ?? claims[0]
+  const drawerClaim = claims.find((claim) => claim.id === drawerClaimId)
   const activeConflict = contradictions.find((item) => item.id === selectedConflictId)
   const pendingQuestions = questions.filter((item) => item.status === 'pending_answer')
   const openConflictCount = contradictions.filter((item) => item.status === 'open_unresolved').length
@@ -260,11 +275,11 @@ export default function Home() {
           <button className="mobile-menu-button" aria-label={menuOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={menuOpen} aria-controls="mobile-navigation" onClick={() => { if (!menuOpen) rememberFocus(); setMenuOpen((open) => !open) }}>{menuOpen ? <X size={19} /> : <Menu size={19} />}</button>
           <div className="topbar-title"><BatonMark compact /><div className="topbar-brand-copy"><span>Baton</span><small>{title}</small></div></div>
           <label className="global-search"><Search size={15} /><input ref={searchInputRef} value={search} onFocus={() => { if (route !== 'claims') navigate('claims') }} onChange={(event) => setSearch(event.target.value)} placeholder="Search claims and sources" aria-label="Search claims and sources" /><kbd>Ctrl K</kbd></label>
-          <label className="persona-control"><span className="sr-only">Reviewer</span><select value={activePersona.role} onChange={(event) => setActivePersonaRole(event.target.value as 'successor' | 'leaver' | 'lead')} aria-label="Select reviewer"><option value="successor">Priya Sharma · Successor</option><option value="leaver">Alex Chen · Leaver</option><option value="lead">Vikram Malhotra · Lead</option></select><ChevronDown size={14} /></label>
+          <label className="persona-control"><span className="sr-only">Reviewer</span><select value={activePersona.role} onChange={(event) => handlePersonaChange(event.target.value as 'successor' | 'leaver' | 'lead')} aria-label="Select reviewer"><option value="successor">Priya Sharma · Successor</option><option value="leaver">Alex Chen · Leaver</option><option value="lead">Vikram Malhotra · Lead</option></select><ChevronDown size={14} /></label>
           <button className="icon-action" aria-label="Help and workflow guide" title="Help" onClick={() => navigate('signoff')}><CircleHelp size={17} /></button>
         </header>
         {menuOpen && <div id="mobile-navigation" className="mobile-menu" role="dialog" aria-modal="true" aria-label="Baton navigation"><p className="nav-caption">FinTrack / Payment Core</p>{routes.map(({ id, label, hash, icon: Icon }) => <a key={id} href={hash} aria-current={route === id ? 'page' : undefined} className={route === id ? 'selected' : undefined} onClick={(event) => { event.preventDefault(); navigate(id) }}><Icon size={17} />{label}</a>)}<button onClick={() => navigate('interview')}><MessageSquare size={17} />Leaver interview</button><button onClick={() => navigate('exposure')}><ShieldAlert size={17} />Exposure diff</button></div>}
-        <main className="sheet">
+        <main className={`sheet${clearancePulse ? ' clearance-pulse' : ''}`}>
           <div className="sheet-content">
             <div className="page-heading">
               <div><p className="breadcrumb">FinTrack <span>/</span> Payment Core</p><h1>{title}</h1></div>
@@ -334,6 +349,7 @@ export default function Home() {
       {activeConflict && <ContradictionModal item={activeConflict} onResolve={(type, note) => { resolveContradiction(activeConflict.id, type, note); closeConflict() }} onClose={closeConflict} isClosing={closingDialog === 'conflict'} />}
       {interviewOpen && <LeaverInterviewModal questions={questions} onAnswer={answerInterviewQuestion} onClose={closeInterview} isClosing={closingDialog === 'interview'} />}
       {exposureOpen && <ExposureDiffModal details={withheldDetails} onClose={closeExposure} isClosing={closingDialog === 'exposure'} />}
+      {drawerClaim && <SourceInspectorDrawer claim={drawerClaim} onClose={closeDrawer} isClosing={closingDialog === 'drawer'} />}
     </div>
   )
 }

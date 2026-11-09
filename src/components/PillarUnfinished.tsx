@@ -102,7 +102,7 @@ export default function PillarUnfinished({
                         </p>
 
                         {item.associatedBlockers.length > 0 && (
-                          <div className="mt-3 rounded-[4px] border-l-2 border-[#0A0A0A] bg-white p-2.5 text-xs text-[#0A0A0A]">
+                          <div className="mt-3 rounded-[4px] border border-[#363636] bg-[#181818] p-2.5 text-xs text-[#eeeeee]">
                             <span className="flex items-center gap-1 font-semibold text-[#0A0A0A]">
                               <AlertCircle size={13} className="text-[#6B6B6B]" />
                               Known blocker

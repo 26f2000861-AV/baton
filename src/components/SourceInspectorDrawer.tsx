@@ -7,9 +7,11 @@ import { Claim } from '@/lib/types'
 export default function SourceInspectorDrawer({
   claim,
   onClose,
+  isClosing = false,
 }: {
   claim?: Claim
   onClose: () => void
+  isClosing?: boolean
 }) {
   const drawerRef = useRef<HTMLDivElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
@@ -38,7 +40,7 @@ export default function SourceInspectorDrawer({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-[2px]"
+      className={`drawer-overlay${isClosing ? ' is-closing' : ''}`}
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -47,7 +49,7 @@ export default function SourceInspectorDrawer({
       <aside
         ref={drawerRef}
         onClick={(e) => e.stopPropagation()}
-        className="h-full w-full max-w-xl overflow-y-auto border-l border-[#E6E6E6] bg-[#FFFFFF] p-6 shadow-2xl flex flex-col justify-between"
+        className="drawer-panel h-full w-full max-w-xl overflow-y-auto border-l border-[#262626] bg-[#121212] p-6 shadow-2xl flex flex-col justify-between"
       >
         <div>
           <div className="flex items-start justify-between border-b border-[#F0F0F0] pb-4">
@@ -103,7 +105,7 @@ export default function SourceInspectorDrawer({
               <span className="text-[11px] font-semibold uppercase tracking-wider text-[#6B6B6B]">
                 Verbatim Source Snippet ({source.sourceId})
               </span>
-              <div className="mt-2 rounded-[4px] border-l-2 border-[#1D5FBF] bg-white p-3 font-mono text-xs leading-relaxed text-[#0A0A0A]">
+              <div className="mt-2 rounded-[4px] border border-[#262626] bg-[#181818] p-3 font-mono text-xs leading-relaxed text-[#eeeeee]">
                 <mark className="bg-[#1D5FBF]/10 font-bold text-[#0A0A0A] px-1 py-0.5 rounded">
                   {source.exactSnippet}
                 </mark>

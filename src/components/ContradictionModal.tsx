@@ -192,7 +192,7 @@ function EvidenceBlock({
         </div>
         <p className="mt-2 text-xs font-medium text-[#6B6B6B]">{title} • {author}</p>
         <p className="mt-2 text-sm font-semibold text-[#0A0A0A]">{extractedValue}</p>
-        <blockquote className="mt-3 rounded-[4px] border-l-2 border-[#0A0A0A] bg-[#F2F4F7] p-2.5 font-mono text-[11px] leading-relaxed text-[#0A0A0A]">
+        <blockquote className="mt-3 rounded-[4px] border border-[#363636] bg-[#181818] p-2.5 font-mono text-[11px] leading-relaxed text-[#eeeeee]">
           &ldquo;{quote}&rdquo;
         </blockquote>
       </div>

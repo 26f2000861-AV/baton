@@ -88,7 +88,7 @@ export default function ExposureDiffModal({
                 <p className="mt-2 text-xs font-medium leading-relaxed text-[#0A0A0A]">
                   {d.statement}
                 </p>
-                <div className="mt-2.5 rounded-[4px] border-l-2 border-[#0A0A0A] bg-white p-2.5 text-[11px] text-[#6B6B6B]">
+                <div className="mt-2.5 rounded-[4px] border border-[#363636] bg-[#181818] p-2.5 text-[11px] text-[#8d8d8d]">
                   <strong className="text-[#0A0A0A]">Reason withheld: </strong>
                   {d.reason}
                 </div>
