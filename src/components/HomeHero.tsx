@@ -53,7 +53,7 @@ export default function HomeHero() {
           primaryCta="Enter Handover Workspace"
           onPrimary={() => router.push('/workspace')}
           secondaryCta="Inspect Routing Conflict"
-          onSecondary={() => router.push('/workspace')}
+          onSecondary={() => router.push('/workspace#conflict')}
           proof={{
             value: "100%",
             before: "Deterministic verification on",
@@ -69,44 +69,62 @@ export default function HomeHero() {
       {/* Product Highlights Strip */}
       <div className="border-t border-[#262626] bg-[#121212]/60 px-4 py-8 sm:px-6">
         <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="flex items-start gap-3 rounded border border-[#262626] bg-[#121212] p-4 transition-colors hover:border-[#363636]">
-            <div className="rounded bg-[#1a1a1a] p-2 text-[#efefef]">
+          <Link
+            href="/workspace#conflict"
+            className="group flex items-start gap-3 rounded border border-[#262626] bg-[#121212] p-4 transition-all hover:border-[#444444] hover:bg-[#161616]"
+          >
+            <div className="rounded bg-[#1a1a1a] p-2 text-[#efefef] transition-colors group-hover:bg-[#222222]">
               <GitPullRequest size={16} />
             </div>
             <div>
               <div className="text-xs font-mono uppercase tracking-wider text-[#8d8d8d]">Contradiction Engine</div>
-              <div className="text-sm font-semibold text-[#eeeeee]">ADR-004 vs Live Fallback</div>
+              <div className="flex items-center gap-1.5 text-sm font-semibold text-[#eeeeee]">
+                ADR-004 vs Live Fallback
+                <span className="text-xs text-[#8d8d8d] transition-transform group-hover:translate-x-0.5">&rarr;</span>
+              </div>
               <p className="mt-1 text-xs text-[#8d8d8d] leading-relaxed">
                 Flags mismatches between RabbitMQ fallback in Slack and SQS FIFO guarantees in PR #204.
               </p>
             </div>
-          </div>
+          </Link>
 
-          <div className="flex items-start gap-3 rounded border border-[#262626] bg-[#121212] p-4 transition-colors hover:border-[#363636]">
-            <div className="rounded bg-[#1a1a1a] p-2 text-[#efefef]">
+          <Link
+            href="/workspace#source"
+            className="group flex items-start gap-3 rounded border border-[#262626] bg-[#121212] p-4 transition-all hover:border-[#444444] hover:bg-[#161616]"
+          >
+            <div className="rounded bg-[#1a1a1a] p-2 text-[#efefef] transition-colors group-hover:bg-[#222222]">
               <FileText size={16} />
             </div>
             <div>
               <div className="text-xs font-mono uppercase tracking-wider text-[#8d8d8d]">Evidence Drawer</div>
-              <div className="text-sm font-semibold text-[#eeeeee]">4-Source Deep Inspector</div>
+              <div className="flex items-center gap-1.5 text-sm font-semibold text-[#eeeeee]">
+                4-Source Deep Inspector
+                <span className="text-xs text-[#8d8d8d] transition-transform group-hover:translate-x-0.5">&rarr;</span>
+              </div>
               <p className="mt-1 text-xs text-[#8d8d8d] leading-relaxed">
                 Direct side-by-side inspection of GitHub diffs, Slack threads, ADRs, and leaver interview logs.
               </p>
             </div>
-          </div>
+          </Link>
 
-          <div className="flex items-start gap-3 rounded border border-[#262626] bg-[#121212] p-4 transition-colors hover:border-[#363636]">
-            <div className="rounded bg-[#1a1a1a] p-2 text-[#efefef]">
+          <Link
+            href="/workspace#signoff"
+            className="group flex items-start gap-3 rounded border border-[#262626] bg-[#121212] p-4 transition-all hover:border-[#444444] hover:bg-[#161616]"
+          >
+            <div className="rounded bg-[#1a1a1a] p-2 text-[#efefef] transition-colors group-hover:bg-[#222222]">
               <ShieldCheck size={16} />
             </div>
             <div>
               <div className="text-xs font-mono uppercase tracking-wider text-[#8d8d8d]">Cryptographic Clearance</div>
-              <div className="text-sm font-semibold text-[#eeeeee]">Successor Sign-Off Barrier</div>
+              <div className="flex items-center gap-1.5 text-sm font-semibold text-[#eeeeee]">
+                Successor Sign-Off Barrier
+                <span className="text-xs text-[#8d8d8d] transition-transform group-hover:translate-x-0.5">&rarr;</span>
+              </div>
               <p className="mt-1 text-xs text-[#8d8d8d] leading-relaxed">
                 Generates a SHA-256 tamper-proof clearance seal once successor, lead, and SRE approve all claims.
               </p>
             </div>
-          </div>
+          </Link>
         </div>
       </div>
 

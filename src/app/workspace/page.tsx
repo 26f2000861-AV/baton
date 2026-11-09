@@ -96,8 +96,29 @@ export default function Home() {
 
   useEffect(() => {
     const readHash = () => {
-      const path = window.location.hash.replace(/^#\/?/, '')
-      const valid = [...routes.map((item) => item.id), 'interview', 'source', 'exposure']
+      const raw = window.location.hash.replace(/^#\/?/, '')
+      const [path] = raw.split('?')
+      if (path === 'conflict' || raw.includes('conflict')) {
+        setRoute('risks')
+        setSelectedConflictId('conflict_01')
+        return
+      }
+      if (path === 'interview') {
+        setRoute('overview')
+        setInterviewOpen(true)
+        return
+      }
+      if (path === 'exposure') {
+        setRoute('overview')
+        setExposureOpen(true)
+        return
+      }
+      if (path === 'source' || raw.startsWith('source')) {
+        setRoute('claims')
+        setDrawerClaimId('claim_09')
+        return
+      }
+      const valid = routes.map((item) => item.id)
       setRoute(valid.includes(path) && path ? path : 'overview')
     }
     readHash()
@@ -151,8 +172,18 @@ export default function Home() {
     const finishClose = () => {
       if (kind === 'interview') setInterviewOpen(false)
       if (kind === 'exposure') setExposureOpen(false)
-      if (kind === 'conflict') setSelectedConflictId(null)
-      if (kind === 'drawer') setDrawerClaimId(null)
+      if (kind === 'conflict') {
+        setSelectedConflictId(null)
+        if (typeof window !== 'undefined' && window.location.hash.includes('conflict')) {
+          window.location.hash = '#/risks'
+        }
+      }
+      if (kind === 'drawer') {
+        setDrawerClaimId(null)
+        if (typeof window !== 'undefined' && window.location.hash.includes('source')) {
+          window.location.hash = '#/claims'
+        }
+      }
       setClosingDialog('')
       dialogCloseTimerRef.current = null
       returnFocusRef.current?.focus()
