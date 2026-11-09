@@ -34,40 +34,46 @@
 }
 
 :root {
-  /* Framed sheet tokens */
-  --ground: #F2F5F7;
-  --ground-gradient: linear-gradient(90deg, #27BED8 0%, #8BD7CA 53%, #F1F0B9 100%);
-  --surface: #FFFFFF;
-  --raised: #F4F6F8;
-  --active: #EBEDEE;
-  --border: #E8EAEC;
-  --border-strong: #CDCED1;
-  --rule: #F0F1F2;
-  --control: #CDCED1;
-  --text: #131416;
-  --muted: #5D5F60;
-  --faint: #5D5F60;
-  --accent: #1B6C80;
-  --positive: #1E7B4F;
-  --negative: #C4242A;
-  --warning: #92400E;
-  --primary: #141414;
-  --primary-ink: #FFFFFF;
+  /* Baton dark ledger */
+  --ground: #070B11;
+  --ground-gradient: radial-gradient(ellipse at 50% -18%, #173441 0%, #101d29 38%, #0a111a 72%, #070b11 100%);
+  --surface: #0c141e;
+  --raised: #111e2a;
+  --active: #1a2a36;
+  --border: #253543;
+  --border-strong: #3a5263;
+  --rule: #1c2a36;
+  --control: #415b6d;
+  --text: #edf4f7;
+  --muted: #a5b5c0;
+  --faint: #8195a3;
+  --accent: #65c5d0;
+  --positive: #75d5a5;
+  --negative: #ff8c96;
+  --warning: #f0c983;
+  --primary: #1d6673;
+  --primary-ink: #f2fcfd;
+  --background: var(--ground);
+  --foreground: var(--text);
+  --secondary: var(--active);
+  --secondary-foreground: var(--text);
+  --muted-surface: var(--raised);
+  --destructive-foreground: #2c1015;
 
-  /* Explicit monochrome status labels */
-  --pill-positive-bg: #DCFAE5;
-  --pill-positive-ink: #04250E;
-  --pill-negative-bg: #FFEDEA;
-  --pill-negative-ink: #831C1E;
-  --pill-warning-bg: #FFFBEB;
-  --pill-warning-ink: #92400E;
-  --pill-neutral-bg: #EBEDEE;
-  --pill-neutral-ink: #353736;
+  /* Quiet status labels with readable text */
+  --pill-positive-bg: #17352b;
+  --pill-positive-ink: #a7ecc6;
+  --pill-negative-bg: #3b2028;
+  --pill-negative-ink: #ffc1c6;
+  --pill-warning-bg: #392f1c;
+  --pill-warning-ink: #f3d596;
+  --pill-neutral-bg: #1a2a36;
+  --pill-neutral-ink: #d2e0e7;
 
-  --chart-1: #1B6C80;
-  --chart-2: #2F70BB;
-  --chart-3: #A86F0C;
-  --chart-muted: #CDCED1;
+  --chart-1: #65c5d0;
+  --chart-2: #8ba2b1;
+  --chart-3: #d4b26e;
+  --chart-muted: #425565;
   --grid: var(--rule);
   --axis-ink: var(--muted);
   --ink: var(--text);

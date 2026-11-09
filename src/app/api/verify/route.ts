@@ -5,9 +5,20 @@ import { verifyQuoteAgainstSource } from '../../../lib/verifier'
 
 export async function POST(req: Request) {
   try {
-    const { sourceId, quoteSnippet, claimStatement } = await req.json()
+    const body: unknown = await req.json()
+    if (!body || typeof body !== 'object') {
+      return NextResponse.json({ error: 'Expected a JSON object.' }, { status: 400 })
+    }
+    const { sourceId, quoteSnippet, claimStatement } = body as Record<string, unknown>
+    if (
+      typeof sourceId !== 'string' || sourceId.length > 100 ||
+      typeof quoteSnippet !== 'string' || quoteSnippet.length === 0 || quoteSnippet.length > 8000 ||
+      (claimStatement !== undefined && (typeof claimStatement !== 'string' || claimStatement.length > 2000))
+    ) {
+      return NextResponse.json({ error: 'Invalid verification request.' }, { status: 400 })
+    }
 
-    const rawSource = RAW_SOURCES[sourceId]
+    const rawSource = Object.hasOwn(RAW_SOURCES, sourceId) ? RAW_SOURCES[sourceId] : undefined
     if (!rawSource) {
       return NextResponse.json(
         { error: `Source with id "${sourceId}" not found in repository.` },
@@ -42,9 +53,9 @@ export async function POST(req: Request) {
         requiredClearanceLevel: rawSource.requiredClearanceLevel,
       },
     })
-  } catch (err: any) {
+  } catch {
     return NextResponse.json(
-      { error: err?.message || 'Verification failure' },
+      { error: 'Verification request could not be processed.' },
       { status: 500 }
     )
   }
