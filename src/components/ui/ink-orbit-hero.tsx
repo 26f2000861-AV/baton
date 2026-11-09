@@ -5,10 +5,9 @@
 // primary and a bracketed "watch demo" button that opens a live workflow-run
 // dialog, a row of drawn faces, and — beside it — the generative 3D ink
 // sculpture you can drag, tilt and click to reforge.
-//
-// No dependencies, no assets. React is the only import.
 
 import React from "react"
+import { ArrowRight, Check, Play, X } from "lucide-react"
 
 export type InkDemoStep = { label: string; detail: string }
 
@@ -27,7 +26,7 @@ export type InkOrbitHeroProps = {
   /** The steps the demo dialog plays through. `[]` = no dialog. */
   demoSteps?: InkDemoStep[]
   /** "Loved by <value> teams". `null` hides the row. */
-  proof?: { before: string; value: string; after: string } | null
+  proof?: { before: string; value: string; after: string; avatars?: string[] } | null
   sculptureSeed?: number
   onReforge?: (seed: number) => void
   sculptureLabel?: string
@@ -48,6 +47,13 @@ const D_STEPS: InkDemoStep[] = [
   { label: "Predict", detail: "Forecasting next-week churn risk across 312 accounts" },
   { label: "Report", detail: "Drafting the weekly ops report with charts and highlights" },
   { label: "Notify", detail: "Posting the summary to #ops and emailing 6 stakeholders" },
+]
+
+const DEFAULT_AVATARS = [
+  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=64&h=64&q=80",
+  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=64&h=64&q=80",
+  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=64&h=64&q=80",
+  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=64&h=64&q=80",
 ]
 
 /* -------------------------------------------------------------- component */
@@ -154,9 +160,7 @@ export default function InkOrbitHero({
                         onSecondary?.()
                       }}
                     >
-                      <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
-                        <path d="M3 1.8v8.4L10 6z" fill="currentColor" />
-                      </svg>
+                      <Play size={11} fill="currentColor" strokeWidth={0} aria-hidden="true" />
                       {secondaryCta}
                     </button>
                   </span>
@@ -165,9 +169,16 @@ export default function InkOrbitHero({
               {proof && (
                 <div className="ih-proof">
                   <span className="ih-proof-faces">
-                    {[0, 1, 2, 3].map((i) => (
-                      <span key={i}>
-                        <Portrait index={i} size={24} uid={uid + "h"} />
+                    {(proof.avatars || DEFAULT_AVATARS).slice(0, 4).map((avatarSrc, i) => (
+                      <span key={i} className="inline-block overflow-hidden rounded-full border-2 border-[var(--ih-paper)]">
+                        <img
+                          src={avatarSrc}
+                          alt="Team member"
+                          width={24}
+                          height={24}
+                          className="h-6 w-6 rounded-full object-cover"
+                          loading="lazy"
+                        />
                       </span>
                     ))}
                   </span>
@@ -212,73 +223,11 @@ function Brackets() {
 }
 
 function Arrow({ size = 14 }: { size?: number }) {
-  return (
-    <svg className="ih-arr" width={size} height={size} viewBox="0 0 16 16" aria-hidden="true">
-      <path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
+  return <ArrowRight className="ih-arr inline-block" size={size} strokeWidth={1.75} aria-hidden="true" />
 }
 
-function Check({ size = 12 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 12 12" aria-hidden="true">
-      <path d="M2 6.4 4.8 9 10 3" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-/* drawn portraits — greyscale, so they sit in the palette */
-const PORTRAITS = [
-  { hair: "short", beard: true, glasses: false, skin: "#b9b4ae", hairC: "#2b2a29", shirt: "#3a3a3a", bg: "#d9d6d2" },
-  { hair: "long", beard: false, glasses: false, skin: "#d6d0c9", hairC: "#8d7f6c", shirt: "#7b7b7b", bg: "#e6e3df" },
-  { hair: "buzz", beard: false, glasses: true, skin: "#a7a19a", hairC: "#3d3c3a", shirt: "#1f1f1f", bg: "#cfcfcf" },
-  { hair: "bun", beard: false, glasses: true, skin: "#9a8f84", hairC: "#1e1d1c", shirt: "#5a5a5a", bg: "#dedbd6" },
-  { hair: "curly", beard: false, glasses: false, skin: "#7f746a", hairC: "#1a1918", shirt: "#8a8a8a", bg: "#d3d0cb" },
-  { hair: "side", beard: true, glasses: true, skin: "#c7c0b8", hairC: "#5b5650", shirt: "#2c2c2c", bg: "#e1ded9" },
-]
-
-function Portrait({ index, size = 38, uid }: { index: number; size?: number; uid: string }) {
-  const p = PORTRAITS[((index % PORTRAITS.length) + PORTRAITS.length) % PORTRAITS.length]
-  const id = uid + "pt" + index
-  return (
-    <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true">
-      <defs>
-        <linearGradient id={id} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor={p.bg} />
-          <stop offset="1" stopColor="#9d9a96" />
-        </linearGradient>
-      </defs>
-      <rect width="64" height="64" fill={"url(#" + id + ")"} />
-      {p.hair === "long" && <path d="M18 30c0-12 6-19 14-19s14 7 14 19v20H18z" fill={p.hairC} />}
-      {p.hair === "curly" &&
-        [[22, 20], [28, 15], [36, 15], [42, 20], [45, 28], [19, 28]].map(([x, y], i) => <circle key={i} cx={x} cy={y} r="7" fill={p.hairC} />)}
-      <path d="M8 64c2-12 12-18 24-18s22 6 24 18z" fill={p.shirt} />
-      <rect x="27.5" y="36" width="9" height="11" rx="3" fill={p.skin} />
-      <path d="M27.5 44c3 2.5 6 2.5 9 0v3h-9z" fill="#000" opacity=".12" />
-      <ellipse cx="32" cy="28" rx="11" ry="13" fill={p.skin} />
-      {p.hair === "short" && <path d="M21 25c0-9 5-13 11-13s11 4 11 13c-2-4-6-6-11-6s-9 2-11 6z" fill={p.hairC} />}
-      {p.hair === "buzz" && <path d="M21.5 24c.5-8 5-11.5 10.5-11.5S42 16 42.5 24c-3-3-6.5-4-10.5-4s-7.5 1-10.5 4z" fill={p.hairC} opacity=".85" />}
-      {p.hair === "bun" && (
-        <>
-          <circle cx="32" cy="11" r="6" fill={p.hairC} />
-          <path d="M21 26c0-10 5-14 11-14s11 4 11 14c-2-5-6-7.5-11-7.5S23 21 21 26z" fill={p.hairC} />
-        </>
-      )}
-      {p.hair === "long" && <path d="M21 27c0-10 5-15 11-15s11 5 11 15c-3-6-8-8-14-7-3 .5-6 3-8 7z" fill={p.hairC} />}
-      {p.hair === "side" && <path d="M21 26c-1-9 5-14 12-14 6 0 11 4 10 12-4-5-10-6-17-3-2 1-4 3-5 5z" fill={p.hairC} />}
-      {p.beard && <path d="M21.5 30c1 9 5 12 10.5 12s9.5-3 10.5-12c-2 4-5 5-10.5 5s-8.5-1-10.5-5z" fill={p.hairC} opacity=".9" />}
-      <circle cx="27.5" cy="28" r="1.2" fill="#1a1a1a" />
-      <circle cx="36.5" cy="28" r="1.2" fill="#1a1a1a" />
-      {p.glasses && (
-        <g fill="none" stroke="#1a1a1a" strokeWidth="1.1">
-          <circle cx="27.5" cy="28" r="3.6" />
-          <circle cx="36.5" cy="28" r="3.6" />
-          <path d="M31.1 28h1.8" />
-        </g>
-      )}
-      <path d="M29 34.5c1.8 1.2 4.2 1.2 6 0" fill="none" stroke="#1a1a1a" strokeWidth="1" strokeLinecap="round" opacity=".7" />
-    </svg>
-  )
+function CheckIcon({ size = 12 }: { size?: number }) {
+  return <Check size={size} strokeWidth={2.2} aria-hidden="true" />
 }
 
 function DemoDialog({ steps, onClose, reduced }: { steps: InkDemoStep[]; onClose: () => void; reduced: boolean }) {
@@ -320,9 +269,7 @@ function DemoDialog({ steps, onClose, reduced }: { steps: InkDemoStep[]; onClose
             {done ? "run complete · " + total.toFixed(1) + "s" : "workflow running · " + elapsed.toFixed(1) + "s"}
           </span>
           <button ref={closeRef} type="button" className="ih-icon-btn" onClick={onClose} aria-label="Close demo">
-            <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
-              <path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
+            <X size={14} strokeWidth={1.8} aria-hidden="true" />
           </button>
         </div>
         <ol className="ih-steps" aria-live="polite">
@@ -330,7 +277,9 @@ function DemoDialog({ steps, onClose, reduced }: { steps: InkDemoStep[]; onClose
             const state = elapsed >= (i + 1) * per ? "done" : elapsed >= i * per ? "run" : "wait"
             return (
               <li key={i} className="ih-step" data-state={state}>
-                <span className="ih-step-ix">{state === "done" ? <Check /> : state === "run" ? <i className="ih-spin" /> : String(i + 1).padStart(2, "0")}</span>
+                <span className="ih-step-ix">
+                  {state === "done" ? <CheckIcon /> : state === "run" ? <i className="ih-spin" /> : String(i + 1).padStart(2, "0")}
+                </span>
                 <span>
                   <b>{s.label}</b>
                   <small>{s.detail}</small>
