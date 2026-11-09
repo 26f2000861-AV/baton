@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import InkOrbitHero from '@/components/ui/ink-orbit-hero'
 import BatonMark from '@/components/BatonMark'
+import HeroScrollVideoReveal from '@/components/ui/hero-scroll-video-pin-reveal'
 import { ShieldCheck, GitPullRequest, FileText } from 'lucide-react'
 
 export default function HomeHero() {
@@ -109,6 +110,45 @@ export default function HomeHero() {
           </Link>
         </div>
       </div>
+
+      {/* Scroll Pin Reveal Section */}
+      <HeroScrollVideoReveal
+        bgColor="#0b0b0b"
+        topText={
+          <div className="flex flex-col items-center">
+            <span className="mb-4 text-xs font-mono uppercase tracking-widest text-[#8d8d8d]">
+              Deterministic Engineering Transfer
+            </span>
+            <span>
+              Built to transfer mission-critical code,
+              <br />
+              <span className="font-serif italic font-normal text-[#c9c9c9]">not tribal rumors.</span>
+            </span>
+          </div>
+        }
+        headingText={
+          <>
+            Inspect Every Claim. <br />
+            Resolve Every Contradiction.
+          </>
+        }
+        subText="From AWS SQS FIFO retries to legacy RabbitMQ clusters — Baton provides immutable source verification before successor sign-off."
+        bottomText={
+          <div className="flex flex-col items-center gap-6">
+            <div>
+              Where every handover decision feels
+              <br />
+              <span className="font-serif italic font-normal text-[#c9c9c9]">deterministic &amp; provable.</span>
+            </div>
+            <Link
+              href="/workspace"
+              className="inline-flex items-center gap-2 rounded border border-[#363636] bg-[#efefef] px-6 py-3 text-sm font-semibold text-[#121212] transition-all hover:bg-white hover:shadow-[0_0_24px_rgba(255,255,255,0.25)]"
+            >
+              Launch Handover Workspace &rarr;
+            </Link>
+          </div>
+        }
+      />
     </div>
   )
 }
