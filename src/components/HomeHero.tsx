@@ -28,34 +28,40 @@ export default function HomeHero() {
         topText={
           <div className="flex flex-col items-center">
             <span className="mb-4 text-xs font-mono uppercase tracking-widest text-[#8d8d8d]">
-              Deterministic Engineering Transfer
+              Engineering handovers, made reviewable
             </span>
             <span>
-              Built to transfer mission-critical code,
+              Keep critical work moving,
               <br />
-              <span className="font-serif italic font-normal text-[#c9c9c9]">not tribal rumors.</span>
+              <span className="font-serif italic font-normal text-[#c9c9c9]">even when ownership changes.</span>
             </span>
           </div>
         }
         headingText={
           <>
-            Inspect Every Claim. <br />
-            Resolve Every Contradiction.
+            Keep the context. <br />
+            Make the next step clear.
           </>
         }
-        subText="From AWS SQS FIFO retries to legacy RabbitMQ clusters — Baton provides immutable source verification before successor sign-off."
+        tags={[
+          { text: 'Evidence-backed claims', background: '#1c1c1c', color: '#eeeeee' },
+          { text: 'Decisions & open work', background: '#242424', color: '#ffffff' },
+          { text: 'Ownership transfer', background: '#20241e', color: '#d5dfca' },
+          { text: 'Human-reviewed risks', background: '#222222', color: '#eeeeee' },
+        ]}
+        subText="Bring decisions, unfinished work, ownership, and risk into one handover. Show what the evidence supports, what conflicts, and what the next owner still needs to check."
       >
         {/* Center: Artifact & Workspace Button Section (Between the Two Scroll Animations) */}
         <div id="handover-core" className="flex flex-1 flex-col justify-center border-t border-[#262626]">
           <InkOrbitHero
             theme="dark"
-            titleTop="Accountable Handover With"
-            titleAccent={["Successor Sign-Offs"]}
-            description="Baton transforms high-stakes engineering handovers into cryptographic, source-backed claim ledgers. Resolve hidden architecture contradictions, inspect evidence drawers, and achieve verified successor sign-off."
-            primaryCta="Enter Handover Workspace"
+            titleTop="A practical handover for"
+            titleAccent={["the work that matters"]}
+            description="Keep decisions, open work, owners, and risks connected to their evidence. Give the next person a clear place to review, question, and take responsibility."
+            primaryCta="Open sample workspace"
             onPrimary={() => router.push('/workspace')}
-            secondaryCta="Inspect Routing Conflict"
-            onSecondary={() => router.push('/workspace#conflict')}
+            secondaryCta="See how it works"
+            onSecondary={() => document.getElementById('handover-workflow')?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })}
             proof={null}
             sculptureLabel=""
             sculptureHint=""
@@ -66,7 +72,7 @@ export default function HomeHero() {
       </HeroScrollVideoReveal>
 
       {/* 3. Product Highlights Strip (Section in image) */}
-      <div className="border-t border-[#262626] bg-[#121212]/60 px-4 py-8 sm:px-6">
+      <div id="handover-workflow" className="border-t border-[#262626] bg-[#121212]/60 px-4 py-8 sm:px-6">
         <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-4 sm:grid-cols-3">
           <Link
             href="/workspace#conflict"
@@ -76,13 +82,13 @@ export default function HomeHero() {
               <GitPullRequest size={16} />
             </div>
             <div>
-              <div className="text-xs font-mono uppercase tracking-wider text-[#8d8d8d]">Contradiction Engine</div>
+              <div className="text-xs font-mono uppercase tracking-wider text-[#8d8d8d]">Evidence trail</div>
               <div className="flex items-center gap-1.5 text-sm font-semibold text-[#eeeeee]">
-                ADR-004 vs Live Fallback
+                See what supports a claim
                 <span className="text-xs text-[#8d8d8d] transition-transform group-hover:translate-x-0.5">&rarr;</span>
               </div>
               <p className="mt-1 text-xs text-[#8d8d8d] leading-relaxed">
-                Flags mismatches between RabbitMQ fallback in Slack and SQS FIFO guarantees in PR #204.
+                Open the source excerpt behind a claim and distinguish quoted evidence from inference.
               </p>
             </div>
           </Link>
@@ -95,13 +101,13 @@ export default function HomeHero() {
               <FileText size={16} />
             </div>
             <div>
-              <div className="text-xs font-mono uppercase tracking-wider text-[#8d8d8d]">Evidence Drawer</div>
+              <div className="text-xs font-mono uppercase tracking-wider text-[#8d8d8d]">Decisions and risks</div>
               <div className="flex items-center gap-1.5 text-sm font-semibold text-[#eeeeee]">
-                4-Source Deep Inspector
+                Keep disagreements visible
                 <span className="text-xs text-[#8d8d8d] transition-transform group-hover:translate-x-0.5">&rarr;</span>
               </div>
               <p className="mt-1 text-xs text-[#8d8d8d] leading-relaxed">
-                Direct side-by-side inspection of GitHub diffs, Slack threads, ADRs, and leaver interview logs.
+                Compare conflicting records and leave the final call to a person who can explain it.
               </p>
             </div>
           </Link>
@@ -114,13 +120,13 @@ export default function HomeHero() {
               <ShieldCheck size={16} />
             </div>
             <div>
-              <div className="text-xs font-mono uppercase tracking-wider text-[#8d8d8d]">Cryptographic Clearance</div>
+              <div className="text-xs font-mono uppercase tracking-wider text-[#8d8d8d]">Ownership transfer</div>
               <div className="flex items-center gap-1.5 text-sm font-semibold text-[#eeeeee]">
-                Successor Sign-Off Barrier
+                Give the next owner a route forward
                 <span className="text-xs text-[#8d8d8d] transition-transform group-hover:translate-x-0.5">&rarr;</span>
               </div>
               <p className="mt-1 text-xs text-[#8d8d8d] leading-relaxed">
-                Generates a SHA-256 tamper-proof clearance seal once successor, lead, and SRE approve all claims.
+                Track open work, identify who can help, and let the successor review each handover section.
               </p>
             </div>
           </Link>

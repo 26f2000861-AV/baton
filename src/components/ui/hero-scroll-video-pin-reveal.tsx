@@ -26,28 +26,28 @@ export interface HeroScrollVideoRevealProps {
 }
 
 const DEFAULT_TAGS: TagItem[] = [
-  { text: 'ADR-004 Conflict Engine', background: '#1c1c1c', color: '#eeeeee' },
-  { text: '4-Source Deep Inspector', background: '#242424', color: '#ffffff' },
-  { text: 'Cryptographic Clearance', background: '#14281c', color: '#4ade80' },
-  { text: 'Deterministic Proof Ledger', background: '#222222', color: '#eeeeee' },
+  { text: 'Evidence-backed claims', background: '#1c1c1c', color: '#eeeeee' },
+  { text: 'Decisions and open work', background: '#242424', color: '#ffffff' },
+  { text: 'Ownership transfer', background: '#20241e', color: '#d5dfca' },
+  { text: 'Human-reviewed risks', background: '#222222', color: '#eeeeee' },
 ];
 
 export const HeroScrollVideoReveal: React.FC<HeroScrollVideoRevealProps> = ({
   topText = (
     <>
-      Built to transfer mission-critical code,
+      Keep critical work moving,
       <br />
-      <span className="font-serif italic font-normal text-[#c9c9c9]">not tribal rumors</span>
+      <span className="font-serif italic font-normal text-[#c9c9c9]">even when ownership changes</span>
     </>
   ),
   headingText = (
     <>
-      Inspect Every Claim. <br />
-      Resolve Every Contradiction.
+      Keep the context. <br />
+      Make the next step clear.
     </>
   ),
   tags = DEFAULT_TAGS,
-  subText = 'From AWS SQS FIFO retries to legacy RabbitMQ clusters — Baton provides immutable source verification before successor sign-off.',
+  subText = 'Bring decisions, unfinished work, ownership, and risk into one handover. Show what the evidence supports, what conflicts, and what the next owner still needs to check.',
   className = '',
   bgColor = '#0b0b0b',
   children,

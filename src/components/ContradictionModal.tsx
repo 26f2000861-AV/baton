@@ -100,7 +100,7 @@ export default function ContradictionModal({
         {/* Settlement Input and Choices */}
         <div className="mt-6 rounded-[6px] border border-[#E6E6E6] bg-[#F2F4F7]/50 p-4">
           <label htmlFor="settlement-note" className="block text-xs font-semibold text-[#0A0A0A]">
-            Human settlement rationale (Required for immutable handover audit log):
+            Decision note (Required to record why this conflict was resolved):
           </label>
           <textarea
             id="settlement-note"

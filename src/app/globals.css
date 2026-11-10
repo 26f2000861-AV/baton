@@ -78,6 +78,9 @@ a:focus-visible {
 .mobile-menu-button, .mobile-action, .mobile-menu { display: none; }
 .sheet { min-height: calc(100vh - 48px - var(--sheet-inset)); margin: 0 0 var(--sheet-inset); overflow: clip; border: 1px solid var(--border); border-radius: var(--radius-sheet); background: var(--surface); }
 .sheet-content { width: min(100%, 1200px); margin: 0 auto; padding: 28px var(--pad) 40px; }
+.sample-workspace-note { display: flex; min-height: 22px; align-items: center; gap: 8px; margin-bottom: 10px; color: var(--muted); font-size: 9px; font-weight: 650; letter-spacing: .06em; }
+.sample-indicator { width: 6px; height: 6px; flex: none; border-radius: 50%; background: var(--accent); }
+.sample-note-copy { margin-left: 4px; color: var(--muted); font-size: 11px; font-weight: 400; letter-spacing: 0; }
 .page-heading { display: flex; align-items: end; justify-content: space-between; gap: var(--gap); margin-bottom: 16px; }
 .breadcrumb { margin-bottom: 5px; color: var(--muted); font-size: var(--fs-small); }
 .breadcrumb span { padding: 0 5px; color: var(--control); }
@@ -573,6 +576,8 @@ h1 { color: var(--text); font-size: var(--fs-title); font-weight: 600; line-heig
 
   .sheet { min-height: calc(100vh - 52px); margin: 0; border-right: 0; border-bottom: 0; border-left: 0; border-radius: 0; }
   .sheet-content { padding: 18px 14px 32px; }
+  .sample-workspace-note { flex-wrap: wrap; gap: 6px; margin-bottom: 8px; font-size: 8px; }
+  .sample-note-copy { width: 100%; margin-left: 12px; font-size: 10px; }
   .page-heading { align-items: stretch; flex-direction: column; gap: 10px; margin-bottom: 16px; }
   .page-heading .primary-action { align-self: stretch; width: 100%; justify-content: center; }
   h1 { font-size: clamp(20px, 5.5vw, 24px); }

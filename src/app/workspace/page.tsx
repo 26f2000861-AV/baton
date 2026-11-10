@@ -245,11 +245,9 @@ export default function Home() {
   const openConflictCount = contradictions.filter((item) => item.status === 'open_unresolved').length
   const overviewConflict = contradictions[0]
   const conflictSettled = overviewConflict?.status === 'settled_by_human'
-  const conflictResolutionSummary = overviewConflict?.settlement?.resolutionType === 'accept_source_a'
-    ? 'SQS FIFO was confirmed as the primary retry path.'
-    : overviewConflict?.settlement?.resolutionType === 'accept_source_b'
-      ? 'RabbitMQ was retained as the active retry fallback.'
-      : 'A lead recorded a clarification for the routing conflict.'
+  const conflictResolutionSummary = overviewConflict?.settlement?.resolutionType === 'clarification_note'
+    ? 'A lead recorded a clarification; source precedence remains open for review.'
+    : 'A lead recorded a decision and rationale for the next owner.'
   const acceptedCount = Object.values(sectionStates).filter((item) => item.isAccepted).length
   const verifiedCount = visibleClaims.filter((item) => item.status === 'quoted_verified').length
   const filteredClaims = useMemo(() => {
@@ -261,8 +259,8 @@ export default function Home() {
   }, [visibleClaims, filter, search, sortDescending])
 
   const titleMap: Record<string, string> = {
-    overview: 'Payment Core handover', claims: 'Claims', decisions: 'Decisions',
-    ownership: 'Ownership', risks: 'Routing conflict', unfinished: 'Unfinished work',
+    overview: 'Handover overview', claims: 'Claims', decisions: 'Decisions',
+    ownership: 'Ownership', risks: 'Risks and conflicts', unfinished: 'Unfinished work',
     signoff: 'Successor sign-off', interview: 'Leaver interview', source: 'Source evidence', exposure: 'Exposure diff',
   }
   const title = titleMap[route] ?? titleMap.overview
@@ -285,7 +283,7 @@ export default function Home() {
       <aside className="sidebar" aria-label="Baton workspace">
         <Link className="brand-lockup" href="/" title="Return to landing page" aria-label="Baton - Return to landing page">
           <BatonMark />
-          <span><strong>Baton</strong><small>FinTrack / Payment Core</small></span>
+          <span><strong>Baton</strong><small>Engineering handover</small></span>
         </Link>
         <p className="nav-caption">Handover</p>
         <nav className="side-nav" aria-label="Handover views">
@@ -321,21 +319,22 @@ export default function Home() {
             </button>
           </div>
         </header>
-        {menuOpen && <div id="mobile-navigation" className="mobile-menu" role="dialog" aria-modal="true" aria-label="Baton navigation"><Link href="/" className="nav-caption flex items-center gap-2 hover:text-[#eeeeee]" onClick={() => setMenuOpen(false)}><strong>Baton</strong> / FinTrack</Link>{routes.map(({ id, label, hash, icon: Icon }) => <a key={id} href={hash} aria-current={route === id ? 'page' : undefined} className={route === id ? 'selected' : undefined} onClick={(event) => { event.preventDefault(); navigate(id) }}><Icon size={17} />{label}</a>)}<button onClick={() => navigate('interview')}><MessageSquare size={17} />Leaver interview</button><button onClick={() => navigate('exposure')}><ShieldAlert size={17} />Exposure diff</button></div>}
+        {menuOpen && <div id="mobile-navigation" className="mobile-menu" role="dialog" aria-modal="true" aria-label="Baton navigation"><Link href="/" className="nav-caption flex items-center gap-2 hover:text-[#eeeeee]" onClick={() => setMenuOpen(false)}><strong>Baton</strong> / Handover</Link>{routes.map(({ id, label, hash, icon: Icon }) => <a key={id} href={hash} aria-current={route === id ? 'page' : undefined} className={route === id ? 'selected' : undefined} onClick={(event) => { event.preventDefault(); navigate(id) }}><Icon size={17} />{label}</a>)}<button onClick={() => navigate('interview')}><MessageSquare size={17} />Leaver interview</button><button onClick={() => navigate('exposure')}><ShieldAlert size={17} />Exposure diff</button></div>}
         <main className={`sheet${clearancePulse ? ' clearance-pulse' : ''}`}>
           <div className="sheet-content">
+            <div className="sample-workspace-note"><span className="sample-indicator" />SAMPLE WORKSPACE<span className="sample-note-copy">Illustrative records; use this workflow to carry real work across a team transition.</span></div>
             <div className="page-heading">
-              <div><p className="breadcrumb">FinTrack <span>/</span> Payment Core</p><h1>{title}</h1></div>
-              {route === 'overview' && <button className="primary-action" onClick={() => navigate('claims')}>Start handover review</button>}
+              <div><p className="breadcrumb">Engineering <span>/</span> Handover</p><h1>{title}</h1></div>
+              {route === 'overview' && <button className="primary-action" onClick={() => navigate('claims')}>Review handover</button>}
             </div>
 
             {route === 'overview' && <div className="view-stack">
               <section className="finding-panel" aria-labelledby="finding-title">
-                <div className="finding-copy"><span className="section-kicker">{conflictSettled ? 'Resolution recorded' : 'Needs review'}</span><h2 id="finding-title">{conflictSettled ? 'Webhook retry routing has a recorded decision' : 'Webhook retries have conflicting delivery records'}</h2><p>{conflictSettled ? conflictResolutionSummary : 'PR #204 says SQS FIFO. Slack records RabbitMQ as the active retry fallback.'}</p></div>
+                <div className="finding-copy"><span className="section-kicker">{conflictSettled ? 'Decision recorded' : 'Needs review'}</span><h2 id="finding-title">{conflictSettled ? 'Risk decision recorded for handover' : 'Conflicting records need a decision'}</h2><p>{conflictSettled ? conflictResolutionSummary : 'Two project records describe different states. Review the source and timing before the next owner takes over.'}</p></div>
                 <button className="secondary-action" onClick={() => navigate('risks')}>{conflictSettled ? 'Review resolution' : 'Compare sources'}</button>
               </section>
               <section className="metric-strip" aria-label="Handover counts">
-                <Metric label="Claims" value={visibleClaims.length} sub={`${verifiedCount} verified`} /><Metric label="Open conflicts" value={openConflictCount} sub={openConflictCount === 0 ? 'No unresolved routing conflicts' : `${openConflictCount} routing ${openConflictCount === 1 ? 'conflict needs' : 'conflicts need'} review`} /><Metric label="Unfinished" value={unfinished.length} sub="2 successor actions" /><Metric label="Ownership" value={ownership.length} sub="2 assets to transfer" />
+                <Metric label="Claims" value={visibleClaims.length} sub={`${verifiedCount} with exact source matches`} /><Metric label="Open conflicts" value={openConflictCount} sub={openConflictCount === 0 ? 'No unresolved conflicts' : `${openConflictCount} ${openConflictCount === 1 ? 'needs' : 'need'} review`} /><Metric label="Unfinished work" value={unfinished.length} sub="Items to pick up" /><Metric label="Ownership" value={ownership.length} sub="Assets to transfer" />
               </section>
               {/* Three equal columns: 3 × 368px + 2 × 24px gutters = 1152px content width. */}
               <div className="overview-grid">
@@ -346,7 +345,7 @@ export default function Home() {
                   <div className="mini-rows">{(['decisions', 'unfinished', 'ownership', 'risks'] as const).map((id) => <div className="mini-row" key={id}><span>{sectionName(id)}</span><span className={`state-label ${sectionStates[id]?.isAccepted ? 'accepted' : ''}`}>{sectionStates[id]?.isAccepted ? 'Accepted' : 'Pending'}</span></div>)}</div>
                   <p className="card-foot">{acceptedCount} of 4 sections accepted</p>
                 </Card>
-                <Card title="Routing conflict" action="Resolve" onAction={() => navigate('risks')}>
+                <Card title="Risk to resolve" action="Review risk" onAction={() => navigate('risks')}>
                   {contradictions.slice(0, 1).map((item) => <div className="conflict-sources" key={item.id}>
                     {[item.sourceA, item.sourceB].map((source) => <div className="conflict-source" key={source.title}>
                       <strong>{source.extractedValue}</strong><span>{source.title}</span><small>{source.author} · {new Date(source.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}</small><p>{source.exactQuote}</p>
@@ -405,9 +404,9 @@ function Card({ title, action, onAction, children }: { title: string; action: st
 }
 
 function sectionName(id: string) {
-  return ({ decisions: 'Architecture decisions', unfinished: 'Unfinished work', ownership: 'Ownership', risks: 'Routing conflict' } as Record<string, string>)[id] ?? id
+  return ({ decisions: 'Architecture decisions', unfinished: 'Unfinished work', ownership: 'Ownership', risks: 'Risks and conflicts' } as Record<string, string>)[id] ?? id
 }
 
 function sectionDetail(id: string) {
-  return ({ decisions: 'Postgres queue persistence and token rationale', unfinished: 'Webhook retries and database migration cleanup', ownership: 'Two assets, owners, successors, and transfer dates', risks: 'SQS FIFO and RabbitMQ source records' } as Record<string, string>)[id] ?? id
+  return ({ decisions: 'Choices, trade-offs, and supporting evidence', unfinished: 'Open work, blockers, and next actions', ownership: 'Owners, successors, and transfer dates', risks: 'Conflicting records and decisions needed' } as Record<string, string>)[id] ?? id
 }

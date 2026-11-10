@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import HomeHero from '@/components/HomeHero'
 
 export const metadata: Metadata = {
-  title: 'Baton | Payment Core handover',
-  description: 'Review the Payment Core handover, resolve its routing conflict, and track successor acceptance.',
+  title: 'Baton | Engineering handovers with evidence',
+  description: 'Keep decisions, open work, ownership, and unresolved risks together so the next owner can review the handover with confidence.',
 }
 
 export default function LandingPage() {

@@ -27,9 +27,7 @@ export type InkOrbitHeroProps = {
   style?: React.CSSProperties
 }
 
-const DEFAULT_ACCENTS = [
-  "Successor Sign-Offs",
-]
+const DEFAULT_ACCENTS = ["The work that matters"]
 
 const DEFAULT_STEPS: InkDemoStep[] = []
 
@@ -42,10 +40,10 @@ const DEFAULT_AVATARS = [
 
 export default function InkOrbitHero({
   theme = "auto",
-  titleTop = "Accountable Handover With",
+  titleTop = "A practical handover for",
   titleAccent = DEFAULT_ACCENTS,
-  description = "Baton turns high-stakes engineering handovers into cryptographic, source-backed claim ledgers with zero unverified tribal knowledge.",
-  primaryCta = "Enter Handover Workspace",
+  description = "Keep decisions, open work, owners, and risks connected to their evidence. Give the next person a clear place to review, question, and take responsibility.",
+  primaryCta = "Open sample workspace",
   onPrimary,
   secondaryCta = null,
   onSecondary,
@@ -842,12 +840,12 @@ function InkOrbitSculpture({
       {hud && (
         <>
           <div className="ios-hud ios-top" aria-hidden="true">
-            <span>SHA-256: f7a9...4b12</span>
+            <span>Evidence review</span>
             {label && <span>{label}</span>}
           </div>
           <div className="ios-hud ios-bottom" aria-hidden="true">
             <span>{interactive ? hint : ""}</span>
-            <span>IMMUTABLE TOPOLOGY</span>
+            <span>HANDOVER WORKFLOW</span>
           </div>
         </>
       )}
