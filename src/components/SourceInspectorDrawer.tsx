@@ -1,10 +1,17 @@
 'use client'
 
-import { useRef } from 'react'
-import { X, ExternalLink, ShieldCheck, Clock, User } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { X, ShieldCheck, Clock, User } from 'lucide-react'
 import { Claim } from '@/lib/types'
 import { CLAIM_STATUS_COPY } from '@/lib/claimStatus'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
+
+interface QuoteCheck {
+  isExactMatch: boolean
+  charStart: number
+  charEnd: number
+  explanation: string
+}
 
 export default function SourceInspectorDrawer({
   claim,
@@ -18,6 +25,10 @@ export default function SourceInspectorDrawer({
   const containerRef = useRef<HTMLDivElement>(null)
   const drawerRef = useRef<HTMLDivElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const [quoteToCheck, setQuoteToCheck] = useState('')
+  const [quoteCheck, setQuoteCheck] = useState<QuoteCheck | null>(null)
+  const [checkingQuote, setCheckingQuote] = useState(false)
+  const [quoteCheckError, setQuoteCheckError] = useState('')
 
   useFocusTrap({
     containerRef,
@@ -26,9 +37,41 @@ export default function SourceInspectorDrawer({
     onClose,
   })
 
+  const source = claim?.sourceQuotes[0]
+
+  useEffect(() => {
+    setQuoteToCheck(source?.exactSnippet ?? '')
+    setQuoteCheck(null)
+    setQuoteCheckError('')
+  }, [claim?.id, source?.sourceId, source?.exactSnippet])
+
+  const verifyQuote = async () => {
+    if (!source || !quoteToCheck.trim() || checkingQuote) return
+    setCheckingQuote(true)
+    setQuoteCheck(null)
+    setQuoteCheckError('')
+    try {
+      const response = await fetch('/api/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sourceId: source.sourceId, quoteSnippet: quoteToCheck }),
+      })
+      const payload = await response.json()
+      if (!response.ok) throw new Error(payload.error ?? 'Quote check could not be completed.')
+      const result = payload?.deterministicCheck
+      if (!result || typeof result.isExactMatch !== 'boolean' || typeof result.charStart !== 'number' || typeof result.charEnd !== 'number' || typeof result.explanation !== 'string') {
+        throw new Error('The verifier returned an unexpected response.')
+      }
+      setQuoteCheck(result as QuoteCheck)
+    } catch (error) {
+      setQuoteCheckError(error instanceof Error ? error.message : 'Quote check could not be completed.')
+    } finally {
+      setCheckingQuote(false)
+    }
+  }
+
   if (!claim) return null
 
-  const source = claim.sourceQuotes[0]
   const status = CLAIM_STATUS_COPY[claim.status]
   const isExactVerified = claim.status === 'quoted_verified'
 
@@ -119,6 +162,33 @@ export default function SourceInspectorDrawer({
                   {source.exactSnippet}
                 </mark>
               </div>
+              <label htmlFor="quote-check-input" className="mt-4 block text-[11px] font-semibold uppercase tracking-wider text-[#6B6B6B]">
+                Check whether this quote appears in the sample source
+              </label>
+              <textarea
+                id="quote-check-input"
+                value={quoteToCheck}
+                onChange={(event) => { setQuoteToCheck(event.target.value); setQuoteCheck(null); setQuoteCheckError('') }}
+                rows={3}
+                maxLength={8000}
+                className="mt-2 min-h-20 w-full rounded-[4px] border border-[#363636] bg-[#121212] p-3 font-mono text-xs leading-relaxed text-[#eeeeee] focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
+              />
+              <button
+                type="button"
+                onClick={verifyQuote}
+                disabled={checkingQuote || !quoteToCheck.trim()}
+                className="mt-3 min-hit rounded-[4px] border border-[#262626] bg-[#eeeeee] px-3 py-2 text-xs font-semibold text-[#121212] disabled:opacity-50"
+              >
+                {checkingQuote ? 'Checking quote…' : 'Check quote'}
+              </button>
+              {quoteCheck && (
+                <p className={`mt-3 rounded-[4px] border p-3 text-xs leading-relaxed ${quoteCheck.isExactMatch ? 'border-[#28543a] bg-[#14281c] text-[#b7f0c8]' : 'border-[#5b3a20] bg-[#2c2010] text-[#f8d28a]'}`} role="status">
+                  <strong>{quoteCheck.isExactMatch ? `Exact text found · characters ${quoteCheck.charStart + 1}–${quoteCheck.charEnd}` : 'No exact text match'}</strong>
+                  <span className="mt-1 block">{quoteCheck.explanation} {quoteCheck.isExactMatch ? 'This confirms text presence only; it does not prove the full claim is true.' : 'No claim record is changed by this check.'}</span>
+                </p>
+              )}
+              {quoteCheckError && <p className="mt-3 text-xs text-[#f87171]" role="alert">{quoteCheckError}</p>}
+              <p className="mt-2 text-[11px] leading-relaxed text-[#6B6B6B]">This checks the app’s synthetic source corpus. It does not connect to GitHub or update the claim’s status.</p>
             </div>
           )}
 
@@ -137,15 +207,8 @@ export default function SourceInspectorDrawer({
                 Clearance Required: <span className="font-mono text-[#0A0A0A]">{source.requiredClearanceLevel}</span>
               </div>
               <div className="pt-2">
-                <a
-                  href={source.uri}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 font-medium text-[#1D5FBF] hover:underline focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
-                >
-                  <span>Open origin record</span>
-                  <ExternalLink size={12} />
-                </a>
+                <span className="block font-medium text-[#0A0A0A]">Illustrative source reference · synthetic, not connected</span>
+                <code className="mt-1 block break-all text-[11px]">{source.uri}</code>
               </div>
             </div>
           )}

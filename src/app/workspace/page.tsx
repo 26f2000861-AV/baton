@@ -19,6 +19,7 @@ import ExposureDiffModal from '../../components/ExposureDiffModal'
 import SourceInspectorDrawer from '../../components/SourceInspectorDrawer'
 import { useHandover } from '../../lib/store'
 import { CLAIM_STATUS_COPY } from '../../lib/claimStatus'
+import type { PersonaRole, SuccessorQuery } from '../../lib/types'
 
 const routes = [
   { id: 'overview', label: 'Overview', hash: '#/', icon: LayoutDashboard },
@@ -37,7 +38,7 @@ export default function Home() {
     activePersona, setActivePersonaRole, claims, visibleClaims, withheldCount, withheldDetails, decisions,
     unfinished, ownership, contradictions, questions, queries, sectionStates,
     answerInterviewQuestion, resolveContradiction, adoptUnfinishedItem, acceptSection, undoSectionAcceptance,
-    submitSuccessorQuery, resetDemoData,
+    submitSuccessorQuery, resolveSuccessorQuery, resetDemoData,
   } = useHandover()
   const [route, setRoute] = useState('overview')
   const [menuOpen, setMenuOpen] = useState(false)
@@ -373,7 +374,7 @@ export default function Home() {
             {route === 'risks' && <div className="native-component"><PillarRisks contradictions={contradictions} isAccepted={sectionStates.risks?.isAccepted ?? false} onContradiction={openConflict} onInspect={openSource} onAccept={() => acceptSection('risks')} onUndo={() => undoSectionAcceptance('risks')} /></div>}
             {route === 'unfinished' && <div className="native-component"><PillarUnfinished items={unfinished} isAccepted={sectionStates.unfinished?.isAccepted ?? false} onAdopt={adoptUnfinishedItem} onInspect={openSource} onAccept={() => acceptSection('unfinished')} onUndo={() => undoSectionAcceptance('unfinished')} /></div>}
 
-            {route === 'signoff' && <div className="view-stack"><div className="view-intro"><p>{reviewedCount} of 4 sections reviewed · {queries.length} successor questions raised</p></div><section className="data-card"><div className="card-heading"><div><h2>Handover sections</h2><p>Mark a section reviewed after checking it. This records your review; it does not certify every claim as correct. You can undo it at any time.</p></div></div><div className="mini-rows">{(['decisions', 'unfinished', 'ownership', 'risks'] as const).map((id) => { const reviewed = sectionStates[id]?.isAccepted ?? false; return <div className="signoff-row" key={id}><div><strong>{sectionName(id)}</strong><small>{sectionDetail(id)}</small></div><div className="signoff-actions"><span className={`state-label ${reviewed ? 'accepted' : ''}`}>{reviewed ? 'Reviewed' : 'Needs review'}</span><button className="secondary-action" aria-pressed={reviewed} onClick={() => reviewed ? undoSectionAcceptance(id) : acceptSection(id)}>{reviewed ? 'Undo review' : 'Mark reviewed'}</button></div></div>})}</div></section><section className="data-card"><div className="card-heading"><div><h2>Successor questions</h2><p>Ask the engineering lead about unclear evidence.</p></div></div><form className="query-form" onSubmit={(event) => { event.preventDefault(); if (queryText.trim() && queryClaimId) { submitSuccessorQuery(queryClaimId, 'unclear_rationale', queryText.trim()); setQueryText('') } }}><label htmlFor="query-claim">Related claim</label><select id="query-claim" value={queryClaimId} onChange={(event) => setQueryClaimId(event.target.value)} required><option value="">Choose a claim</option>{visibleClaims.map((claim) => <option key={claim.id} value={claim.id}>{claim.id} · {claim.statement.slice(0, 90)}</option>)}</select><label htmlFor="successor-query">Question for the handover</label><textarea id="successor-query" value={queryText} onChange={(event) => setQueryText(event.target.value)} placeholder="Ask about a decision or missing context" /><button className="primary-action" disabled={!queryText.trim() || !queryClaimId}>Send question</button></form>{queries.slice(0, 3).map((query) => <div className="mini-row" key={query.id}><span>{query.claimId} · {query.queryText}</span><span className="state-label">{query.status === 'resolved' ? 'Resolved' : 'Pending'}</span></div>)}</section></div>}
+            {route === 'signoff' && <div className="view-stack"><div className="view-intro"><p>{reviewedCount} of 4 sections reviewed · {queries.length} successor questions raised</p></div><section className="data-card"><div className="card-heading"><div><h2>Handover sections</h2><p>Mark a section reviewed after checking it. This records your review; it does not certify every claim as correct. You can undo it at any time.</p></div></div><div className="mini-rows">{(['decisions', 'unfinished', 'ownership', 'risks'] as const).map((id) => { const reviewed = sectionStates[id]?.isAccepted ?? false; return <div className="signoff-row" key={id}><div><strong>{sectionName(id)}</strong><small>{sectionDetail(id)}</small></div><div className="signoff-actions"><span className={`state-label ${reviewed ? 'accepted' : ''}`}>{reviewed ? 'Reviewed' : 'Needs review'}</span><button className="secondary-action" aria-pressed={reviewed} onClick={() => reviewed ? undoSectionAcceptance(id) : acceptSection(id)}>{reviewed ? 'Undo review' : 'Mark reviewed'}</button></div></div>})}</div></section><section className="data-card"><div className="card-heading"><div><h2>Successor questions</h2><p>Ask the engineering lead about unclear evidence. Replies are recorded in this sample session; no message is sent.</p></div></div><form className="query-form" onSubmit={(event) => { event.preventDefault(); if (queryText.trim() && queryClaimId) { submitSuccessorQuery(queryClaimId, 'unclear_rationale', queryText.trim()); setQueryText('') } }}><label htmlFor="query-claim">Related claim</label><select id="query-claim" value={queryClaimId} onChange={(event) => setQueryClaimId(event.target.value)} required><option value="">Choose a claim</option>{visibleClaims.map((claim) => <option key={claim.id} value={claim.id}>{claim.id} · {claim.statement.slice(0, 90)}</option>)}</select><label htmlFor="successor-query">Question for the handover</label><textarea id="successor-query" value={queryText} onChange={(event) => setQueryText(event.target.value)} placeholder="Ask about a decision or missing context" /><button className="primary-action" disabled={!queryText.trim() || !queryClaimId}>Send question</button></form><SuccessorQuestionReplies queries={queries.slice(0, 3)} role={activePersona.role} onResolve={resolveSuccessorQuery} /></section></div>}
 
             {route === 'interview' && <div className="view-stack"><div className="view-intro"><p>{pendingQuestions.length} questions awaiting an answer</p><button className="primary-action" onClick={() => { rememberFocus(); setInterviewOpen(true) }}>Answer questions</button></div><section className="data-card"><div className="card-heading"><div><h2>Pending questions</h2><p>Context from the departing engineer</p></div></div>{questions.map((question) => <button key={question.id} className="question-row" onClick={() => { rememberFocus(); setInterviewOpen(true) }}><span className="question-priority">{question.priorityRank}</span><span><strong>{question.promptText}</strong><small>Claim {question.associatedClaimId} · {statusLabels[claims.find((claim) => claim.id === question.associatedClaimId)?.status ?? '']?.label ?? 'Pending'}</small></span><span className="state-label">{question.status === 'pending_answer' ? 'Pending' : question.status === 'answered' ? 'Answered' : 'Escalated'}</span></button>)}</section></div>}
 
@@ -387,6 +388,45 @@ export default function Home() {
       {interviewOpen && <LeaverInterviewModal questions={questions} onAnswer={answerInterviewQuestion} onClose={closeInterview} isClosing={closingDialog === 'interview'} />}
       {exposureOpen && <ExposureDiffModal details={withheldDetails} onClose={closeExposure} isClosing={closingDialog === 'exposure'} />}
       {drawerClaim && <SourceInspectorDrawer claim={drawerClaim} onClose={closeDrawer} isClosing={closingDialog === 'drawer'} />}
+    </div>
+  )
+}
+
+function SuccessorQuestionReplies({
+  queries,
+  role,
+  onResolve,
+}: {
+  queries: SuccessorQuery[]
+  role: PersonaRole
+  onResolve: (queryId: string, responseText: string) => void
+}) {
+  const [drafts, setDrafts] = useState<Record<string, string>>({})
+
+  if (queries.length === 0) return <p className="empty-state">No successor questions yet.</p>
+
+  return (
+    <div className="mt-4 space-y-3">
+      {queries.map((query) => (
+        <article className="rounded-[6px] border border-[#262626] p-3" key={query.id}>
+          <p className="text-xs leading-relaxed"><strong>{query.claimId}</strong> · {query.queryText}</p>
+          {query.resolution ? (
+            <div className="mt-3 border-l-2 border-[#4ade80] pl-3 text-xs">
+              <p>{query.resolution.responseSnippet}</p>
+              <p className="mt-1 text-[#8d8d8d]">Recorded by {query.resolution.answeredBy} · {new Date(query.resolution.timestamp).toLocaleString()}</p>
+            </div>
+          ) : (
+            <>
+              <p className="mt-2 text-[11px] text-[#8d8d8d]">Waiting for {query.assignedRespondent.name} · sample state only</p>
+              {role === 'lead' && <form className="mt-3 grid gap-2" onSubmit={(event) => { event.preventDefault(); const response = drafts[query.id]?.trim(); if (response) { onResolve(query.id, response); setDrafts((current) => ({ ...current, [query.id]: '' })) } }}>
+                <label htmlFor={`query-reply-${query.id}`} className="text-xs font-semibold">Record a reply as the lead</label>
+                <textarea id={`query-reply-${query.id}`} value={drafts[query.id] ?? ''} onChange={(event) => setDrafts((current) => ({ ...current, [query.id]: event.target.value }))} rows={2} maxLength={1000} placeholder="Add a short clarification" />
+                <button className="secondary-action justify-self-start" type="submit" disabled={!drafts[query.id]?.trim()}>Record reply</button>
+              </form>}
+            </>
+          )}
+        </article>
+      ))}
     </div>
   )
 }

@@ -269,7 +269,7 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
               ...q,
               status: 'resolved',
               resolution: {
-                answeredBy: 'Vikram Malhotra (Lead)',
+                answeredBy: activePersona.name,
                 responseSnippet: responseText,
                 timestamp: new Date().toISOString(),
               },

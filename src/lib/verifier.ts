@@ -56,8 +56,8 @@ export function verifyQuoteAgainstSource(
       normalizedQuote,
       suggestedStatus: 'quoted_unverified',
       explanation: isNearMiss
-        ? 'Quote failed exact match due to formatting or whitespace alteration. Downgraded.'
-        : 'Quote was not found verbatim in the source document. Downgraded to unverified.',
+        ? 'Quote failed exact matching; its whitespace differs from the source. Suggested label: unverified.'
+        : 'Quote was not found verbatim in the source document. Suggested label: unverified.',
     }
   }
 
@@ -67,6 +67,6 @@ export function verifyQuoteAgainstSource(
     charEnd: charStart + normalizedQuote.length,
     normalizedQuote,
     suggestedStatus: 'quoted_verified',
-    explanation: 'Verbatim character sequence confirmed in authorized source.',
+    explanation: 'Verbatim character sequence found in the synthetic source.',
   }
 }

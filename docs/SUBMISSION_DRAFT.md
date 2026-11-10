@@ -1,5 +1,7 @@
 # Round 2 Official Submission Draft — Team GIT LOST
 
+> **Superseded draft — do not submit.** The feature and implementation claims below describe an earlier version. Use `docs/ROUND_2_FORM_RESPONSE_DRAFT.md` as the current factual drafting aid, then personally verify every statement and complete all TODOs before submitting.
+
 > **Hackathon:** CodersInPune (Round 2 — The Build)  
 > **Team Name:** GIT LOST  
 > **Team Leader:** Aditya Verma  

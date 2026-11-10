@@ -12,20 +12,22 @@
 
 When software engineers leave an organization, tribal knowledge evaporates. Successors are forced to dig through old pull requests, chat logs, and issue trackers to recover the "why" behind decisions.
 
-**Baton** transforms scattered project activity into an **Accountable Claim Ledger**—a verifiable database of atomic claims labeled with strict evidence provenance, reader-scoped permissions, and gap-driven leaver interviews.
+**Baton** is a handover workspace demonstrated with a synthetic case. It groups seeded claims, source excerpts, decisions, unfinished work, ownership, and conflicts so an incoming engineer can review what needs attention. It is not a database or a production access-control system.
 
 ### The Five Core Capabilities
-1. **Atomic Claim Ledger with Deterministic Verification:** Pure TypeScript substring checking (`verifyQuoteAgainstSource`) verifies quotes character-by-character against raw source documents before validating claims. Unverified quotes are automatically downgraded.
+1. **Seeded claim ledger with quote checking:** A reviewer can check whether edited text appears in the app’s synthetic source corpus. A match confirms text presence only; it does not prove the full claim or change the pre-seeded claim status. There is no live source ingestion.
 2. **Contradiction Settlement Queue:** Disagreement *is* the product discovery. Cross-source contradictions (e.g. PR #204 claiming AWS SQS vs Slack #payment-eng revealing rollback to RabbitMQ) are surfaced side-by-side for human settlement.
-3. **Gap-Driven Leaver Focus Interview:** Generates 5 targeted questions derived strictly from detected gaps (`not_found`, `inferred_ai` rationale). Submitting answers immediately stamps claims as `stated_by_leaver`.
+3. **Leaver interview demo:** Five questions are seeded from sample gaps. Submitting an answer updates a related sample claim to `stated_by_leaver` and records a timestamp in browser memory.
 4. **Reader-Scoped Demo Views:** Filters the sample claim ledger by the selected demo persona. This is a UI demonstration only: personas are selectable and are not authenticated identities or a security boundary. Do not use real confidential data with this zero-login build. A production deployment must authenticate users and enforce authorization on the server before returning claims or sources.
-5. **I-PASS-Inspired Receiver Acceptance:** Successor reviews sections individually, records acceptance, and can raise claim-linked questions. The current workspace does not issue a downloadable or signed certificate.
+5. **Successor review and questions:** A successor can mark sections reviewed, undo a review, and submit claim-linked questions. In the same browser session, the lead persona can record a reply. Nothing is sent to another person, changes reset on refresh, and no certificate is issued.
+
+The public verifier route performs deterministic text-presence checks only. Model-based entailment is not exposed in the demo.
 
 ---
 
 ## Live Demo & Zero-Sign-in Access
 
-The application opens with **zero login barrier** in incognito/private windows, directly loading a **synthetic FinTrack Payment Core Handover** case. All names, records, conversations, and credentials are fabricated for demonstration; do not treat this app as a secure handover system:
+Open the [deployed workspace](https://gitlostbaton.xyz/workspace#/) to view a **synthetic FinTrack Payment Core Handover** case. The app has no login. All names, records, conversations, and credentials are fabricated for demonstration; do not treat this app as a secure handover system:
 - **Alex Chen** (Staff Platform Engineer — Departing)
 - **Priya Sharma** (Senior Backend Engineer — Successor)
 - **Vikram Malhotra** (Engineering Director — Lead)
@@ -61,7 +63,7 @@ baton/
 │   │   ├── workspace/
 │   │   │   ├── layout.tsx            # Workspace layout wrapper
 │   │   │   └── page.tsx              # Main Handover Dashboard (The 4 Pillars & Persona Switcher)
-│   │   └── api/verify/route.ts       # Substring exact-match & Gemini entailment API
+│   │   └── api/verify/route.ts       # Deterministic quote check over synthetic sources
 │   ├── components/
 │   │   ├── HomeHero.tsx              # Landing page hero component
 │   │   ├── PillarDecisions.tsx       # Decisions Already Taken timeline
@@ -72,12 +74,10 @@ baton/
 │   │   ├── LeaverInterviewModal.tsx  # Focused 5-question interview drawer
 │   │   ├── ContradictionModal.tsx    # Side-by-side source diff resolution
 │   │   ├── ExposureDiffModal.tsx     # Lead compliance audit modal
-│   │   └── SuccessorSignoffBar.tsx   # Section-by-section accept/query console
 │   ├── lib/
 │   │   ├── types.ts                  # Shared TypeScript domain models
 │   │   ├── verifier.ts               # Deterministic exact substring matching engine
 │   │   ├── personaCompiler.ts        # Reader-clearance filter & exposure diff
-│   │   ├── gemini.ts                 # Structured Gemini API client with offline fallback
 │   │   └── store.tsx                 # Reactive state store with mutation handlers
 │   └── data/
 │       ├── rawSources.ts             # Raw synthetic GitHub PRs, Slack threads, Linear tickets
