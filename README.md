@@ -17,9 +17,9 @@ When software engineers leave an organization, tribal knowledge evaporates. Succ
 ### The Five Core Capabilities
 1. **Seeded claim ledger with quote checking:** A reviewer can check whether edited text appears in the app’s synthetic source corpus. A match confirms text presence only; it does not prove the full claim or change the pre-seeded claim status. There is no live source ingestion.
 2. **Contradiction Settlement Queue:** Disagreement *is* the product discovery. Cross-source contradictions (e.g. PR #204 claiming AWS SQS vs Slack #payment-eng revealing rollback to RabbitMQ) are surfaced side-by-side for human settlement.
-3. **Leaver interview demo:** Five questions are seeded from sample gaps. Submitting an answer updates a related sample claim to `stated_by_leaver` and records a timestamp in browser memory.
+3. **Leaver interview demo:** Five questions are seeded from sample gaps. Submitting an answer updates a related sample claim to `stated_by_leaver` and records a timestamp in this browser’s local storage.
 4. **Reader-Scoped Demo Views:** Filters the sample claim ledger by the selected demo persona. This is a UI demonstration only: personas are selectable and are not authenticated identities or a security boundary. Do not use real confidential data with this zero-login build. A production deployment must authenticate users and enforce authorization on the server before returning claims or sources.
-5. **Successor review and questions:** A successor can mark sections reviewed, undo a review, and submit claim-linked questions. In the same browser session, the lead persona can record a reply. Nothing is sent to another person, changes reset on refresh, and no certificate is issued.
+5. **Successor review and questions:** A successor can mark sections reviewed, undo a review, and submit claim-linked questions. The lead persona can record a reply. Changes are saved only in this browser; nothing is sent to another person or shared across devices, and no certificate is issued.
 
 The public verifier route performs deterministic text-presence checks only. Model-based entailment is not exposed in the demo.
 

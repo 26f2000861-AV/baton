@@ -28,9 +28,9 @@ A decisions view showing recorded choices, alternatives, and rationale confidenc
 An unfinished-work view with triage and successor adoption actions.
 An ownership view with current owners, proposed successors, transfer dates, and escalation contacts.
 A contradiction review flow showing the sample SQS and RabbitMQ records and recording a human decision or clarification.
-A five-question sample leaver interview flow that records answers in browser memory and adds dated history to related claims.
+A five-question sample leaver interview flow that records answers in browser-local state and adds dated history to related claims.
 Persona-filtered demo views for successor, leaver, and lead; these simulate reader-scoped views and are not authentication or production access control.
-Section-by-section successor review with undo, plus claim-linked questions and same-session replies from the lead persona. This sends no real messages and resets on refresh.
+Section-by-section successor review with undo, plus claim-linked questions and lead replies in the same browser. This sends no real messages and does not share state across devices.
 ```
 
 Before pasting, make sure each sentence describes a path you personally opened in the current deployed version. Remove anything that does not work there.
@@ -38,19 +38,19 @@ Before pasting, make sure each sentence describes a path you personally opened i
 ## Technology and implementation details
 
 ```text
-Built with Next.js 14 App Router, React 18, TypeScript, and Tailwind CSS. The workspace uses a client-side React state store seeded with synthetic handover records; it has no database or persistent backend. A server route checks whether a submitted quote appears in the fixed synthetic source corpus. It does not establish that a claim is true, update the seeded status, or call an LLM. The UI includes claim/source inspection, ownership and unfinished-work views, contradiction settlement, leaver interview, persona-filtered demo views, successor review, and same-session sample question replies.
+Built with Next.js 14 App Router, React 18, TypeScript, and Tailwind CSS. The workspace uses a client-side React state store seeded with synthetic handover records and saves demo changes in browser local storage; it has no server database or shared persistent backend. A server route checks whether a submitted quote appears in the fixed synthetic source corpus. It does not establish that a claim is true, update the seeded status, or call an LLM. The UI includes claim/source inspection, ownership and unfinished-work views, contradiction settlement, leaver interview, persona-filtered demo views, successor review, and sample question replies.
 ```
 
 ## What changed from the original proposal, and why?
 
 ```text
-Round 1 proposed PostgreSQL with pgvector and integrations with GitHub and other project sources. In Round 2 we narrowed the build to a self-contained demo: a synthetic seeded case, an in-memory state store, a user-triggered deterministic quote-presence check, and a human contradiction-resolution workflow. This let us demonstrate the handover workflow without claiming that live source ingestion, persistent storage, model-based entailment, or production identity and access control had been built. Those remain future work.
+Round 1 proposed PostgreSQL with pgvector and integrations with GitHub and other project sources. In Round 2 we narrowed the build to a self-contained demo: a synthetic seeded case, browser-local state persistence, a user-triggered deterministic quote-presence check, and a human contradiction-resolution workflow. This let us demonstrate the handover workflow without claiming that live source ingestion, shared server storage, model-based entailment, or production identity and access control had been built. Those remain future work.
 ```
 
 ## What does NOT work yet?
 
 ```text
-The app uses synthetic sample data and does not connect to live GitHub, Slack, Linear, or cloud systems. Workspace changes are held in browser memory and are lost on reload; there is no database or cross-user synchronization. Persona switching is a demo simulation, not authentication or a security boundary, so the app must not be used with real confidential data. Successor questions and lead replies are same-session sample state; no real person is notified. The verifier checks text presence only and does not validate claim entailment. Certificate generation is not available.
+The app uses synthetic sample data and does not connect to live GitHub, Slack, Linear, or cloud systems. Workspace changes persist in local storage on the current browser profile; there is no server database or cross-user/device synchronization. Persona switching is a demo simulation, not authentication or a security boundary, so the app must not be used with real confidential data. Successor questions and lead replies are saved locally; no real person is notified. The verifier checks text presence only and does not validate claim entailment. Certificate generation is not available.
 ```
 
 ## Three improvements for Round 3

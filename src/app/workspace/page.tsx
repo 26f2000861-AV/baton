@@ -321,7 +321,7 @@ export default function Home() {
         {menuOpen && <div id="mobile-navigation" className="mobile-menu" role="dialog" aria-modal="true" aria-label="Baton navigation"><Link href="/" className="nav-caption flex items-center gap-2 hover:text-[#eeeeee]" onClick={() => setMenuOpen(false)}><strong>Baton</strong> / Handover</Link>{routes.map(({ id, label, hash, icon: Icon }) => <a key={id} href={hash} aria-current={route === id ? 'page' : undefined} className={route === id ? 'selected' : undefined} onClick={(event) => { event.preventDefault(); navigate(id) }}><Icon size={17} />{label}</a>)}<button onClick={() => navigate('interview')}><MessageSquare size={17} />Leaver interview</button><button onClick={() => navigate('exposure')}><ShieldAlert size={17} />Exposure diff</button></div>}
         <main className={`sheet${clearancePulse ? ' clearance-pulse' : ''}`}>
           <div className="sheet-content">
-            <div className="sample-workspace-note"><span className="sample-indicator" />SAMPLE WORKSPACE<span className="sample-note-copy">Synthetic records · changes reset on refresh · role switcher is a preview, not access control.</span></div>
+            <div className="sample-workspace-note"><span className="sample-indicator" />SAMPLE WORKSPACE<span className="sample-note-copy">Synthetic records · saved in this browser only · role switcher is a preview, not access control.</span></div>
             <div className="page-heading">
               <div><p className="breadcrumb">Engineering <span>/</span> Handover</p><h1>{title}</h1></div>
             </div>

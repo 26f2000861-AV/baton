@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 import {
   INITIAL_CLAIMS,
   INITIAL_CONTRADICTIONS,
@@ -61,6 +61,33 @@ interface HandoverContextType {
 }
 
 const HandoverContext = createContext<HandoverContextType | null>(null)
+const DEMO_STORAGE_KEY = 'baton-demo-state-v1'
+const DEMO_STORAGE_VERSION = 1
+
+interface DemoSnapshot {
+  version: number
+  activeRole: PersonaRole
+  claims: Claim[]
+  decisions: ArchitecturalDecision[]
+  unfinished: UnfinishedWorkItem[]
+  ownership: OwnershipAsset[]
+  contradictions: ContradictionItem[]
+  questions: LeaverInterviewQuestion[]
+  queries: SuccessorQuery[]
+  sectionStates: Record<string, HandoverSectionState>
+}
+
+function isDemoSnapshot(value: unknown): value is DemoSnapshot {
+  if (!value || typeof value !== 'object') return false
+  const snapshot = value as Partial<DemoSnapshot>
+  return snapshot.version === DEMO_STORAGE_VERSION &&
+    ['successor', 'leaver', 'lead'].includes(snapshot.activeRole ?? '') &&
+    Array.isArray(snapshot.claims) && Array.isArray(snapshot.decisions) &&
+    Array.isArray(snapshot.unfinished) && Array.isArray(snapshot.ownership) &&
+    Array.isArray(snapshot.contradictions) && Array.isArray(snapshot.questions) &&
+    Array.isArray(snapshot.queries) && Boolean(snapshot.sectionStates) &&
+    typeof snapshot.sectionStates === 'object'
+}
 
 export function HandoverProvider({ children }: { children: React.ReactNode }) {
   const [activeRole, setActiveRole] = useState<PersonaRole>('successor')
@@ -78,6 +105,54 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
     ownership: { sectionId: 'ownership', isAccepted: false, queryCount: 0 },
     risks: { sectionId: 'risks', isAccepted: false, queryCount: 0 },
   })
+  const [storageReady, setStorageReady] = useState(false)
+
+  useEffect(() => {
+    try {
+      const rawSnapshot = window.localStorage.getItem(DEMO_STORAGE_KEY)
+      if (rawSnapshot) {
+        const snapshot: unknown = JSON.parse(rawSnapshot)
+        if (isDemoSnapshot(snapshot)) {
+          setActiveRole(snapshot.activeRole)
+          setClaims(snapshot.claims)
+          setDecisions(snapshot.decisions)
+          setUnfinished(snapshot.unfinished)
+          setOwnership(snapshot.ownership)
+          setContradictions(snapshot.contradictions)
+          setQuestions(snapshot.questions)
+          setQueries(snapshot.queries)
+          setSectionStates(snapshot.sectionStates)
+        } else {
+          window.localStorage.removeItem(DEMO_STORAGE_KEY)
+        }
+      }
+    } catch {
+      try { window.localStorage.removeItem(DEMO_STORAGE_KEY) } catch { /* Storage may be disabled. */ }
+    } finally {
+      setStorageReady(true)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!storageReady) return
+    const snapshot: DemoSnapshot = {
+      version: DEMO_STORAGE_VERSION,
+      activeRole,
+      claims,
+      decisions,
+      unfinished,
+      ownership,
+      contradictions,
+      questions,
+      queries,
+      sectionStates,
+    }
+    try {
+      window.localStorage.setItem(DEMO_STORAGE_KEY, JSON.stringify(snapshot))
+    } catch {
+      // The sample workspace remains usable when browser storage is unavailable.
+    }
+  }, [activeRole, claims, decisions, unfinished, ownership, contradictions, questions, queries, sectionStates, storageReady])
 
   const activePersona = PERSONA_PROFILES[activeRole]
 
