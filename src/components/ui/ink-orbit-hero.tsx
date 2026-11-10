@@ -28,9 +28,6 @@ export type InkOrbitHeroProps = {
 }
 
 const DEFAULT_ACCENTS = [
-  "Source-Backed Claims",
-  "Deterministic Proofs",
-  "Contradiction Resolvers",
   "Successor Sign-Offs",
 ]
 
@@ -255,12 +252,6 @@ function nextSeed(seed: number): number {
   return n === s ? (n + 7919) % 100000 : n
 }
 
-// Yaw angle converted to 0–359 degrees
-function headingOf(yaw: number): number {
-  const d = Math.round((yaw * 180) / Math.PI) % 360
-  return (d + 360) % 360
-}
-
 // Point cloud geometry generation for continuous particle interpolation
 type Cloud = { core: Float32Array; grain: Float32Array; spikes: Float32Array }
 const CORE_N = 2800
@@ -440,15 +431,14 @@ function InkOrbitSculpture({
   spin = 0.16,
   density = 1,
   glass = true,
-  hud = true,
-  label = "FORGE · 3D",
-  hint = "Drag to rotate · Click to reforge",
+  hud = false,
+  label = "",
+  hint = "",
   interactive = true,
   maxDpr = 2,
   className = "",
 }: InkOrbitSculptureProps) {
   const canvasRef = React.useRef(null as HTMLCanvasElement | null)
-  const headingRef = React.useRef(null as HTMLSpanElement | null)
   const [seed, setSeed] = React.useState(seedProp)
   React.useEffect(() => setSeed(seedProp), [seedProp])
 
@@ -612,11 +602,6 @@ function InkOrbitSculpture({
 
       const yaw = s.yaw + s.leanYaw
       const pitch = s.pitch + s.leanPitch
-      const hd = headingOf(yaw)
-      if (hd !== s.heading && headingRef.current) {
-        s.heading = hd
-        headingRef.current.textContent = "N " + String(hd).padStart(3, "0") + "°"
-      }
 
       const { ink: inkC, bg } = s.colors
       ctx.setTransform(1, 0, 0, 1, 0, 0)
@@ -857,12 +842,12 @@ function InkOrbitSculpture({
       {hud && (
         <>
           <div className="ios-hud ios-top" aria-hidden="true">
-            <span ref={headingRef}>N 000°</span>
+            <span>SHA-256: f7a9...4b12</span>
             {label && <span>{label}</span>}
           </div>
           <div className="ios-hud ios-bottom" aria-hidden="true">
             <span>{interactive ? hint : ""}</span>
-            <span>{"seed " + String(seed).padStart(5, "0")}</span>
+            <span>IMMUTABLE TOPOLOGY</span>
           </div>
         </>
       )}

@@ -50,22 +50,17 @@ export default function HomeHero() {
           <InkOrbitHero
             theme="dark"
             titleTop="Accountable Handover With"
-            titleAccent={[
-              "Source-Backed Claims",
-              "Deterministic Proofs",
-              "Contradiction Resolvers",
-              "Successor Sign-Offs",
-            ]}
+            titleAccent={["Successor Sign-Offs"]}
             description="Baton transforms high-stakes engineering handovers into cryptographic, source-backed claim ledgers. Resolve hidden architecture contradictions, inspect evidence drawers, and achieve verified successor sign-off."
             primaryCta="Enter Handover Workspace"
             onPrimary={() => router.push('/workspace')}
             secondaryCta="Inspect Routing Conflict"
             onSecondary={() => router.push('/workspace#conflict')}
             proof={null}
-            sculptureLabel="PAYMENT-CORE-V2"
-            sculptureHint="Drag to inspect topology"
-            hud={true}
-            minHeight="clamp(500px, 64svh, 680px)"
+            sculptureLabel=""
+            sculptureHint=""
+            hud={false}
+            minHeight="clamp(480px, 60svh, 640px)"
           />
         </div>
       </HeroScrollVideoReveal>

@@ -57,20 +57,6 @@ export const HeroScrollVideoReveal: React.FC<HeroScrollVideoRevealProps> = ({
   const tagRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    // Optional Lenis smooth scroll
-    let lenis: any = null;
-    let lenisTicker: ((time: number) => void) | null = null;
-
-    import('@studio-freight/lenis')
-      .then(({ default: Lenis }: any) => {
-        lenis = new Lenis({ smooth: true });
-        lenis.on('scroll', ScrollTrigger.update);
-        lenisTicker = (time: number) => lenis.raf(time * 1000);
-        gsap.ticker.add(lenisTicker);
-        gsap.ticker.lagSmoothing(0);
-      })
-      .catch(() => {});
-
     // Word split kinetic reveal animation
     let split: any = null;
     let words: Element[] = [];
@@ -141,10 +127,6 @@ export const HeroScrollVideoReveal: React.FC<HeroScrollVideoRevealProps> = ({
       if (split && split.revert) split.revert();
       revealTl.kill();
       ScrollTrigger.getAll().forEach((t) => t.kill());
-      if (lenis && lenisTicker) {
-        gsap.ticker.remove(lenisTicker);
-        lenis.destroy();
-      }
     };
   }, []);
 
@@ -155,11 +137,11 @@ export const HeroScrollVideoReveal: React.FC<HeroScrollVideoRevealProps> = ({
     >
       {/* ── Section 1: Intro Bold Tagline ─────────────────────────────────── */}
       <section
-        className="w-full min-h-[75vh] flex flex-col justify-center items-center text-center px-4 sm:px-8 py-20 text-[clamp(2.2rem,5vw,4.8rem)] font-bold tracking-tight leading-tight text-white relative z-10"
+        className="w-full min-h-[48vh] flex flex-col justify-center items-center text-center px-4 sm:px-8 pt-28 pb-14 text-[clamp(1.9rem,4.2vw,3.8rem)] font-bold tracking-tight leading-tight text-white relative z-10"
         style={{ backgroundColor: bgColor }}
       >
         <div className="max-w-4xl">{topText}</div>
-        <div className="mt-10 flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-[#8d8d8d]">
+        <div className="mt-8 flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-[#8d8d8d]">
           <span>Scroll to inspect handover architecture</span>
           <span>&darr;</span>
         </div>
