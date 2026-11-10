@@ -25,8 +25,32 @@ export default function HomeHero() {
         </div>
       </header>
 
-      {/* Main Hero Viewport */}
-      <div className="flex flex-1 flex-col justify-center">
+      {/* 1. Scroll Reveal Entrance */}
+      <HeroScrollVideoReveal
+        bgColor="#0b0b0b"
+        topText={
+          <div className="flex flex-col items-center">
+            <span className="mb-4 text-xs font-mono uppercase tracking-widest text-[#8d8d8d]">
+              Deterministic Engineering Transfer
+            </span>
+            <span>
+              Built to transfer mission-critical code,
+              <br />
+              <span className="font-serif italic font-normal text-[#c9c9c9]">not tribal rumors.</span>
+            </span>
+          </div>
+        }
+        headingText={
+          <>
+            Inspect Every Claim. <br />
+            Resolve Every Contradiction.
+          </>
+        }
+        subText="From AWS SQS FIFO retries to legacy RabbitMQ clusters — Baton provides immutable source verification before successor sign-off."
+      />
+
+      {/* 2. Main Handover Workspace Hero Section (Section in image) */}
+      <div id="handover-core" className="flex flex-1 flex-col justify-center border-t border-[#262626]">
         <InkOrbitHero
           theme="dark"
           titleTop="Accountable Handover With"
@@ -49,7 +73,7 @@ export default function HomeHero() {
         />
       </div>
 
-      {/* Product Highlights Strip */}
+      {/* 3. Product Highlights Strip (Section in image) */}
       <div className="border-t border-[#262626] bg-[#121212]/60 px-4 py-8 sm:px-6">
         <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-4 sm:grid-cols-3">
           <Link
@@ -110,45 +134,6 @@ export default function HomeHero() {
           </Link>
         </div>
       </div>
-
-      {/* Scroll Pin Reveal Section */}
-      <HeroScrollVideoReveal
-        bgColor="#0b0b0b"
-        topText={
-          <div className="flex flex-col items-center">
-            <span className="mb-4 text-xs font-mono uppercase tracking-widest text-[#8d8d8d]">
-              Deterministic Engineering Transfer
-            </span>
-            <span>
-              Built to transfer mission-critical code,
-              <br />
-              <span className="font-serif italic font-normal text-[#c9c9c9]">not tribal rumors.</span>
-            </span>
-          </div>
-        }
-        headingText={
-          <>
-            Inspect Every Claim. <br />
-            Resolve Every Contradiction.
-          </>
-        }
-        subText="From AWS SQS FIFO retries to legacy RabbitMQ clusters — Baton provides immutable source verification before successor sign-off."
-        bottomText={
-          <div className="flex flex-col items-center gap-6">
-            <div>
-              Where every handover decision feels
-              <br />
-              <span className="font-serif italic font-normal text-[#c9c9c9]">deterministic &amp; provable.</span>
-            </div>
-            <Link
-              href="/workspace"
-              className="inline-flex items-center gap-2 rounded border border-[#363636] bg-[#efefef] px-6 py-3 text-sm font-semibold text-[#121212] transition-all hover:bg-white hover:shadow-[0_0_24px_rgba(255,255,255,0.25)]"
-            >
-              Launch Handover Workspace &rarr;
-            </Link>
-          </div>
-        }
-      />
     </div>
   )
 }
