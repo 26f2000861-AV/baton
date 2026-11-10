@@ -1,6 +1,6 @@
 # Round 2 — The Build: form response draft
 
-Use this as a drafting aid for the official submission form. Replace every `TODO` before submitting. **Submission-count instructions conflict:** the official event page says each participant files an entry, while the Round 2 email says the team leader submits once. Check the live Round 2 form or get written clarification before filing; do not assume these instructions agree. Each participant must provide their own role and contribution wherever requested.
+Use this as a drafting aid for the official submission form. Replace every `TODO` before submitting. **The live Round 2 form says the team leader submits once**, matching the Round 2 email. Follow that form; keep each participant's role and contribution in the updated project PDF wherever requested.
 
 ## Team details
 
@@ -26,6 +26,7 @@ An evidence ledger showing seeded claims, sample evidence statuses, and source e
 A source inspector for reviewing claim context and provenance.
 A decisions view showing recorded choices, alternatives, and rationale confidence.
 An unfinished-work view with triage and successor adoption actions.
+An in-work decision capture form for recording a change, rationale, next action, and optional source reference; entries are saved in this browser and shown in the successor's decision history.
 An ownership view with current owners, proposed successors, transfer dates, and escalation contacts.
 A contradiction review flow showing the sample SQS and RabbitMQ records and recording a human decision or clarification.
 A five-question sample leaver interview flow that records answers in browser-local state and adds dated history to related claims.
@@ -38,7 +39,7 @@ Before pasting, make sure each sentence describes a path you personally opened i
 ## Technology and implementation details
 
 ```text
-Built with Next.js 14 App Router, React 18, TypeScript, and Tailwind CSS. The workspace uses a client-side React state store seeded with synthetic handover records and saves demo changes in browser local storage; it has no server database or shared persistent backend. A server route checks whether a submitted quote appears in the fixed synthetic source corpus. It does not establish that a claim is true, update the seeded status, or call an LLM. The UI includes claim/source inspection, ownership and unfinished-work views, contradiction settlement, leaver interview, persona-filtered demo views, successor review, and sample question replies.
+Built with Next.js 14 App Router, React 18, TypeScript, and Tailwind CSS. The workspace uses a client-side React state store seeded with synthetic handover records and saves demo changes in browser local storage; it has no server database or shared persistent backend. Engineers can record a decision or change, rationale, next action, and optional source reference during work; entries are person-reported and references are not verified. A server route checks whether a submitted quote appears in the fixed synthetic source corpus. It does not establish that a claim is true, update the seeded status, or call an LLM. The UI includes claim/source inspection, ownership and unfinished-work views, contradiction settlement, leaver interview, persona-filtered demo views, successor review, and sample question replies.
 ```
 
 ## What changed from the original proposal, and why?
@@ -50,7 +51,7 @@ Round 1 proposed PostgreSQL with pgvector and integrations with GitHub and other
 ## What does NOT work yet?
 
 ```text
-The app uses synthetic sample data and does not connect to live GitHub, Slack, Linear, or cloud systems. Workspace changes persist in local storage on the current browser profile; there is no server database or cross-user/device synchronization. The current demo does not let an engineer create decision records as work happens; it demonstrates how seeded records, a leaver answer, and a human conflict decision can be reviewed during a handover. Persona switching is a demo simulation, not authentication or a security boundary, so the app must not be used with real confidential data. Successor questions and lead replies are saved locally; no real person is notified. The verifier checks text presence only and does not validate claim entailment. Certificate generation is not available.
+The app uses synthetic sample data and does not connect to live GitHub, Slack, Linear, or cloud systems. Workspace changes persist in local storage on the current browser profile; there is no server database or cross-user/device synchronization. Work updates and other workflow changes are not shared across devices or users. New source references are entered by the person and are not checked against connected sources. Persona switching is a demo simulation, not authentication or a security boundary, so the app must not be used with real confidential data. Successor questions and lead replies are saved locally; no real person is notified. The verifier checks text presence only and does not validate claim entailment. Certificate generation is not available.
 ```
 
 ## Three improvements for Round 3
@@ -69,10 +70,10 @@ Add sign-in, server-side role authorization, and persistent storage for handover
 Add a scoped GitHub import for pull requests and commits, then map imported source records to claims with verifiable excerpts and links back to origin. The user can refresh a handover from real project records instead of relying on the seeded case. Clearly show import errors and unsupported source types.
 ```
 
-### Improvement 3 — Capture knowledge during the work
+### Improvement 3 — Share and verify the work history
 
 ```text
-Let engineers record a decision when it is made, including the context, rationale, alternatives, owner, follow-up, and a link to the relevant PR or issue. Keep the entry in a dated handover history so a successor can see what changed and why without reconstructing it from scratch. Clearly distinguish a person's note from a source-backed claim.
+Extend the local capture prototype into a shared, dated team history. Persist each entry with its author and link it to an imported PR or issue; show source verification separately from the author's explanation. Let the successor trace what changed, why, and what follow-up remains across devices.
 ```
 
 ## Final confirmation checklist — do not tick until true
@@ -82,7 +83,7 @@ Let engineers record a decision when it is made, including the context, rational
 - [ ] PDF is shared as “Anyone with the link” — Viewer.
 - [ ] Every listed feature works in the deployed product and every limitation above is disclosed.
 - [ ] Round 1 team name, leader name, and leader email match exactly.
-- [ ] Resolve the official event-page versus Round 2 email submission-count conflict by checking the live form or written organizer clarification.
+- [x] Confirmed the live Round 2 form says the team leader submits once.
 - [ ] Disclose the significant AI tools actually used to build the project, in the field requested by the official form.
 - [ ] Round 2 closes November 11, 2026 at 10:00 IST on the published event schedule; follow the official submission form/email if it gives a more specific instruction.
 - [ ] Check the deployed link and PDF link in a private window before submitting.

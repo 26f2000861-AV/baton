@@ -12,14 +12,15 @@
 
 When software engineers leave an organization, tribal knowledge evaporates. Successors are forced to dig through old pull requests, chat logs, and issue trackers to recover the "why" behind decisions.
 
-**Baton** is a handover workspace demonstrated with a synthetic case. It groups seeded claims, source excerpts, decisions, unfinished work, ownership, and conflicts so an incoming engineer can review what needs attention. It is not a database or a production access-control system.
+**Baton** is a handover workspace demonstrated with a synthetic case. It groups seeded claims, source excerpts, decisions, unfinished work, ownership, and conflicts so an incoming engineer can review what needs attention. Departing engineers can also capture a decision or change as it happens, with its rationale, next action, and an optional source reference. Captured entries are person-reported and saved only in the current browser. Baton is not a shared database or a production access-control system.
 
 ### The Five Core Capabilities
 1. **Seeded claim ledger with quote checking:** A reviewer can check whether edited text appears in the app’s synthetic source corpus. A match confirms text presence only; it does not prove the full claim or change the pre-seeded claim status. There is no live source ingestion.
-2. **Contradiction Settlement Queue:** Disagreement *is* the product discovery. Cross-source contradictions (e.g. PR #204 claiming AWS SQS vs Slack #payment-eng revealing rollback to RabbitMQ) are surfaced side-by-side for human settlement.
-3. **Leaver interview demo:** Five questions are seeded from sample gaps. Submitting an answer updates a related sample claim to `stated_by_leaver` and records a timestamp in this browser’s local storage.
-4. **Reader-Scoped Demo Views:** Filters the sample claim ledger by the selected demo persona. This is a UI demonstration only: personas are selectable and are not authenticated identities or a security boundary. Do not use real confidential data with this zero-login build. A production deployment must authenticate users and enforce authorization on the server before returning claims or sources.
-5. **Successor review and questions:** A successor can mark sections reviewed, undo a review, and submit claim-linked questions. The lead persona can record a reply. Changes are saved only in this browser; nothing is sent to another person or shared across devices, and no certificate is issued.
+2. **In-work decision capture:** Record a decision or change, why it happened, the next action, and an optional source reference; the dated entry appears in the handover history. Entries and references are not source-verified or shared across devices.
+3. **Contradiction Settlement Queue:** Disagreement *is* the product discovery. Cross-source contradictions (e.g. PR #204 claiming AWS SQS vs Slack #payment-eng revealing rollback to RabbitMQ) are surfaced side-by-side for human settlement.
+4. **Leaver interview demo:** Five questions are seeded from sample gaps. Submitting an answer updates a related sample claim to `stated_by_leaver` and records a timestamp in this browser’s local storage.
+5. **Reader-Scoped Demo Views:** Filters the sample claim ledger by the selected demo persona. This is a UI demonstration only: personas are selectable and are not authenticated identities or a security boundary. Do not use real confidential data with this zero-login build. A production deployment must authenticate users and enforce authorization on the server before returning claims or sources.
+6. **Successor review and questions:** A successor can mark sections reviewed, undo a review, and submit claim-linked questions. The lead persona can record a reply. Changes are saved only in this browser; nothing is sent to another person or shared across devices, and no certificate is issued.
 
 The public verifier route performs deterministic text-presence checks only. Model-based entailment is not exposed in the demo.
 

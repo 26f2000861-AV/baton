@@ -21,6 +21,7 @@ import {
   PersonaRole,
   SuccessorQuery,
   UnfinishedWorkItem,
+  WorkUpdate,
 } from './types'
 
 interface HandoverContextType {
@@ -36,6 +37,7 @@ interface HandoverContextType {
     reason: string
   }[]
   decisions: ArchitecturalDecision[]
+  workUpdates: WorkUpdate[]
   unfinished: UnfinishedWorkItem[]
   ownership: OwnershipAsset[]
   contradictions: ContradictionItem[]
@@ -51,6 +53,7 @@ interface HandoverContextType {
   adoptUnfinishedItem: (itemId: string) => void
   acceptSection: (sectionId: 'decisions' | 'unfinished' | 'ownership' | 'risks') => void
   undoSectionAcceptance: (sectionId: 'decisions' | 'unfinished' | 'ownership' | 'risks') => void
+  captureWorkUpdate: (update: Omit<WorkUpdate, 'id' | 'capturedBy' | 'capturedAt'>) => void
   submitSuccessorQuery: (
     claimId: string,
     category: SuccessorQuery['queryCategory'],
@@ -62,13 +65,14 @@ interface HandoverContextType {
 
 const HandoverContext = createContext<HandoverContextType | null>(null)
 const DEMO_STORAGE_KEY = 'baton-demo-state-v1'
-const DEMO_STORAGE_VERSION = 1
+const DEMO_STORAGE_VERSION = 2
 
 interface DemoSnapshot {
   version: number
   activeRole: PersonaRole
   claims: Claim[]
   decisions: ArchitecturalDecision[]
+  workUpdates: WorkUpdate[]
   unfinished: UnfinishedWorkItem[]
   ownership: OwnershipAsset[]
   contradictions: ContradictionItem[]
@@ -80,12 +84,14 @@ interface DemoSnapshot {
 function isDemoSnapshot(value: unknown): value is DemoSnapshot {
   if (!value || typeof value !== 'object') return false
   const snapshot = value as Partial<DemoSnapshot>
-  return snapshot.version === DEMO_STORAGE_VERSION &&
+  return (snapshot.version === 1 || snapshot.version === DEMO_STORAGE_VERSION) &&
     ['successor', 'leaver', 'lead'].includes(snapshot.activeRole ?? '') &&
     Array.isArray(snapshot.claims) && Array.isArray(snapshot.decisions) &&
     Array.isArray(snapshot.unfinished) && Array.isArray(snapshot.ownership) &&
     Array.isArray(snapshot.contradictions) && Array.isArray(snapshot.questions) &&
-    Array.isArray(snapshot.queries) && Boolean(snapshot.sectionStates) &&
+    Array.isArray(snapshot.queries) &&
+    (snapshot.workUpdates === undefined || Array.isArray(snapshot.workUpdates)) &&
+    Boolean(snapshot.sectionStates) &&
     typeof snapshot.sectionStates === 'object'
 }
 
@@ -93,6 +99,7 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
   const [activeRole, setActiveRole] = useState<PersonaRole>('successor')
   const [claims, setClaims] = useState<Claim[]>(INITIAL_CLAIMS)
   const [decisions, setDecisions] = useState<ArchitecturalDecision[]>(INITIAL_DECISIONS)
+  const [workUpdates, setWorkUpdates] = useState<WorkUpdate[]>([])
   const [unfinished, setUnfinished] = useState<UnfinishedWorkItem[]>(INITIAL_UNFINISHED)
   const [ownership, setOwnership] = useState<OwnershipAsset[]>(INITIAL_OWNERSHIP)
   const [contradictions, setContradictions] = useState<ContradictionItem[]>(INITIAL_CONTRADICTIONS)
@@ -116,6 +123,7 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
           setActiveRole(snapshot.activeRole)
           setClaims(snapshot.claims)
           setDecisions(snapshot.decisions)
+          setWorkUpdates(snapshot.workUpdates ?? [])
           setUnfinished(snapshot.unfinished)
           setOwnership(snapshot.ownership)
           setContradictions(snapshot.contradictions)
@@ -140,6 +148,7 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
       activeRole,
       claims,
       decisions,
+      workUpdates,
       unfinished,
       ownership,
       contradictions,
@@ -152,7 +161,7 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
     } catch {
       // The sample workspace remains usable when browser storage is unavailable.
     }
-  }, [activeRole, claims, decisions, unfinished, ownership, contradictions, questions, queries, sectionStates, storageReady])
+  }, [activeRole, claims, decisions, workUpdates, unfinished, ownership, contradictions, questions, queries, sectionStates, storageReady])
 
   const activePersona = PERSONA_PROFILES[activeRole]
 
@@ -300,6 +309,24 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
     }))
   }
 
+  const captureWorkUpdate = (update: Omit<WorkUpdate, 'id' | 'capturedBy' | 'capturedAt'>) => {
+    const decisionText = update.decisionText.trim()
+    const rationale = update.rationale.trim()
+    if (!decisionText || !rationale) return
+
+    const captured: WorkUpdate = {
+      ...update,
+      decisionText,
+      rationale,
+      nextAction: update.nextAction.trim(),
+      sourceReference: update.sourceReference.trim(),
+      id: `update_${crypto.randomUUID()}`,
+      capturedBy: activePersona.name,
+      capturedAt: new Date().toISOString(),
+    }
+    setWorkUpdates((current) => [captured, ...current])
+  }
+
   const submitSuccessorQuery = (
     claimId: string,
     category: SuccessorQuery['queryCategory'],
@@ -359,6 +386,7 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
   const resetDemoData = () => {
     setClaims(INITIAL_CLAIMS)
     setDecisions(INITIAL_DECISIONS)
+    setWorkUpdates([])
     setUnfinished(INITIAL_UNFINISHED)
     setOwnership(INITIAL_OWNERSHIP)
     setContradictions(INITIAL_CONTRADICTIONS)
@@ -383,6 +411,7 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
         withheldCount,
         withheldDetails: withheldClaims,
         decisions,
+        workUpdates,
         unfinished,
         ownership,
         contradictions,
@@ -394,6 +423,7 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
         adoptUnfinishedItem,
         acceptSection,
         undoSectionAcceptance,
+        captureWorkUpdate,
         submitSuccessorQuery,
         resolveSuccessorQuery,
         resetDemoData,

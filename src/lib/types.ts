@@ -87,6 +87,16 @@ export interface ArchitecturalDecision {
   associatedClaimId: string
 }
 
+export interface WorkUpdate {
+  id: string
+  decisionText: string
+  rationale: string
+  nextAction: string
+  sourceReference: string
+  capturedBy: string
+  capturedAt: string
+}
+
 export interface UnfinishedWorkItem {
   id: string
   title: string

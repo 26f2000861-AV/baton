@@ -30,7 +30,7 @@ Baton centers a handover on an inspectable claim ledger. It distinguishes exact 
 
 ## Capabilities and Constraints
 
-- The demo includes a claim ledger, source inspector, decision and unfinished-work views, ownership view, contradiction review, leaver interview, persona-filtered views, lead exposure preview, successor questions, and section acceptance.
+- The demo includes a claim ledger, source inspector, in-work decision capture (change, rationale, next action, optional unverified source reference), unfinished-work views, ownership view, contradiction review, leaver interview, persona-filtered views, lead exposure preview, successor questions, and section acceptance.
 - The seeded workflow state is saved in this browser's local storage so the demo survives refreshes. There is no server database, account system, live GitHub/Slack/Linear ingestion, cross-device synchronization, or working production authorization.
 - Persona switching demonstrates role-specific views; it is not authentication or a security boundary. Use synthetic data only.
 - The verifier confirms an exact quote substring, with limited newline normalization. This is not a substitute for human review of the source and claim.
