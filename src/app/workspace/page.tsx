@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import Link from 'next/link'
 import {
-  AlertTriangle, ArrowDownUp, CheckSquare, ChevronDown,
+  AlertTriangle, ArrowDownUp, CheckSquare,
   FileText, GitCommit, GitPullRequest, LayoutDashboard, Menu, MessageSquare,
   RotateCcw, Search, ShieldAlert, ShieldCheck, X,
 } from 'lucide-react'
@@ -239,12 +239,6 @@ export default function Home() {
     }
   }
   const activeClaim = claims.find((claim) => claim.id === selectedClaimId) ?? claims[0]
-  const personaInitials = activePersona.name.split(' ').map((part) => part[0]).join('')
-  const personaRoleLabel = activePersona.role === 'successor'
-    ? 'Successor'
-    : activePersona.role === 'leaver'
-      ? 'Departing engineer'
-      : 'Engineering lead'
   const drawerClaim = claims.find((claim) => claim.id === drawerClaimId)
   const activeConflict = contradictions.find((item) => item.id === selectedConflictId)
   const pendingQuestions = questions.filter((item) => item.status === 'pending_answer')
@@ -314,26 +308,18 @@ export default function Home() {
           <button className="mobile-menu-button" aria-label={menuOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={menuOpen} aria-controls="mobile-navigation" onClick={() => { if (!menuOpen) rememberFocus(); setMenuOpen((open) => !open) }}>{menuOpen ? <X size={19} /> : <Menu size={19} />}</button>
           <Link href="/" className="topbar-title" title="Return to landing page" aria-label="Baton - Return to landing page"><BatonMark compact /><div className="topbar-brand-copy"><span>Baton</span><small>{title}</small></div></Link>
           <label className="global-search"><Search size={15} /><input ref={searchInputRef} value={search} onFocus={() => { if (route !== 'claims') navigate('claims') }} onChange={(event) => setSearch(event.target.value)} placeholder="Search claims and sources" aria-label="Search claims and sources" /><kbd>Ctrl K</kbd></label>
-          <label
-            className="persona-control"
-            title={`Reviewing as ${activePersona.name} · ${personaRoleLabel}`}
-          >
-            <span className="persona-avatar" aria-hidden="true">{personaInitials}</span>
-            <span className="persona-copy" aria-hidden="true">
-              <span className="persona-name">{activePersona.name}</span>
-              <span className="persona-role">{personaRoleLabel}</span>
-            </span>
-            <select
-              value={activePersona.role}
-              onChange={(event) => handlePersonaChange(event.target.value as 'successor' | 'leaver' | 'lead')}
-              aria-label={`Reviewer persona. Current reviewer: ${activePersona.name}, ${personaRoleLabel}`}
-            >
-              <option value="successor">Priya Sharma · Successor</option>
-              <option value="leaver">Alex Chen · Leaver</option>
-              <option value="lead">Vikram Malhotra · Lead</option>
-            </select>
-            <ChevronDown size={12} className="persona-chevron text-[#8d8d8d] flex-none" />
-          </label>
+          <div className="persona-switcher" role="group" aria-label="Preview handover as">
+            <span className="persona-switcher-label" aria-hidden="true">VIEW AS</span>
+            <button type="button" className={`persona-chip${activePersona.role === 'successor' ? ' selected' : ''}`} aria-pressed={activePersona.role === 'successor'} aria-label="Preview as Priya Sharma, successor" title="Priya Sharma · Successor" onClick={() => handlePersonaChange('successor')}>
+              <span className="persona-chip-name">Priya</span><span className="persona-chip-role">Successor</span>
+            </button>
+            <button type="button" className={`persona-chip${activePersona.role === 'leaver' ? ' selected' : ''}`} aria-pressed={activePersona.role === 'leaver'} aria-label="Preview as Alex Chen, departing engineer" title="Alex Chen · Departing engineer" onClick={() => handlePersonaChange('leaver')}>
+              <span className="persona-chip-name">Alex</span><span className="persona-chip-role">Departing</span>
+            </button>
+            <button type="button" className={`persona-chip${activePersona.role === 'lead' ? ' selected' : ''}`} aria-pressed={activePersona.role === 'lead'} aria-label="Preview as Vikram Malhotra, engineering lead" title="Vikram Malhotra · Engineering lead" onClick={() => handlePersonaChange('lead')}>
+              <span className="persona-chip-name">Vikram</span><span className="persona-chip-role">Lead</span>
+            </button>
+          </div>
         </header>
         {menuOpen && <div id="mobile-navigation" className="mobile-menu" role="dialog" aria-modal="true" aria-label="Baton navigation"><Link href="/" className="nav-caption flex items-center gap-2 hover:text-[#eeeeee]" onClick={() => setMenuOpen(false)}><strong>Baton</strong> / FinTrack</Link>{routes.map(({ id, label, hash, icon: Icon }) => <a key={id} href={hash} aria-current={route === id ? 'page' : undefined} className={route === id ? 'selected' : undefined} onClick={(event) => { event.preventDefault(); navigate(id) }}><Icon size={17} />{label}</a>)}<button onClick={() => navigate('interview')}><MessageSquare size={17} />Leaver interview</button><button onClick={() => navigate('exposure')}><ShieldAlert size={17} />Exposure diff</button></div>}
         <main className={`sheet${clearancePulse ? ' clearance-pulse' : ''}`}>

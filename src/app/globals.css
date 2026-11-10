@@ -64,17 +64,15 @@ a:focus-visible {
 .global-search input { width: 100%; min-width: 0; min-height: 44px; border: 0; outline: 0; background: transparent; color: var(--text); font-size: var(--fs-small); }
 .global-search input::placeholder { color: var(--muted); opacity: 1; }
 .global-search kbd { flex: none; border: 1px solid var(--border); border-radius: var(--radius-control); padding: 1px 5px; color: var(--muted); font-size: var(--fs-small); }
-.persona-control { position: relative; display: flex; width: clamp(160px, 21vw, 224px); height: 44px; align-items: center; justify-self: end; gap: 10px; padding: 0 11px; border: 1px solid var(--control); border-radius: var(--radius-control); background: var(--surface); color: var(--text); cursor: pointer; transition: border-color var(--t-ui) var(--ease-out), background-color var(--t-ui) var(--ease-out), transform var(--t-ui) var(--ease-out); }
-.persona-control:hover { border-color: var(--text); }
-.persona-control:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
-.persona-control:active { transform: translateY(1px); }
-.persona-avatar { display: grid; width: 29px; height: 29px; flex: none; place-items: center; border: 1px solid var(--border-strong); border-radius: 50%; background: var(--active); color: var(--text); font-size: 10px; font-weight: 650; letter-spacing: -0.03em; }
-.persona-copy { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 2px; overflow: hidden; }
-.persona-name { overflow: hidden; color: var(--text); font-size: 12px; font-weight: 600; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
-.persona-role { overflow: hidden; color: var(--muted); font-size: 10px; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
-.persona-chevron { flex: none; color: var(--muted); transition: transform var(--t-ui) var(--ease-out), color var(--t-ui) var(--ease-out); }
-.persona-control:hover .persona-chevron { color: var(--text); transform: translateY(1px); }
-.persona-control select { position: absolute; z-index: 1; inset: 0; width: 100%; height: 100%; appearance: none; border: 0; outline: 0; background: transparent; opacity: 0; cursor: pointer; }
+.persona-switcher { display: flex; width: min(310px, 29vw); height: 44px; align-items: center; justify-self: end; gap: 4px; padding: 3px 5px; border: 1px solid var(--control); border-radius: var(--radius-control); background: var(--surface); }
+.persona-switcher-label { flex: none; padding: 0 5px; color: var(--muted); font-size: 8px; font-weight: 650; letter-spacing: .08em; }
+.persona-chip { display: flex; min-width: 0; height: 34px; flex: 1; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 0 5px; border: 1px solid transparent; border-radius: calc(var(--radius-control) - 2px); background: transparent; color: var(--muted); cursor: pointer; transition: background-color var(--t-ui) var(--ease-out), border-color var(--t-ui) var(--ease-out), color var(--t-ui) var(--ease-out), transform var(--t-ui) var(--ease-out); }
+.persona-chip:hover { border-color: var(--border); color: var(--text); }
+.persona-chip:active { transform: translateY(1px); }
+.persona-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.persona-chip.selected { border-color: var(--border-strong); background: var(--active); color: var(--text); }
+.persona-chip-name { font-size: 10px; font-weight: 600; line-height: 1.1; }
+.persona-chip-role { font-size: 8px; line-height: 1.1; opacity: .8; }
 .icon-action, .mobile-menu-button { display: inline-flex; width: 44px; height: 44px; align-items: center; justify-content: center; border: 1px solid transparent; border-radius: var(--radius-control); background: transparent; color: var(--muted); transition: background-color var(--t-ui) var(--ease-out), color var(--t-ui) var(--ease-out); }
 .icon-action:hover, .mobile-menu-button:hover { border-color: var(--control); background: var(--surface); color: var(--text); }
 .mobile-menu-button, .mobile-action, .mobile-menu { display: none; }
@@ -567,39 +565,11 @@ h1 { color: var(--text); font-size: var(--fs-title); font-weight: 600; line-heig
   }
   .global-search, .icon-action { display: none; }
 
-  /* Clean Reviewer Persona Pill Trigger on Mobile */
-  .persona-control {
-    position: relative;
-    display: inline-flex;
-    width: min(148px, 42vw);
-    height: 44px;
-    align-items: center;
-    gap: 8px;
-    padding: 0 8px;
-    border: 1px solid var(--border-strong);
-    border-radius: var(--radius-control);
-    background: var(--surface);
-    color: var(--text);
-    flex: none;
-    cursor: pointer;
-  }
-  .persona-avatar {
-    width: 27px;
-    height: 27px;
-    font-size: 9px;
-  }
-  .persona-name {
-    font-size: 11px;
-  }
-  .persona-role {
-    font-size: 9px;
-  }
-  .persona-control select {
-    -webkit-appearance: none;
-  }
-  .persona-control::before {
-    content: none !important;
-  }
+  .persona-switcher { width: min(176px, 48vw); height: 40px; gap: 2px; padding: 2px; flex: none; }
+  .persona-switcher-label { display: none; }
+  .persona-chip { height: 34px; padding: 0 3px; }
+  .persona-chip-name { font-size: 10px; }
+  .persona-chip-role { display: none; }
 
   .sheet { min-height: calc(100vh - 52px); margin: 0; border-right: 0; border-bottom: 0; border-left: 0; border-radius: 0; }
   .sheet-content { padding: 18px 14px 32px; }
