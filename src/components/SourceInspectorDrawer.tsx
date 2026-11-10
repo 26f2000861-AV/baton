@@ -3,6 +3,7 @@
 import { useRef } from 'react'
 import { X, ExternalLink, ShieldCheck, Clock, User } from 'lucide-react'
 import { Claim } from '@/lib/types'
+import { CLAIM_STATUS_COPY } from '@/lib/claimStatus'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
 
 export default function SourceInspectorDrawer({
@@ -28,6 +29,7 @@ export default function SourceInspectorDrawer({
   if (!claim) return null
 
   const source = claim.sourceQuotes[0]
+  const status = CLAIM_STATUS_COPY[claim.status]
   const isExactVerified = claim.status === 'quoted_verified'
 
   return (
@@ -73,15 +75,14 @@ export default function SourceInspectorDrawer({
             <div className="flex items-center gap-2">
               <ShieldCheck size={16} className={isExactVerified ? 'text-[#1D5FBF]' : 'text-[#6B6B6B]'} />
               <span className="font-semibold text-[#0A0A0A]">
-                {isExactVerified
-                  ? 'Exact Substring Verified (Deterministic Match)'
-                  : `Verification Status: ${claim.status.replaceAll('_', ' ')}`}
+                {status.label}
               </span>
             </div>
             <span className="font-mono text-[11px] text-[#6B6B6B]">
               {claim.verificationMethod}
             </span>
           </div>
+          <p className="mt-2 text-xs leading-relaxed text-[#555555]">{status.description}</p>
 
           {/* Handover Claim Statement */}
           <div className="mt-4 rounded-[6px] border border-[#E6E6E6] bg-white p-4">

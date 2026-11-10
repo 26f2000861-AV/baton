@@ -8,11 +8,13 @@ export default function PillarDecisions({
   isAccepted,
   onInspect,
   onAccept,
+  onUndo,
 }: {
   decisions: ArchitecturalDecision[]
   isAccepted: boolean
   onInspect: (claimId: string) => void
   onAccept: () => void
+  onUndo: () => void
 }) {
   return (
     <section id="decisions" className="space-y-4">
@@ -29,17 +31,17 @@ export default function PillarDecisions({
           </p>
         </div>
         <button
-          onClick={onAccept}
-          disabled={isAccepted}
+          onClick={isAccepted ? onUndo : onAccept}
           className={`min-hit flex items-center gap-1.5 rounded-[6px] px-3 py-2 text-xs font-semibold transition ${
             isAccepted
               ? 'border border-[#E6E6E6] bg-[#EEEEEE] text-[#0A0A0A]'
               : 'border border-[#0A0A0A] bg-[#141414] text-white hover:bg-[#2a2a2a]'
           }`}
-          aria-label={isAccepted ? 'Architecture decisions accepted' : 'Accept architecture decisions'}
+          aria-pressed={isAccepted}
+          aria-label={isAccepted ? 'Undo architecture decisions review' : 'Mark architecture decisions reviewed'}
         >
           <Check size={14} />
-          {isAccepted ? 'Section accepted' : 'Accept decisions'}
+          {isAccepted ? 'Undo review' : 'Mark reviewed'}
         </button>
       </div>
 
@@ -57,7 +59,7 @@ export default function PillarDecisions({
                     {d.id === 'dec_01' ? 'ADR-004' : 'COMMIT 8f4a1'}
                   </span>
                   <span className="monochrome-pill">
-                    {isInferred ? 'Inferred' : 'Verified'}
+                    {isInferred ? 'Inferred' : 'Quote found'}
                   </span>
                 </div>
 

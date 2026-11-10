@@ -15,12 +15,14 @@ export default function PillarUnfinished({
   onAdopt,
   onInspect,
   onAccept,
+  onUndo,
 }: {
   items: UnfinishedWorkItem[]
   isAccepted: boolean
   onAdopt: (id: string) => void
   onInspect: (claimId: string) => void
   onAccept: () => void
+  onUndo: () => void
 }) {
   return (
     <section id="unfinished" className="space-y-4">
@@ -37,17 +39,17 @@ export default function PillarUnfinished({
           </p>
         </div>
         <button
-          onClick={onAccept}
-          disabled={isAccepted}
+          onClick={isAccepted ? onUndo : onAccept}
           className={`min-hit flex items-center gap-1.5 rounded-[6px] px-3 py-2 text-xs font-semibold transition ${
             isAccepted
               ? 'border border-[#E6E6E6] bg-[#EEEEEE] text-[#0A0A0A]'
               : 'border border-[#0A0A0A] bg-[#141414] text-white hover:bg-[#2a2a2a]'
           }`}
-          aria-label={isAccepted ? 'Unfinished work accepted' : 'Accept unfinished work'}
+          aria-pressed={isAccepted}
+          aria-label={isAccepted ? 'Undo unfinished work review' : 'Mark unfinished work reviewed'}
         >
           <Check size={14} />
-          {isAccepted ? 'Section accepted' : 'Accept unfinished'}
+          {isAccepted ? 'Undo review' : 'Mark reviewed'}
         </button>
       </div>
 

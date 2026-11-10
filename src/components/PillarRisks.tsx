@@ -9,12 +9,14 @@ export default function PillarRisks({
   onContradiction,
   onInspect,
   onAccept,
+  onUndo,
 }: {
   contradictions: ContradictionItem[]
   isAccepted: boolean
   onContradiction: (id: string) => void
   onInspect: (claimId: string) => void
   onAccept: () => void
+  onUndo: () => void
 }) {
   const unresolvedCount = contradictions.filter((c) => c.status === 'open_unresolved').length
 
@@ -33,17 +35,17 @@ export default function PillarRisks({
           </p>
         </div>
         <button
-          onClick={onAccept}
-          disabled={isAccepted}
+          onClick={isAccepted ? onUndo : onAccept}
           className={`min-hit flex items-center gap-1.5 rounded-[6px] px-3 py-2 text-xs font-semibold transition ${
             isAccepted
               ? 'border border-[#E6E6E6] bg-[#EEEEEE] text-[#0A0A0A]'
               : 'border border-[#0A0A0A] bg-[#141414] text-white hover:bg-[#2a2a2a]'
           }`}
-          aria-label={isAccepted ? 'Risks section accepted' : 'Accept risks'}
+          aria-pressed={isAccepted}
+          aria-label={isAccepted ? 'Undo risks review' : 'Mark risks reviewed'}
         >
           <Check size={14} />
-          {isAccepted ? 'Section accepted' : 'Accept risks'}
+          {isAccepted ? 'Undo review' : 'Mark reviewed'}
         </button>
       </div>
 

@@ -50,6 +50,7 @@ interface HandoverContextType {
   ) => void
   adoptUnfinishedItem: (itemId: string) => void
   acceptSection: (sectionId: 'decisions' | 'unfinished' | 'ownership' | 'risks') => void
+  undoSectionAcceptance: (sectionId: 'decisions' | 'unfinished' | 'ownership' | 'risks') => void
   submitSuccessorQuery: (
     claimId: string,
     category: SuccessorQuery['queryCategory'],
@@ -217,6 +218,13 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
     }))
   }
 
+  const undoSectionAcceptance = (sectionId: 'decisions' | 'unfinished' | 'ownership' | 'risks') => {
+    setSectionStates((prev) => ({
+      ...prev,
+      [sectionId]: { ...prev[sectionId], isAccepted: false, acceptedAt: undefined, acceptedBy: undefined },
+    }))
+  }
+
   const submitSuccessorQuery = (
     claimId: string,
     category: SuccessorQuery['queryCategory'],
@@ -308,6 +316,7 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
         resolveContradiction,
         adoptUnfinishedItem,
         acceptSection,
+        undoSectionAcceptance,
         submitSuccessorQuery,
         resolveSuccessorQuery,
         resetDemoData,
