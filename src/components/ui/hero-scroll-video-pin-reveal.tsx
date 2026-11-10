@@ -177,6 +177,7 @@ export const HeroScrollVideoReveal: React.FC<HeroScrollVideoRevealProps> = ({
           <div className="w-full mb-8 sm:mb-12">
             <p
               ref={paraRef}
+              suppressHydrationWarning
               className="text-[clamp(2.2rem,5.5vw,5rem)] font-extrabold tracking-tight leading-tight text-white overflow-visible"
             >
               {headingText}

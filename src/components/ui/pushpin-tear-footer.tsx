@@ -272,10 +272,12 @@ function KMark() {
   return <BatonMark compact />
 }
 
-/** Live local time with a blinking colon; empty until mounted so SSR never mismatches. */
+/** Live local time with a blinking colon; mounted guard and suppressHydrationWarning to prevent SSR mismatch. */
 function Clock({ zone, label }: { zone: string; label: string }) {
+  const [mounted, setMounted] = React.useState(false)
   const [t, setT] = React.useState(["--", "--"])
   React.useEffect(() => {
+    setMounted(true)
     let f: Intl.DateTimeFormat
     try {
       f = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: zone })
@@ -288,10 +290,8 @@ function Clock({ zone, label }: { zone: string; label: string }) {
     return () => clearInterval(id)
   }, [zone])
   return (
-    <span className="tpf-clock">
-      {label} {t[0]}
-      <i aria-hidden="true">:</i>
-      {t[1]}
+    <span className="tpf-clock" suppressHydrationWarning>
+      {label} {mounted ? t[0] : "--"}<i aria-hidden="true">:</i>{mounted ? t[1] : "--"}
     </span>
   )
 }
@@ -561,7 +561,7 @@ export default function PushpinTearFooter({
   onRepin,
   className = "",
 }: PushpinTearFooterProps) {
-  const uid = React.useId().replace(/[^a-zA-Z0-9]/g, "")
+  const uid = "baton-tpf-"
   const rootRef = React.useRef<HTMLElement>(null)
   const svgRef = React.useRef<SVGSVGElement>(null)
   const sheetRef = React.useRef<SVGPathElement>(null)
@@ -850,7 +850,7 @@ export default function PushpinTearFooter({
 
   return (
     <footer ref={rootRef} className={cls} style={vars} onPointerMove={onPointerMove} onPointerLeave={onPointerLeave}>
-      <style>{CSS}</style>
+      <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
       <svg ref={svgRef} className="tpf-stage" aria-hidden="true">
         <defs>
@@ -951,7 +951,7 @@ export default function PushpinTearFooter({
 
       {mark && <span className="tpf-z tpf-flank tpf-h" style={{ ...H(4), left: "24%" }}>{mark}</span>}
       {timeZone && (
-        <span className="tpf-z tpf-flank tpf-h" style={{ ...H(4), left: "76%" }} title={"Local time · " + timeZone}>
+        <span className="tpf-z tpf-flank tpf-h" style={{ ...H(4), left: "76%" }} title={`Local time \u00B7 ${timeZone}`} suppressHydrationWarning>
           <Clock zone={timeZone} label={timeLabel} />
         </span>
       )}
@@ -1033,3 +1033,4 @@ export default function PushpinTearFooter({
     </footer>
   )
 }
+
