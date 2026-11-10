@@ -1,6 +1,6 @@
 # Round 2 — The Build: form response draft
 
-Use this as a drafting aid for the official submission form. Replace every `TODO` before submitting. The published event page says **each participant files their own entry** for the same project in every round. Aditya and Manas should each submit separately, confirm the current form instructions, and describe their own role and contribution in their own words.
+Use this as a drafting aid for the official submission form. Replace every `TODO` before submitting. **Submission-count instructions conflict:** the official event page says each participant files an entry, while the Round 2 email says the team leader submits once. Check the live Round 2 form or get written clarification before filing; do not assume these instructions agree. Each participant must provide their own role and contribution wherever requested.
 
 ## Team details
 
@@ -50,7 +50,7 @@ Round 1 proposed PostgreSQL with pgvector and integrations with GitHub and other
 ## What does NOT work yet?
 
 ```text
-The app uses synthetic sample data and does not connect to live GitHub, Slack, Linear, or cloud systems. Workspace changes persist in local storage on the current browser profile; there is no server database or cross-user/device synchronization. Persona switching is a demo simulation, not authentication or a security boundary, so the app must not be used with real confidential data. Successor questions and lead replies are saved locally; no real person is notified. The verifier checks text presence only and does not validate claim entailment. Certificate generation is not available.
+The app uses synthetic sample data and does not connect to live GitHub, Slack, Linear, or cloud systems. Workspace changes persist in local storage on the current browser profile; there is no server database or cross-user/device synchronization. The current demo does not let an engineer create decision records as work happens; it demonstrates how seeded records, a leaver answer, and a human conflict decision can be reviewed during a handover. Persona switching is a demo simulation, not authentication or a security boundary, so the app must not be used with real confidential data. Successor questions and lead replies are saved locally; no real person is notified. The verifier checks text presence only and does not validate claim entailment. Certificate generation is not available.
 ```
 
 ## Three improvements for Round 3
@@ -69,10 +69,10 @@ Add sign-in, server-side role authorization, and persistent storage for handover
 Add a scoped GitHub import for pull requests and commits, then map imported source records to claims with verifiable excerpts and links back to origin. The user can refresh a handover from real project records instead of relying on the seeded case. Clearly show import errors and unsupported source types.
 ```
 
-### Improvement 3 — Auditable handover export
+### Improvement 3 — Capture knowledge during the work
 
 ```text
-Add a downloadable handover report that includes claim status, source references, unresolved conflicts, ownership transfers, open successor questions, and acceptance history. The report must label synthetic or unverified information and must not present a demo sign-off as a legal or compliance certificate.
+Let engineers record a decision when it is made, including the context, rationale, alternatives, owner, follow-up, and a link to the relevant PR or issue. Keep the entry in a dated handover history so a successor can see what changed and why without reconstructing it from scratch. Clearly distinguish a person's note from a source-backed claim.
 ```
 
 ## Final confirmation checklist — do not tick until true
@@ -82,7 +82,7 @@ Add a downloadable handover report that includes claim status, source references
 - [ ] PDF is shared as “Anyone with the link” — Viewer.
 - [ ] Every listed feature works in the deployed product and every limitation above is disclosed.
 - [ ] Round 1 team name, leader name, and leader email match exactly.
-- [ ] Each participant submits their own entry for the shared project, using their own role and contribution wording. Check the official form/email for any additional instructions.
+- [ ] Resolve the official event-page versus Round 2 email submission-count conflict by checking the live form or written organizer clarification.
 - [ ] Disclose the significant AI tools actually used to build the project, in the field requested by the official form.
 - [ ] Round 2 closes November 11, 2026 at 10:00 IST on the published event schedule; follow the official submission form/email if it gives a more specific instruction.
 - [ ] Check the deployed link and PDF link in a private window before submitting.
