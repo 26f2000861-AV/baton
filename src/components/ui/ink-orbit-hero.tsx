@@ -910,7 +910,8 @@ const IH_CSS = `
 .ih-word-out{animation:ih-blur-out .45s ease both}
 .ih-hero-body{padding:clamp(20px,2.8cqw,28px) clamp(20px,3.2cqw,36px) 0}
 .ih-lede{font-size:clamp(14.5px,1.4cqw,16px);line-height:1.65;color:var(--ih-soft);max-width:50ch;animation:ih-rise .9s .15s cubic-bezier(.2,.7,.2,1) both}
-.ih-hero-ctas{display:flex;flex-wrap:wrap;gap:16px;margin-top:28px;animation:ih-rise .9s .28s cubic-bezier(.2,.7,.2,1) both}
+.ih-hero-ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px;animation:ih-rise .9s .28s cubic-bezier(.2,.7,.2,1) both}
+@media (max-width:480px){.ih-hero-ctas{flex-direction:column;gap:10px}.ih-hero-ctas .ih-btn,.ih-hero-ctas .ih-frame{width:100%}.ih-hero-ctas .ih-btn{width:100%;justify-content:center}}
 .ih-hero-ctas .ih-frame>.ih-c{width:7px;height:7px;top:-4px;left:-4px}
 .ih-hero-ctas .ih-frame>.ih-c-tr{left:auto;right:-4px}
 .ih-hero-ctas .ih-frame>.ih-c-bl{top:auto;bottom:-4px}
