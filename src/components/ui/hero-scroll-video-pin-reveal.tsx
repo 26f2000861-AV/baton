@@ -142,7 +142,7 @@ export const HeroScrollVideoReveal: React.FC<HeroScrollVideoRevealProps> = ({
     >
       {/* ── Section 1: Intro Bold Tagline ─────────────────────────────────── */}
       <section
-        className="w-full min-h-[44vh] sm:min-h-[48vh] flex flex-col justify-center items-center text-center px-4 sm:px-8 pt-20 sm:pt-28 pb-10 sm:pb-14 text-[clamp(1.6rem,4.8vw,3.8rem)] font-bold tracking-tight leading-tight text-white relative z-10"
+        className="w-full min-h-[32vh] sm:min-h-[48vh] flex flex-col justify-center items-center text-center px-4 sm:px-8 pt-16 sm:pt-28 pb-8 sm:pb-14 text-[clamp(1.45rem,4.8vw,3.8rem)] font-bold tracking-tight leading-tight text-white relative z-10"
         style={{ backgroundColor: bgColor }}
       >
         <div className="max-w-4xl">{topText}</div>

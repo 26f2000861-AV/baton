@@ -27,7 +27,7 @@ export default function HomeHero() {
       {/* Brand Navigation Header */}
       <header className="sticky top-0 z-20 border-b border-[#262626] bg-[#0b0b0b]/85 px-4 py-3 backdrop-blur-md sm:px-6">
         <div className="mx-auto flex max-w-[1200px] items-center justify-center">
-          <Link href="/" aria-label="Baton Home" className="transition-transform hover:scale-105">
+          <Link href="/" aria-label="Baton Home" className="inline-flex min-h-11 min-w-11 items-center justify-center transition-transform hover:scale-105">
             <BatonMark size="medium" />
           </Link>
         </div>
