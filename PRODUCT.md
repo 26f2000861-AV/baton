@@ -18,7 +18,7 @@ Baton organizes a team transition into a handover workspace covering decisions, 
 
 ## Positioning
 
-Baton centers a handover on an inspectable claim ledger. It distinguishes exact source-text matches from model-assisted entailment, inference, contradiction, missing information, and human attestation. Conflicts remain visible for human review instead of being silently reconciled. This is a product direction demonstrated with seeded data, not an automated production ingestion service.
+Baton centers a handover on an inspectable claim ledger. It distinguishes exact source-text matches from inference, contradiction, missing information, and human attestation. The current demo's quote check only confirms text presence; it does not test claim entailment. Conflicts remain visible for human review instead of being silently reconciled. This is a product direction demonstrated with seeded data, not an automated production ingestion service.
 
 ## Operating Context
 
@@ -26,14 +26,14 @@ Baton centers a handover on an inspectable claim ledger. It distinguishes exact 
 - The current demonstration uses a fabricated FinTrack Payment Core case with sample decision, work, ownership, risk, source, and persona records.
 - Current live demo URL: https://gitlostbaton.xyz
 - Intended workflow: successor reviews claims and source excerpts; lead inspects exposure and records a conflict decision; leaver answers targeted questions; successor records acceptance or linked questions.
-- Optional server-side Gemini entailment checking is available when a key is configured. Exact quote matching is deterministic; it only confirms text presence, not that a source logically supports a claim.
+- The public verifier performs deterministic exact-text matching against the fixed synthetic source corpus. It does not call an LLM or test whether a source logically supports a claim.
 
 ## Capabilities and Constraints
 
 - The demo includes a claim ledger, source inspector, decision and unfinished-work views, ownership view, contradiction review, leaver interview, persona-filtered views, lead exposure preview, successor questions, and section acceptance.
 - The seeded workflow state is held in client memory and resets on refresh. There is no persistent database, account system, live GitHub/Slack/Linear ingestion, cross-user collaboration, or working production authorization.
 - Persona switching demonstrates role-specific views; it is not authentication or a security boundary. Use synthetic data only.
-- The verifier confirms an exact quote substring, with limited newline normalization. An optional LLM check is separate and is not a substitute for human review; its fallback is heuristic.
+- The verifier confirms an exact quote substring, with limited newline normalization. This is not a substitute for human review of the source and claim.
 - No downloadable or signed handover certificate is currently issued.
 - Planned capabilities such as persistent authenticated workspaces, source connectors, and report export are not current product behavior.
 

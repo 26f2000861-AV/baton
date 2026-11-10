@@ -230,11 +230,13 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
     category: SuccessorQuery['queryCategory'],
     queryText: string
   ) => {
+    if (activeRole !== 'successor' || !queryText.trim()) return
+
     const newQuery: SuccessorQuery = {
-      id: `query_${Date.now()}`,
+      id: `query_${crypto.randomUUID()}`,
       claimId,
       successorId: 'priya_01',
-      successorName: 'Priya Sharma (Successor)',
+      successorName: `${activePersona.name} (Successor)`,
       timestamp: new Date().toISOString(),
       queryCategory: category,
       queryText,
