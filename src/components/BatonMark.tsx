@@ -10,21 +10,15 @@ export default function BatonMark({
   const isCompact = compact || size === 'compact'
   const isMedium = size === 'medium'
 
-  const sizeClasses = isMedium
-    ? '!w-[46px] !h-[46px]'
-    : isCompact
-    ? 'compact'
-    : ''
-
   const svgSizeClasses = isMedium
-    ? '!w-[34px] !h-[26px]'
+    ? '!w-[44px] !h-[31px]'
     : isCompact
-    ? '!w-[22px] !h-[16px]'
-    : '!w-[26px] !h-[19px]'
+    ? '!w-[24px] !h-[17px]'
+    : '!w-[30px] !h-[21px]'
 
   return (
     <span
-      className={`brand-mark ${sizeClasses} ${className}`.trim()}
+      className={`brand-mark border-0 !bg-transparent p-0 ${className}`.trim()}
       aria-hidden="true"
     >
       <svg
