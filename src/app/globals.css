@@ -86,7 +86,7 @@ a:focus-visible {
 .page-heading { display: flex; align-items: end; justify-content: space-between; gap: var(--gap); margin-bottom: 16px; }
 .page-capture-action { flex: none; }
 .breadcrumb { margin-bottom: 5px; color: var(--muted); font-size: var(--fs-small); }
-.breadcrumb span { padding: 0 5px; color: var(--control); }
+.breadcrumb span { padding: 0 5px; color: var(--muted); }
 h1 { color: var(--text); font-size: var(--fs-title); font-weight: 600; line-height: 1.25; }
 .primary-action, .secondary-action { position: relative; isolation: isolate; display: inline-flex; min-height: 44px; min-width: 44px; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 0; border-radius: var(--radius-control); background: transparent; color: var(--text); font-size: var(--fs-body); font-weight: 600; white-space: nowrap; transition: transform var(--t-press) var(--ease-out); }
 .primary-action::before, .secondary-action::before { position: absolute; z-index: -1; inset: 6px 0; border: 1px solid transparent; border-radius: var(--radius-control); background: var(--primary); content: ''; transition: background-color var(--t-ui) var(--ease-out), border-color var(--t-ui) var(--ease-out); }

@@ -330,7 +330,7 @@ export default function Home() {
           <div className="sheet-content">
             <div className="sample-workspace-note"><span className="sample-indicator" />SAMPLE WORKSPACE<span className="sample-note-copy" role="status" aria-live="polite">{storageIssue ? 'Browser storage is unavailable; changes may be lost after refresh. Use synthetic data only.' : 'Synthetic records · saved in this browser only · role switcher is a preview, not access control.'}</span></div>
             <div className="page-heading">
-              <div><p className="breadcrumb">Engineering <span>/</span> Handover</p><h1>{title}</h1></div>
+            <div><p className="breadcrumb">Engineering <span aria-hidden="true">/</span> Handover</p><h1>{title}</h1></div>
               {route === 'overview' && <button className="primary-action page-capture-action" onClick={() => navigate('decisions')}>
                 <GitCommit size={16} aria-hidden="true" /> Capture a work update
               </button>}
