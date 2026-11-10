@@ -203,7 +203,7 @@ export type PushpinTearFooterProps = {
   /** Two links either side of the wordmark. */
   sideLinks?: IconLink[]
   copyright?: string
-  credit?: string
+  credit?: string | null
   handle?: TearLink | null
   sheet?: string
   paper?: string
@@ -454,7 +454,6 @@ const CSS =
   ".tpf-side span{background:linear-gradient(currentColor,currentColor) 0 100%/0 1px no-repeat;transition:background-size .4s var(--ease)}" +
   ".tpf-side:hover span{background-size:100% 1px}" +
   ".tpf-foot{left:0;right:0;bottom:5%;display:flex;align-items:center;justify-content:space-between;gap:1.5em;padding:0 15%;font-size:max(12px,1.85cqmin)}" +
-  ".tpf-credit{position:absolute;left:50%;transform:translateX(-50%);font-size:max(10px,1.4cqmin);letter-spacing:.08em;text-transform:uppercase;opacity:.62;white-space:nowrap}" +
   ".tpf-handle:hover{text-decoration:underline;text-underline-offset:.2em}" +
   "@container (max-width: 620px){" +
   ".tpf-top{padding:0 7%}.tpf-flank,.tpf-mail span{display:none}" +
@@ -462,7 +461,7 @@ const CSS =
   ".tpf-status{top:29%}.tpf-badge{top:33%}" +
   ".tpf-col{top:36.5%}.tpf-col.l{left:7%}.tpf-col.r{right:7%}.tpf-col li:nth-child(n+3){display:none}" +
   ".tpf-side{top:86%}.tpf-side.l{left:14%!important}.tpf-side.r{left:86%!important}" +
-  ".tpf-foot{padding:0 7%;bottom:3.5%}.tpf-credit{bottom:2.4em}" +
+  ".tpf-foot{padding:0 7%;bottom:3.5%}" +
   "}" +
   "@keyframes tpf-hit{0%{transform:translateY(0)}30%{transform:translateY(2px)}60%{transform:translateY(-.5px)}100%{transform:translateY(0)}}" +
   "@keyframes tpf-drop{0%{transform:translateY(-62cqh) rotate(-28deg) scale(1.5);opacity:0}25%{opacity:1}80%{transform:translateY(0) rotate(3deg) scale(1)}90%{transform:scale(1.04,.95)}100%{transform:none;opacity:1}}" +
@@ -531,7 +530,7 @@ export default function PushpinTearFooter({
   chat = null,
   sideLinks = DEFAULT_SIDES,
   copyright = "© 2026 Baton — Accountable Engineering Handover Ledger",
-  credit = "verified by cryptographic clearance",
+  credit = null,
   handle = null,
   sheet = "#181818",
   paper = "#0b0b0b",
@@ -1010,7 +1009,6 @@ export default function PushpinTearFooter({
 
       <div className="tpf-z tpf-foot tpf-ink">
         <span className="tpf-p" style={H(3)}>{copyright}</span>
-        {credit && <span className="tpf-credit tpf-p" style={H(4)}>{credit}</span>}
         {handle && <A href={handle.href} className="tpf-handle tpf-p" style={H(5)}>{handle.label}</A>}
       </div>
     </footer>
