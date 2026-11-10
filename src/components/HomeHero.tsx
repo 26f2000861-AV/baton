@@ -5,6 +5,7 @@ import Link from 'next/link'
 import InkOrbitHero from '@/components/ui/ink-orbit-hero'
 import BatonMark from '@/components/BatonMark'
 import HeroScrollVideoReveal from '@/components/ui/hero-scroll-video-pin-reveal'
+import PushpinTearFooter from '@/components/ui/pushpin-tear-footer'
 import { ShieldCheck, GitPullRequest, FileText } from 'lucide-react'
 
 export default function HomeHero() {
@@ -130,6 +131,9 @@ export default function HomeHero() {
           </Link>
         </div>
       </div>
+
+      {/* 3. Interactive Pushpin Tear Footer */}
+      <PushpinTearFooter />
     </div>
   )
 }
