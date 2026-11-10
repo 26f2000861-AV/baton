@@ -123,7 +123,7 @@ export default function PillarRisks({
               <div className="mt-4 pt-3 border-t border-[#F0F0F0]">
                 <div className="baton-pass-line">
                   <span className="text-xs text-[#6B6B6B]">
-                    {isOpen ? 'Requires lead settlement decision' : 'Resolved with human audit note'}
+                    {isOpen ? 'Requires lead settlement decision' : 'Decision recorded by lead'}
                   </span>
                   <div className="pass-rule" />
                   <button
