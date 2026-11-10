@@ -251,7 +251,9 @@ export default function Home() {
   const conflictSettled = overviewConflict?.status === 'settled_by_human'
   const conflictResolutionSummary = overviewConflict?.settlement?.resolutionType === 'clarification_note'
     ? 'A lead recorded a clarification; source precedence remains open for review.'
-    : 'A lead recorded a decision and rationale for the next owner.'
+    : overviewConflict?.settlement?.resolutionType === 'accept_dual_scope'
+      ? 'A lead resolved the scope: SQS remains primary; RabbitMQ is the temporary retry fallback.'
+      : 'A lead recorded a decision and rationale for the next owner.'
   const reviewedCount = Object.values(sectionStates).filter((item) => item.isAccepted).length
   const exactQuoteCount = visibleClaims.filter((item) => item.status === 'quoted_verified').length
   const filteredClaims = useMemo(() => {

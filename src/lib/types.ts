@@ -184,7 +184,7 @@ export interface ContradictionItem {
   settlement?: {
     resolvedBy: string
     resolutionTimestamp: string
-    resolutionType: 'accept_source_a' | 'accept_source_b' | 'clarification_note'
+    resolutionType: 'accept_source_a' | 'accept_source_b' | 'accept_dual_scope' | 'clarification_note'
     humanComment: string
   }
   associatedClaimId: string

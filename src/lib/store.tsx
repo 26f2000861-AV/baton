@@ -48,7 +48,7 @@ interface HandoverContextType {
   answerInterviewQuestion: (questionId: string, answerText: string) => void
   resolveContradiction: (
     contradictionId: string,
-    resolutionType: 'accept_source_a' | 'accept_source_b' | 'clarification_note',
+    resolutionType: 'accept_source_a' | 'accept_source_b' | 'accept_dual_scope' | 'clarification_note',
     humanComment: string
   ) => void
   adoptUnfinishedItem: (itemId: string) => void
@@ -233,7 +233,7 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
 
   const resolveContradiction = (
     contradictionId: string,
-    resolutionType: 'accept_source_a' | 'accept_source_b' | 'clarification_note',
+    resolutionType: 'accept_source_a' | 'accept_source_b' | 'accept_dual_scope' | 'clarification_note',
     humanComment: string
   ) => {
     setContradictions((prev) =>
@@ -260,7 +260,9 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
         ? 'Accepted Source B: RabbitMQ is the active live fallback.'
         : resolutionType === 'accept_source_a'
           ? 'Accepted Source A: AWS SQS FIFO is primary.'
-          : 'Lead clarification recorded; source precedence remains explicitly unresolved.'
+          : resolutionType === 'accept_dual_scope'
+            ? 'Resolved scope: AWS SQS FIFO remains primary; RabbitMQ handles temporary retry fallback.'
+            : 'Lead clarification recorded; source precedence remains explicitly unresolved.'
 
       setClaims((prev) =>
         prev.map((claim) =>

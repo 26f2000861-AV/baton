@@ -13,7 +13,7 @@ export default function ContradictionModal({
 }: {
   item?: ContradictionItem
   onResolve: (
-    type: 'accept_source_a' | 'accept_source_b' | 'clarification_note',
+    type: 'accept_source_a' | 'accept_source_b' | 'accept_dual_scope' | 'clarification_note',
     note: string
   ) => void
   onClose: () => void
@@ -98,7 +98,7 @@ export default function ContradictionModal({
         {/* Settlement Input and Choices */}
         <div className="mt-6 rounded-[6px] border border-[#E6E6E6] bg-[#F2F4F7]/50 p-4">
           <label htmlFor="settlement-note" className="block text-xs font-semibold text-[#0A0A0A]">
-            Decision note (Required to record why this conflict was resolved):
+            Decision note (required):
           </label>
           <textarea
             id="settlement-note"
@@ -136,10 +136,10 @@ export default function ContradictionModal({
 
               <button
                 disabled={!note.trim()}
-                onClick={() => onResolve('clarification_note', note)}
+                onClick={() => onResolve('accept_dual_scope', note)}
                 className="btn-secondary min-hit text-xs focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
               >
-                <span>Annotate Dual Scope / Temporary Fallback</span>
+                <span>Resolve: SQS primary, RabbitMQ retry fallback</span>
               </button>
             </div>
           )}

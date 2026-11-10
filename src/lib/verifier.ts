@@ -56,7 +56,7 @@ export function verifyQuoteAgainstSource(
       normalizedQuote,
       suggestedStatus: 'quoted_unverified',
       explanation: isNearMiss
-        ? 'Quote failed exact matching; its whitespace differs from the source. Suggested label: unverified.'
+        ? 'Quote failed exact matching; a formatting or whitespace alteration was detected. Suggested label: unverified.'
         : 'Quote was not found verbatim in the source document. Suggested label: unverified.',
     }
   }
