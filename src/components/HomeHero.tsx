@@ -14,14 +14,10 @@ export default function HomeHero() {
     <div className="flex min-h-screen flex-col bg-[#0b0b0b] text-[#eeeeee]">
       {/* Brand Navigation Header */}
       <header className="sticky top-0 z-20 border-b border-[#262626] bg-[#0b0b0b]/85 px-4 py-3 backdrop-blur-md sm:px-6">
-        <div className="mx-auto flex max-w-[1200px] items-center justify-between">
-          <div className="flex items-center gap-3">
-            <BatonMark compact />
-            <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-2">
-              <span className="font-semibold tracking-tight text-[#eeeeee]">Baton</span>
-              <span className="text-[11px] font-mono text-[#8d8d8d]">Payment Core Handover Ledger</span>
-            </div>
-          </div>
+        <div className="mx-auto flex max-w-[1200px] items-center justify-center">
+          <Link href="/" aria-label="Baton Home" className="transition-transform hover:scale-105">
+            <BatonMark size="medium" />
+          </Link>
         </div>
       </header>
 
