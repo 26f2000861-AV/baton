@@ -437,6 +437,7 @@ function InkOrbitSculpture({
   className = "",
 }: InkOrbitSculptureProps) {
   const canvasRef = React.useRef(null as HTMLCanvasElement | null)
+  const wakeFrameRef = React.useRef<(() => void) | null>(null)
   const [seed, setSeed] = React.useState(seedProp)
   React.useEffect(() => setSeed(seedProp), [seedProp])
 
@@ -486,11 +487,13 @@ function InkOrbitSculpture({
     morphT: 1,
     ring: 0,
     dirty: true,
-    visible: true,
+    visible: false,
     heading: -1,
     colors,
     reduced,
     spin,
+    spinUntil: 0,
+    introSpinDone: false,
     glass,
   })
   const s0 = st.current
@@ -498,7 +501,11 @@ function InkOrbitSculpture({
   s0.reduced = reduced
   s0.spin = spin
   s0.glass = glass
-  s0.dirty = true
+
+  React.useEffect(() => {
+    s0.dirty = true
+    wakeFrameRef.current?.()
+  }, [colors.ink, colors.bg, reduced, spin, glass, s0])
 
   const seedRef = React.useRef(seed)
   seedRef.current = seed
@@ -524,6 +531,7 @@ function InkOrbitSculpture({
     if (canMorph) s.ring = s.reduced ? 0 : 1
     s.dirty = true
     builtFor.current = { seed, grainN }
+    wakeFrameRef.current?.()
   }, [seed, grainN])
 
   React.useEffect(() => {
@@ -535,53 +543,48 @@ function InkOrbitSculpture({
   }, [autoReforge, reduced, reforge])
 
   React.useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext("2d")
-    if (!ctx) return
+    const canvasNode = canvasRef.current
+    if (!canvasNode) return
+    const canvas: HTMLCanvasElement = canvasNode
+    const context2d = canvas.getContext("2d")
+    if (!context2d) return
+    const ctx: CanvasRenderingContext2D = context2d
     const lens = document.createElement("canvas")
     const lctx = lens.getContext("2d")
     const s = st.current
     let W = 0
     let H = 0
     let dpr = 1
-    const resize = () => {
-      dpr = clamp(window.devicePixelRatio || 1, 1, Math.max(1, maxDpr))
-      W = Math.max(1, Math.round(canvas.clientWidth * dpr))
-      H = Math.max(1, Math.round(canvas.clientHeight * dpr))
-      canvas.width = W
-      canvas.height = H
-      s.dirty = true
-    }
-    resize()
-    const ro = typeof ResizeObserver === "function" ? new ResizeObserver(resize) : null
-    ro?.observe(canvas)
-    const io =
-      typeof IntersectionObserver === "function"
-        ? new IntersectionObserver((es) => {
-            s.visible = es.some((e) => e.isIntersecting)
-            s.dirty = true
-          })
-        : null
-    io?.observe(canvas)
-
     const NB = 7
     const px = new Float32Array(CORE_N + grainN)
     const py = new Float32Array(CORE_N + grainN)
     const pr = new Float32Array(CORE_N)
     const bin = new Uint8Array(CORE_N + grainN)
     let raf = 0
+    let disposed = false
 
-    const draw = (now: number) => {
+    const beginIntroSpin = () => {
+      if (s.introSpinDone || s.reduced || Math.abs(s.spin) <= 0.002) return
+      s.introSpinDone = true
+      s.spinUntil = performance.now() + 3600
+    }
+
+    const requestDraw = () => {
+      if (disposed || raf || !s.visible) return
       raf = requestAnimationFrame(draw)
-      const dt = s.lastT ? Math.min(0.05, (now - s.lastT) / 1000) : 0.016
-      s.lastT = now
+    }
+
+    function draw(now: number) {
+      raf = 0
       const B = s.to
       if (!s.visible || !B || B.grain.length !== grainN * 3) return
+      const dt = s.lastT ? Math.min(0.05, (now - s.lastT) / 1000) : 0.016
+      s.lastT = now
       // motion: idle spin eases back in after a flick; pitch springs home
+      const spinActive = !s.reduced && Math.abs(s.spin) > 0.002 && now < s.spinUntil
       if (!s.drag) {
-        const target = s.reduced ? 0 : s.spin
-        s.vyaw += (target - s.vyaw) * Math.min(1, dt * 1.6)
+        const target = spinActive ? s.spin : 0
+        s.vyaw += (target - s.vyaw) * Math.min(1, dt * (spinActive ? 1.6 : 4))
         s.yaw += s.vyaw * dt
         s.pitch += s.vpitch * dt
         s.vpitch *= Math.pow(0.04, dt)
@@ -593,8 +596,8 @@ function InkOrbitSculpture({
       if (s.morphT < 1) s.morphT = Math.min(1, s.morphT + dt / 1.3)
       if (s.ring > 0) s.ring = Math.max(0, s.ring - dt / 1.1)
       const moving =
-        !s.reduced || s.drag || Math.abs(s.vyaw) > 0.002 || Math.abs(s.vpitch) > 0.002 || s.morphT < 1 || s.ring > 0 ||
-        Math.abs(s.tLeanYaw - s.leanYaw) > 0.001 || Math.abs(s.tLeanPitch - s.leanPitch) > 0.001
+        spinActive || s.drag || Math.abs(s.vyaw) > 0.002 || Math.abs(s.vpitch) > 0.002 || s.morphT < 1 || s.ring > 0 ||
+        Math.abs(s.pitch - 0.18) > 0.001 || Math.abs(s.tLeanYaw - s.leanYaw) > 0.001 || Math.abs(s.tLeanPitch - s.leanPitch) > 0.001
       if (!moving && !s.dirty) return
       s.dirty = false
 
@@ -746,10 +749,50 @@ function InkOrbitSculpture({
 
       for (let b = Math.floor(NB / 2) + 1; b < NB; b++) pass(b)
       spikes(true)
+
+      if (moving) requestDraw()
     }
-    raf = requestAnimationFrame(draw)
+
+    const resize = () => {
+      dpr = clamp(window.devicePixelRatio || 1, 1, Math.max(1, maxDpr))
+      W = Math.max(1, Math.round(canvas.clientWidth * dpr))
+      H = Math.max(1, Math.round(canvas.clientHeight * dpr))
+      canvas.width = W
+      canvas.height = H
+      s.dirty = true
+      requestDraw()
+    }
+    resize()
+    const ro = typeof ResizeObserver === "function" ? new ResizeObserver(resize) : null
+    ro?.observe(canvas)
+
+    let io: IntersectionObserver | null = null
+    if (typeof IntersectionObserver === "function") {
+      io = new IntersectionObserver((entries) => {
+        const isVisible = entries.some((entry) => entry.isIntersecting)
+        s.visible = isVisible
+        if (isVisible) {
+          beginIntroSpin()
+          s.dirty = true
+          requestDraw()
+        } else if (raf) {
+          cancelAnimationFrame(raf)
+          raf = 0
+        }
+      })
+      io.observe(canvas)
+    } else {
+      s.visible = true
+      beginIntroSpin()
+      s.dirty = true
+      requestDraw()
+    }
+
+    wakeFrameRef.current = requestDraw
     return () => {
-      cancelAnimationFrame(raf)
+      disposed = true
+      if (raf) cancelAnimationFrame(raf)
+      if (wakeFrameRef.current === requestDraw) wakeFrameRef.current = null
       ro?.disconnect()
       io?.disconnect()
     }
@@ -759,10 +802,14 @@ function InkOrbitSculpture({
     if (!interactive) return
     const s = st.current
     s.drag = true
+    s.introSpinDone = true
+    s.spinUntil = 0
     s.lastX = s.downX = e.clientX
     s.lastY = s.downY = e.clientY
     s.vyaw = 0
     s.vpitch = 0
+    s.dirty = true
+    wakeFrameRef.current?.()
     e.currentTarget.setPointerCapture?.(e.pointerId)
   }
   const onPointerMove = (e: PointerCanvasEv) => {
@@ -783,6 +830,7 @@ function InkOrbitSculpture({
       s.tLeanPitch = ((e.clientY - r.top) / r.height - 0.5) * 0.5
     }
     s.dirty = true
+    wakeFrameRef.current?.()
   }
   const onPointerUp = (e: PointerCanvasEv) => {
     const s = st.current
@@ -791,10 +839,15 @@ function InkOrbitSculpture({
     s.vyaw = clamp(s.vyaw, -6, 6)
     s.vpitch = clamp(s.vpitch, -3, 3)
     if (Math.hypot(e.clientX - s.downX, e.clientY - s.downY) < 4) reforge()
+    s.dirty = true
+    wakeFrameRef.current?.()
   }
   const onLeave = () => {
-    st.current.tLeanYaw = 0
-    st.current.tLeanPitch = 0
+    const s = st.current
+    s.tLeanYaw = 0
+    s.tLeanPitch = 0
+    s.dirty = true
+    wakeFrameRef.current?.()
   }
   const onKey = (e: KeyCanvasEv) => {
     if (!interactive) return
@@ -809,7 +862,10 @@ function InkOrbitSculpture({
       e.preventDefault()
       reforge()
     } else return
+    s.introSpinDone = true
+    s.spinUntil = 0
     s.dirty = true
+    wakeFrameRef.current?.()
   }
 
   const faint = rgba(colors.ink, colors.bg, 0.55, 1)

@@ -57,77 +57,82 @@ export const HeroScrollVideoReveal: React.FC<HeroScrollVideoRevealProps> = ({
   const tagRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    // Word split kinetic reveal animation
-    let split: any = null;
-    let words: Element[] = [];
+    const motion = gsap.matchMedia();
 
-    try {
-      const { SplitText } = require('gsap/SplitText');
-      if (SplitText) {
-        split = new SplitText(paraRef.current, {
-          type: 'words',
-          wordsClass: 'reveal-word inline-block origin-left mr-[0.25em] will-change-transform',
-        });
-        words = split.words || [];
-      }
-    } catch {
-      if (paraRef.current) {
-        words = Array.from(paraRef.current.querySelectorAll('.reveal-word'));
-        if (words.length === 0 && paraRef.current.textContent) {
-          const text = paraRef.current.innerText || paraRef.current.textContent || '';
-          paraRef.current.innerHTML = text
-            .split(/\s+/)
-            .map((w) => `<span class="reveal-word inline-block origin-left mr-[0.25em] will-change-transform">${w}</span>`)
-            .join(' ');
-          words = Array.from(paraRef.current.querySelectorAll('.reveal-word'));
+    motion.add('(prefers-reduced-motion: no-preference)', () => {
+      // Word split kinetic reveal animation. Content stays visible unless this
+      // motion preference matches and the animation is ready to run.
+      let split: any = null;
+      let words: Element[] = [];
+      const paragraph = paraRef.current;
+      const originalMarkup = paragraph?.innerHTML ?? '';
+
+      try {
+        const { SplitText } = require('gsap/SplitText');
+        if (SplitText && paragraph) {
+          split = new SplitText(paragraph, {
+            type: 'words',
+            wordsClass: 'reveal-word inline-block origin-left mr-[0.25em]',
+          });
+          words = split.words || [];
         }
+      } catch {
+        // Preserve rich React markup if the optional word-splitting plugin is unavailable.
+        if (paragraph?.textContent) words = [paragraph];
       }
-    }
 
-    if (words && words.length > 0) {
-      gsap.set(words, { opacity: 0, rotate: 6, yPercent: 24 });
-    }
-
-    // Reveal timeline for headline & tag badges
-    const revealTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: benefitRef.current,
-        start: 'top 75%',
-        end: 'top 20%',
-        scrub: 1.2,
-      },
-    });
-
-    if (words && words.length > 0) {
-      revealTl.to(words, {
-        stagger: 0.15,
-        opacity: 1,
-        rotate: 0,
-        yPercent: 0,
-        ease: 'power1.out',
+      if (words.length > 0) {
+        gsap.set(words, { opacity: 0, rotate: 6, yPercent: 24 });
+      }
+      tagRefs.current.forEach((tagEl) => {
+        if (tagEl) gsap.set(tagEl, { opacity: 0, clipPath: 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)' });
       });
-    }
 
-    tagRefs.current.forEach((tagEl) => {
-      if (tagEl) {
+      // One authored entrance plays once as the handover principles enter view.
+      const revealTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: benefitRef.current,
+          start: 'top 75%',
+          toggleActions: 'play none none none',
+          once: true,
+        },
+      });
+
+      if (words.length > 0) {
+        revealTl.to(words, {
+          duration: 0.42,
+          stagger: 0.025,
+          opacity: 1,
+          rotate: 0,
+          yPercent: 0,
+          ease: 'power1.out',
+        });
+      }
+
+      const visibleTags = tagRefs.current.filter((tagEl): tagEl is HTMLDivElement => tagEl !== null);
+      if (visibleTags.length > 0) {
         revealTl.to(
-          tagEl,
+          visibleTags,
           {
-            duration: 0.8,
+            duration: 0.28,
+            stagger: 0.04,
             opacity: 1,
             clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
-            ease: 'circ.out',
+            ease: 'power2.out',
           },
-          '>-0.3'
+          words.length > 0 ? '>-0.08' : 0
         );
       }
+
+      return () => {
+        revealTl.scrollTrigger?.kill();
+        revealTl.kill();
+        if (split?.revert) split.revert();
+        else if (paragraph && paragraph.innerHTML !== originalMarkup) paragraph.innerHTML = originalMarkup;
+      };
     });
 
-    return () => {
-      if (split && split.revert) split.revert();
-      revealTl.kill();
-      ScrollTrigger.getAll().forEach((t) => t.kill());
-    };
+    return () => motion.revert();
   }, []);
 
   return (
@@ -179,11 +184,10 @@ export const HeroScrollVideoReveal: React.FC<HeroScrollVideoRevealProps> = ({
                 ref={(el) => {
                   tagRefs.current[idx] = el;
                 }}
-                className="px-5 sm:px-7 py-2.5 sm:py-3.5 rounded-full text-[clamp(0.9rem,1.8vw,1.35rem)] font-semibold tracking-tight opacity-0 shadow-2xl will-change-[clip-path,opacity] border border-[#333333]"
+                className="px-5 sm:px-7 py-2.5 sm:py-3.5 rounded-full text-[clamp(0.9rem,1.8vw,1.35rem)] font-semibold tracking-tight shadow-2xl border border-[#333333]"
                 style={{
                   backgroundColor: tag.background,
                   color: tag.color || '#ffffff',
-                  clipPath: 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)',
                 }}
               >
                 {tag.text}
