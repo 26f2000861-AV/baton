@@ -204,7 +204,7 @@ export type PushpinTearFooterProps = {
   sideLinks?: IconLink[]
   copyright?: string
   credit?: string
-  handle?: TearLink
+  handle?: TearLink | null
   sheet?: string
   paper?: string
   sheetInk?: string
@@ -487,11 +487,10 @@ const CSS =
   "@keyframes tpf-ping{0%{transform:scale(1);opacity:.9}80%,100%{transform:scale(2.6);opacity:0}}" +
   "@media (prefers-reduced-motion: reduce){.tpf *,.tpf *::before,.tpf *::after{animation:none!important;transition-duration:.01s!important;transition-delay:0s!important}}"
 
-const REPO = "https://github.com/26f2000861-AV/baton"
+const GITHUB_PROFILE = "https://github.com/26f2000861-AV"
 
 const DEFAULT_SOCIALS: IconLink[] = [
-  { icon: "github", label: "GitHub", href: REPO },
-  { icon: "shield", label: "Clearance", href: "/workspace#signoff" },
+  { icon: "github", label: "GitHub Profile", href: GITHUB_PROFILE },
 ]
 
 const DEFAULT_COLUMNS: FooterColumn[] = [
@@ -515,10 +514,7 @@ const DEFAULT_COLUMNS: FooterColumn[] = [
   },
 ]
 
-const DEFAULT_SIDES: IconLink[] = [
-  { icon: "shield", label: "sha-256 seal", href: "/workspace#signoff" },
-  { icon: "doc", label: "adr-004 spec", href: "/workspace#conflict" },
-]
+const DEFAULT_SIDES: IconLink[] = []
 
 function A({ href, className, label, children, style }: { href?: string; className?: string; label?: string; children: React.ReactNode; style?: React.CSSProperties }) {
   const onClick = (e: React.MouseEvent) => {
@@ -539,17 +535,17 @@ export default function PushpinTearFooter({
   logoHref = "/",
   socials = DEFAULT_SOCIALS,
   email = "adityaverma200911@gmail.com",
-  newsletter = { label: "weekly handover audit digest", placeholder: "engineer@company.com" },
-  status = { label: "Payment Core: Verified State Ready", href: "/workspace#signoff" },
-  mark = "BATON / 2026",
+  newsletter = null,
+  status = null,
+  mark = "",
   timeZone = "Asia/Kolkata",
   timeLabel = "IST",
   columns = DEFAULT_COLUMNS,
-  chat = { label: "inspect" },
+  chat = null,
   sideLinks = DEFAULT_SIDES,
   copyright = "© 2026 Baton — Accountable Engineering Handover Ledger",
   credit = "verified by cryptographic clearance",
-  handle = { label: "github.com/26f2000861-AV/baton", href: REPO },
+  handle = null,
   sheet = "#181818",
   paper = "#0b0b0b",
   sheetInk = "#eeeeee",
@@ -1028,7 +1024,7 @@ export default function PushpinTearFooter({
       <div className="tpf-z tpf-foot tpf-ink">
         <span className="tpf-p" style={H(3)}>{copyright}</span>
         {credit && <span className="tpf-credit tpf-p" style={H(4)}>{credit}</span>}
-        <A href={handle.href} className="tpf-handle tpf-p" style={H(5)}>{handle.label}</A>
+        {handle && <A href={handle.href} className="tpf-handle tpf-p" style={H(5)}>{handle.label}</A>}
       </div>
     </footer>
   )

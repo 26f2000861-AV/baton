@@ -317,7 +317,6 @@ export default function Home() {
               <div><p className="breadcrumb">FinTrack <span>/</span> Payment Core</p><h1>{title}</h1></div>
               {route === 'overview' && <button className="primary-action" onClick={() => navigate('claims')}>Start handover review</button>}
             </div>
-            <p className="sample-notice">Sample data · Local handover case records</p>
 
             {route === 'overview' && <div className="view-stack">
               <section className="finding-panel" aria-labelledby="finding-title">

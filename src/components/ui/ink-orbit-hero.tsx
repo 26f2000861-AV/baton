@@ -108,9 +108,6 @@ export default function InkOrbitHero({
     }
   }, [accents.length, reduced])
 
-  const [demo, setDemo] = React.useState(false)
-  const closeDemo = React.useCallback(() => setDemo(false), [])
-
   return (
     <div className={"ih-root " + className} data-theme={dark ? "dark" : "light"} style={style}>
       <style dangerouslySetInnerHTML={{ __html: IH_CSS }} />
@@ -142,10 +139,7 @@ export default function InkOrbitHero({
                     <button
                       type="button"
                       className="ih-btn ih-btn-ghost"
-                      onClick={() => {
-                        if (demoSteps.length) setDemo(true)
-                        onSecondary?.()
-                      }}
+                      onClick={() => onSecondary?.()}
                     >
                       <Play size={11} fill="currentColor" strokeWidth={0} aria-hidden="true" />
                       {secondaryCta}
@@ -192,7 +186,6 @@ export default function InkOrbitHero({
           </div>
         </section>
       </div>
-      {demo && <DemoDialog steps={demoSteps} onClose={closeDemo} reduced={reduced} />}
     </div>
   )
 }
@@ -214,79 +207,6 @@ function Arrow({ size = 14 }: { size?: number }) {
 
 function CheckIcon({ size = 12 }: { size?: number }) {
   return <Check size={size} strokeWidth={2.2} aria-hidden="true" />
-}
-
-function DemoDialog({ steps, onClose, reduced }: { steps: InkDemoStep[]; onClose: () => void; reduced: boolean }) {
-  const [elapsed, setElapsed] = React.useState(0)
-  const [run, setRun] = React.useState(0)
-  const closeRef = React.useRef(null as HTMLButtonElement | null)
-  const per = 1.6
-  const total = steps.length * per
-  React.useEffect(() => {
-    closeRef.current?.focus()
-    const prev = document.activeElement as HTMLElement | null
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose()
-    window.addEventListener("keydown", onKey)
-    return () => {
-      window.removeEventListener("keydown", onKey)
-      prev?.focus?.()
-    }
-  }, [onClose])
-  React.useEffect(() => {
-    setElapsed(reduced ? total : 0)
-    if (reduced) return
-    const t0 = performance.now()
-    let raf = 0
-    const tick = (now: number) => {
-      const e = (now - t0) / 1000
-      setElapsed(Math.min(total, e))
-      if (e < total) raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [run, total, reduced])
-  const done = elapsed >= total
-  return (
-    <div className="ih-modal" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="ih-dialog" role="dialog" aria-modal="true" aria-label="Product demo">
-        <div className="ih-dialog-head">
-          <span>
-            <i className="ih-live" />
-            {done ? "run complete · " + total.toFixed(1) + "s" : "workflow running · " + elapsed.toFixed(1) + "s"}
-          </span>
-          <button ref={closeRef} type="button" className="ih-icon-btn" onClick={onClose} aria-label="Close demo">
-            <X size={14} strokeWidth={1.8} aria-hidden="true" />
-          </button>
-        </div>
-        <ol className="ih-steps" aria-live="polite">
-          {steps.map((s, i) => {
-            const state = elapsed >= (i + 1) * per ? "done" : elapsed >= i * per ? "run" : "wait"
-            return (
-              <li key={i} className="ih-step" data-state={state}>
-                <span className="ih-step-ix">
-                  {state === "done" ? <CheckIcon /> : state === "run" ? <i className="ih-spin" /> : String(i + 1).padStart(2, "0")}
-                </span>
-                <span>
-                  <b>{s.label}</b>
-                  <small>{s.detail}</small>
-                </span>
-                <span className="ih-step-t">{state === "done" ? per.toFixed(1) + "s" : state === "run" ? "…" : ""}</span>
-              </li>
-            )
-          })}
-        </ol>
-        <div className="ih-bar">
-          <i style={{ width: (elapsed / total) * 100 + "%" }} />
-        </div>
-        <div className="ih-dialog-foot">
-          <span>{done ? "Saved ~3h 40m of manual work." : "Sit back — nothing here needs a human."}</span>
-          <button type="button" className="ih-btn ih-btn-ghost" onClick={() => setRun((r) => r + 1)} disabled={!done}>
-            Replay
-          </button>
-        </div>
-      </div>
-    </div>
-  )
 }
 
 function clamp(v: number, a: number, b: number): number {

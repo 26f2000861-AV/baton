@@ -18,14 +18,12 @@ export default function PushpinTearFooterDemo() {
         paperInk="#efefef"
         seed={7}
         email="adityaverma200911@gmail.com"
-        newsletter={{ label: "weekly handover audit digest", placeholder: "engineer@company.com" }}
-        status={{ label: "Payment Core: Verified State Ready", href: "/workspace#signoff" }}
-        mark="BATON / 2026"
+        socials={[{ icon: "github", label: "GitHub Profile", href: "https://github.com/26f2000861-AV" }]}
         timeZone="Asia/Kolkata"
         timeLabel="IST"
         columns={[
           {
-            title: "workspace",
+            title: "handover",
             links: [
               { label: "Claims Ledger", href: "/workspace#claims" },
               { label: "Routing Conflict", href: "/workspace#conflict" },
@@ -43,14 +41,14 @@ export default function PushpinTearFooterDemo() {
             cta: { label: "sign-off.", href: "/workspace#signoff" },
           },
         ]}
-        sideLinks={[
-          { icon: "shield", label: "sha-256 seal", href: "/workspace#signoff" },
-          { icon: "doc", label: "adr-004 spec", href: "/workspace#conflict" },
-        ]}
-        chat={{ label: "inspect", href: "/workspace#conflict" }}
+        newsletter={null}
+        status={null}
+        chat={null}
+        sideLinks={[]}
+        mark=""
+        handle={null}
         copyright="© 2026 Baton — Accountable Engineering Handover Ledger"
         credit="verified by cryptographic clearance"
-        handle={{ label: "github.com/26f2000861-AV/baton", href: "https://github.com/26f2000861-AV/baton" }}
       />
     </div>
   );
