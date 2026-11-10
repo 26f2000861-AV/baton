@@ -90,7 +90,9 @@ baton/
 
 ## Submission & Documentation
 
-Complete functional specifications and the 7 mandatory Round 2 submission deliverables are available in [`docs/`](./docs/):
+The current, factual Round 2 response draft is [`docs/ROUND_2_FORM_RESPONSE_DRAFT.md`](./docs/ROUND_2_FORM_RESPONSE_DRAFT.md). The numbered specifications below are historical planning notes: they describe parts of the original target design, not a complete inventory of shipped features. Some early assumptions and research comparisons in them have not been validated; use the README and running source code for current product behavior.
+
+Historical planning notes:
 - `docs/00_overview_and_workflow_architecture.md`
 - `docs/01_claim_ledger_and_provenance_engine.md`
 - `docs/02_decisions_and_architecture_rationale.md`

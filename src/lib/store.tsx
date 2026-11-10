@@ -44,6 +44,7 @@ interface HandoverContextType {
   questions: LeaverInterviewQuestion[]
   queries: SuccessorQuery[]
   sectionStates: Record<string, HandoverSectionState>
+  storageIssue: boolean
   answerInterviewQuestion: (questionId: string, answerText: string) => void
   resolveContradiction: (
     contradictionId: string,
@@ -113,29 +114,31 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
     risks: { sectionId: 'risks', isAccepted: false, queryCount: 0 },
   })
   const [storageReady, setStorageReady] = useState(false)
+  const [storageIssue, setStorageIssue] = useState(false)
 
   useEffect(() => {
     try {
       const rawSnapshot = window.localStorage.getItem(DEMO_STORAGE_KEY)
       if (rawSnapshot) {
-        const snapshot: unknown = JSON.parse(rawSnapshot)
-        if (isDemoSnapshot(snapshot)) {
-          setActiveRole(snapshot.activeRole)
-          setClaims(snapshot.claims)
-          setDecisions(snapshot.decisions)
-          setWorkUpdates(snapshot.workUpdates ?? [])
-          setUnfinished(snapshot.unfinished)
-          setOwnership(snapshot.ownership)
-          setContradictions(snapshot.contradictions)
-          setQuestions(snapshot.questions)
-          setQueries(snapshot.queries)
-          setSectionStates(snapshot.sectionStates)
+        let parsed: unknown
+        try { parsed = JSON.parse(rawSnapshot) } catch { parsed = null }
+        if (isDemoSnapshot(parsed)) {
+          setActiveRole(parsed.activeRole)
+          setClaims(parsed.claims)
+          setDecisions(parsed.decisions)
+          setWorkUpdates(parsed.workUpdates ?? [])
+          setUnfinished(parsed.unfinished)
+          setOwnership(parsed.ownership)
+          setContradictions(parsed.contradictions)
+          setQuestions(parsed.questions)
+          setQueries(parsed.queries)
+          setSectionStates(parsed.sectionStates)
         } else {
           window.localStorage.removeItem(DEMO_STORAGE_KEY)
         }
       }
     } catch {
-      try { window.localStorage.removeItem(DEMO_STORAGE_KEY) } catch { /* Storage may be disabled. */ }
+      setStorageIssue(true)
     } finally {
       setStorageReady(true)
     }
@@ -158,8 +161,9 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
     }
     try {
       window.localStorage.setItem(DEMO_STORAGE_KEY, JSON.stringify(snapshot))
+      setStorageIssue(false)
     } catch {
-      // The sample workspace remains usable when browser storage is unavailable.
+      setStorageIssue(true)
     }
   }, [activeRole, claims, decisions, workUpdates, unfinished, ownership, contradictions, questions, queries, sectionStates, storageReady])
 
@@ -418,6 +422,7 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
         questions,
         queries,
         sectionStates,
+        storageIssue,
         answerInterviewQuestion,
         resolveContradiction,
         adoptUnfinishedItem,

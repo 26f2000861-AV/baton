@@ -32,6 +32,8 @@ export function useFocusTrap({
 
     // Save previous active element to restore focus when overlay closes
     const previousActiveElement = document.activeElement as HTMLElement | null
+    const previousBodyOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
 
     // Set initial focus
     const frameId = window.requestAnimationFrame(() => {
@@ -91,6 +93,7 @@ export function useFocusTrap({
     return () => {
       window.cancelAnimationFrame(frameId)
       window.removeEventListener('keydown', handleKeyDown)
+      document.body.style.overflow = previousBodyOverflow
       if (
         previousActiveElement &&
         typeof previousActiveElement.focus === 'function' &&

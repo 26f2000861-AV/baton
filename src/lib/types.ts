@@ -1,5 +1,5 @@
 export type ClaimStatus =
-  | 'quoted_verified'   // Exact substring match in source + entailed
+  | 'quoted_verified'   // Exact substring appears in source; claim support still needs human review
   | 'quoted_unverified' // Quote altered, paraphrased or unverified
   | 'inferred_ai'       // AI deduction/synthesis without verbatim quote
   | 'conflicting'       // Contradicted by another source document

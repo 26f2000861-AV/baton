@@ -8,6 +8,7 @@ export default function PillarDecisions({
   decisions,
   workUpdates,
   activeAuthor,
+  storageIssue,
   onCapture,
   isAccepted,
   onInspect,
@@ -17,6 +18,7 @@ export default function PillarDecisions({
   decisions: ArchitecturalDecision[]
   workUpdates: WorkUpdate[]
   activeAuthor: string
+  storageIssue: boolean
   onCapture: (update: Omit<WorkUpdate, 'id' | 'capturedBy' | 'capturedAt'>) => void
   isAccepted: boolean
   onInspect: (claimId: string) => void
@@ -125,7 +127,7 @@ export default function PillarDecisions({
               Save update
             </button>
           </div>
-          {savedMessage && <p className="work-capture-feedback" role="status">{savedMessage}</p>}
+          {savedMessage && <p className="work-capture-feedback" role="status">{storageIssue ? 'The update is visible here, but browser storage could not save it. It may be lost after refresh.' : savedMessage}</p>}
         </form>
         {workUpdates.length > 0 ? (
           <div className="work-update-list" aria-label="Captured work updates">
@@ -152,6 +154,11 @@ export default function PillarDecisions({
       <div className="grid gap-4 lg:grid-cols-2">
         {decisions.map((d) => {
           const isInferred = d.provenance.rationaleConfidence === 'inferred_ai'
+          const rationaleLabel = isInferred
+            ? 'Rationale inferred'
+            : d.provenance.rationaleConfidence === 'stated_by_leaver'
+              ? 'Leaver-stated rationale'
+              : 'Rationale documented'
           return (
             <article
               key={d.id}
@@ -163,7 +170,7 @@ export default function PillarDecisions({
                     {d.id === 'dec_01' ? 'ADR-004' : 'COMMIT 8f4a1'}
                   </span>
                   <span className="monochrome-pill">
-                    {isInferred ? 'Inferred' : 'Quote found'}
+                    {rationaleLabel}
                   </span>
                 </div>
 
@@ -194,11 +201,11 @@ export default function PillarDecisions({
                     {isInferred ? (
                       <span className="flex items-center gap-1 font-medium text-[#0A0A0A]">
                         <AlertCircle size={13} className="text-[#6B6B6B]" />
-                        Rationale inferred ({d.provenance.exactQuote})
+                        Rationale inferred from sample context ({d.provenance.exactQuote})
                       </span>
                     ) : (
                       <span className="evidence-signal font-medium text-[#1D5FBF]">
-                        Verified claim
+                        Rationale documented; claim support still needs review
                       </span>
                     )}
                   </span>

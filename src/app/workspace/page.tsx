@@ -35,7 +35,7 @@ const statusLabels: Record<string, { label: string; description: string }> = CLA
 
 export default function Home() {
   const {
-    activePersona, setActivePersonaRole, claims, visibleClaims, withheldCount, withheldDetails, decisions, workUpdates,
+    activePersona, setActivePersonaRole, claims, visibleClaims, withheldCount, withheldDetails, decisions, workUpdates, storageIssue,
     unfinished, ownership, contradictions, questions, queries, sectionStates,
     answerInterviewQuestion, resolveContradiction, adoptUnfinishedItem, acceptSection, undoSectionAcceptance,
     submitSuccessorQuery, resolveSuccessorQuery, captureWorkUpdate, resetDemoData,
@@ -73,7 +73,7 @@ export default function Home() {
     if (window.location.hash !== hash) window.location.hash = hash
     setRoute(id)
     setMenuOpen(false)
-    window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
+    window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
     if (menuOpen) window.requestAnimationFrame(() => returnFocusRef.current?.focus())
   }, [menuOpen])
 
@@ -83,7 +83,7 @@ export default function Home() {
         event.preventDefault()
         if (route !== 'claims') navigate('claims')
         window.requestAnimationFrame(() => {
-          const target = window.matchMedia('(max-width: 640px)').matches
+          const target = window.matchMedia('(max-width: 760px)').matches
             ? document.querySelector<HTMLInputElement>('.claims-search-input')
             : searchInputRef.current
           target?.focus()
@@ -128,6 +128,8 @@ export default function Home() {
 
   useEffect(() => {
     if (!menuOpen) return
+    const previousBodyOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
     document.querySelector<HTMLAnchorElement>('.mobile-menu a')?.focus()
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -151,7 +153,10 @@ export default function Home() {
       }
     }
     window.addEventListener('keydown', closeOnEscape)
-    return () => window.removeEventListener('keydown', closeOnEscape)
+    return () => {
+      window.removeEventListener('keydown', closeOnEscape)
+      document.body.style.overflow = previousBodyOverflow
+    }
   }, [menuOpen])
 
   useEffect(() => {
@@ -296,7 +301,7 @@ export default function Home() {
         <div className="sidebar-tools">
           <button className="nav-link" onClick={() => navigate('interview')}><MessageSquare size={17} /><span>Leaver interview</span><span className="nav-count">{pendingQuestions.length}</span></button>
           <button className="nav-link" onClick={() => navigate('exposure')}><ShieldAlert size={17} /><span>Exposure diff</span></button>
-          <button className="nav-link" onClick={resetDemoData}><RotateCcw size={17} /><span>Reset sample data</span></button>
+          <button className="nav-link" onClick={() => { if (window.confirm('Reset this browser\'s sample handover and clear local changes?')) resetDemoData() }}><RotateCcw size={17} /><span>Reset sample data</span></button>
         </div>
       </aside>
 
@@ -318,12 +323,15 @@ export default function Home() {
             </button>
           </div>
         </header>
-        {menuOpen && <div id="mobile-navigation" className="mobile-menu" role="dialog" aria-modal="true" aria-label="Baton navigation"><Link href="/" className="nav-caption flex items-center gap-2 hover:text-[#eeeeee]" onClick={() => setMenuOpen(false)}><strong>Baton</strong> / Handover</Link>{routes.map(({ id, label, hash, icon: Icon }) => <a key={id} href={hash} aria-current={route === id ? 'page' : undefined} className={route === id ? 'selected' : undefined} onClick={(event) => { event.preventDefault(); navigate(id) }}><Icon size={17} />{label}</a>)}<button onClick={() => navigate('interview')}><MessageSquare size={17} />Leaver interview</button><button onClick={() => navigate('exposure')}><ShieldAlert size={17} />Exposure diff</button></div>}
+        {menuOpen && <div id="mobile-navigation" className="mobile-menu" role="dialog" aria-modal="true" aria-label="Baton navigation"><Link href="/" className="nav-caption flex items-center gap-2 hover:text-[#eeeeee]" onClick={() => setMenuOpen(false)}><strong>Baton</strong> / Handover</Link>{routes.map(({ id, label, hash, icon: Icon }) => <a key={id} href={hash} aria-current={route === id ? 'page' : undefined} className={route === id ? 'selected' : undefined} onClick={(event) => { event.preventDefault(); navigate(id) }}><Icon size={17} />{label}</a>)}<button onClick={() => navigate('interview')}><MessageSquare size={17} />Leaver interview</button><button onClick={() => navigate('exposure')}><ShieldAlert size={17} />Exposure diff</button><button onClick={() => { if (window.confirm('Reset this browser\'s sample handover and clear local changes?')) { resetDemoData(); setMenuOpen(false) } }}><RotateCcw size={17} />Reset sample data</button></div>}
         <main className={`sheet${clearancePulse ? ' clearance-pulse' : ''}`}>
           <div className="sheet-content">
-            <div className="sample-workspace-note"><span className="sample-indicator" />SAMPLE WORKSPACE<span className="sample-note-copy">Synthetic records · saved in this browser only · role switcher is a preview, not access control.</span></div>
+            <div className="sample-workspace-note"><span className="sample-indicator" />SAMPLE WORKSPACE<span className="sample-note-copy" role="status" aria-live="polite">{storageIssue ? 'Browser storage is unavailable; changes may be lost after refresh. Use synthetic data only.' : 'Synthetic records · saved in this browser only · role switcher is a preview, not access control.'}</span></div>
             <div className="page-heading">
               <div><p className="breadcrumb">Engineering <span>/</span> Handover</p><h1>{title}</h1></div>
+              {route === 'overview' && <button className="primary-action page-capture-action" onClick={() => navigate('decisions')}>
+                <GitCommit size={16} aria-hidden="true" /> Capture a work update
+              </button>}
             </div>
 
             {route === 'overview' && <div className="view-stack">
@@ -368,9 +376,9 @@ export default function Home() {
               </div>
             </div>}
 
-            {route === 'claims' && <div className="view-stack"><div className="view-intro"><p>{visibleClaims.length} visible claims for {activePersona.name}</p><button className="secondary-action" onClick={() => navigate('exposure')}>View exposure diff</button></div><section className={`data-card claims-card${claimsUpdating ? ' is-updating' : ''}`}><div className="card-heading"><div><h2>Claims</h2><p>{filteredClaims.length} matching claims</p></div><button className="icon-action" aria-label="Sort claims by ID" aria-pressed={sortDescending} onClick={() => updateClaims(() => setSortDescending((value) => !value))}><ArrowDownUp size={16} /></button></div><label className="claims-mobile-search"><span className="sr-only">Search claims and sources</span><Search size={16} aria-hidden="true" /><input className="claims-search-input" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search claims and sources" /></label><p className="evidence-clarifier">“Quote found” means the source contains that text. It does not confirm the claim is true.</p><div className="filter-tabs" role="tablist" aria-label="Filter claims by evidence state">{['all', 'verified', 'inferred', 'unverified', 'conflict'].map((item) => <button role="tab" aria-selected={filter === item} className={filter === item ? 'active' : ''} key={item} onClick={() => updateClaims(() => setFilter(item))}>{item === 'all' ? `All ${visibleClaims.length}` : `${item === 'verified' ? 'Quote found' : `${item[0].toUpperCase()}${item.slice(1)}`} ${visibleClaims.filter((claim) => item === 'conflict' ? claim.status === 'conflicting' : claim.status === `quoted_${item === 'verified' ? 'verified' : item === 'unverified' ? 'unverified' : 'none'}` || (item === 'inferred' && claim.status === 'inferred_ai')).length}`}</button>)}</div><details className="evidence-help"><summary>How to read these labels</summary><p className="evidence-help-intro">Labels describe the source and review state. An exact quote does not prove the whole claim is correct.</p><dl>{Object.entries(CLAIM_STATUS_COPY).map(([key, status]) => <div key={key}><dt>{status.label}</dt><dd>{status.description}</dd></div>)}</dl></details><div className="claim-list">{renderClaimRows(filteredClaims)}</div></section></div>}
+            {route === 'claims' && <div className="view-stack"><div className="view-intro"><p>{visibleClaims.length} visible claims for {activePersona.name}</p><button className="secondary-action" onClick={() => navigate('exposure')}>View exposure diff</button></div><section className={`data-card claims-card${claimsUpdating ? ' is-updating' : ''}`}><div className="card-heading"><div><h2>Claims</h2><p>{filteredClaims.length} matching claims</p></div><button className="icon-action" aria-label="Sort claims by ID" aria-pressed={sortDescending} onClick={() => updateClaims(() => setSortDescending((value) => !value))}><ArrowDownUp size={16} /></button></div><label className="claims-mobile-search"><span className="sr-only">Search claims and sources</span><Search size={16} aria-hidden="true" /><input className="claims-search-input" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search claims and sources" /></label><p className="evidence-clarifier">“Quote found” means the source contains that text. It does not confirm the claim is true.</p><div className="filter-tabs" role="group" aria-label="Filter claims by evidence state">{['all', 'verified', 'inferred', 'unverified', 'conflict'].map((item) => <button type="button" aria-pressed={filter === item} className={filter === item ? 'active' : ''} key={item} onClick={() => updateClaims(() => setFilter(item))}>{item === 'all' ? `All ${visibleClaims.length}` : `${item === 'verified' ? 'Quote found' : `${item[0].toUpperCase()}${item.slice(1)}`} ${visibleClaims.filter((claim) => item === 'conflict' ? claim.status === 'conflicting' : claim.status === `quoted_${item === 'verified' ? 'verified' : item === 'unverified' ? 'unverified' : 'none'}` || (item === 'inferred' && claim.status === 'inferred_ai')).length}`}</button>)}</div><details className="evidence-help"><summary>How to read these labels</summary><p className="evidence-help-intro">Labels describe the source and review state. An exact quote does not prove the whole claim is correct.</p><dl>{Object.entries(CLAIM_STATUS_COPY).map(([key, status]) => <div key={key}><dt>{status.label}</dt><dd>{status.description}</dd></div>)}</dl></details><div className="claim-list">{renderClaimRows(filteredClaims)}</div></section></div>}
 
-            {route === 'decisions' && <div className="native-component"><PillarDecisions decisions={decisions} workUpdates={workUpdates} activeAuthor={activePersona.name} onCapture={captureWorkUpdate} isAccepted={sectionStates.decisions?.isAccepted ?? false} onInspect={openSource} onAccept={() => acceptSection('decisions')} onUndo={() => undoSectionAcceptance('decisions')} /></div>}
+            {route === 'decisions' && <div className="native-component"><PillarDecisions decisions={decisions} workUpdates={workUpdates} activeAuthor={activePersona.name} storageIssue={storageIssue} onCapture={captureWorkUpdate} isAccepted={sectionStates.decisions?.isAccepted ?? false} onInspect={openSource} onAccept={() => acceptSection('decisions')} onUndo={() => undoSectionAcceptance('decisions')} /></div>}
             {route === 'ownership' && <div className="native-component"><PillarOwnership assets={ownership} isAccepted={sectionStates.ownership?.isAccepted ?? false} onInspect={openSource} onAccept={() => acceptSection('ownership')} onUndo={() => undoSectionAcceptance('ownership')} /></div>}
             {route === 'risks' && <div className="native-component"><PillarRisks contradictions={contradictions} isAccepted={sectionStates.risks?.isAccepted ?? false} onContradiction={openConflict} onInspect={openSource} onAccept={() => acceptSection('risks')} onUndo={() => undoSectionAcceptance('risks')} /></div>}
             {route === 'unfinished' && <div className="native-component"><PillarUnfinished items={unfinished} isAccepted={sectionStates.unfinished?.isAccepted ?? false} onAdopt={adoptUnfinishedItem} onInspect={openSource} onAccept={() => acceptSection('unfinished')} onUndo={() => undoSectionAcceptance('unfinished')} /></div>}

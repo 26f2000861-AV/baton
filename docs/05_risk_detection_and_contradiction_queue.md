@@ -1,4 +1,6 @@
 # Baton Functional Specification 05: Risk Detection & Contradiction Queue
+> **Planning specification — aspirational, not a shipped feature list.** This note describes parts of the original target design. Those workflows are not all implemented in the Round 2 demo, and some technical or research assumptions have not been validated. For current behavior and limitations, use the top-level README, source code, and Round 2 form draft.
+
 
 ## 1. Problem Statement & Theoretical Foundation
 

@@ -61,7 +61,7 @@ export default function HomeHero() {
             primaryCta="Open sample workspace"
             onPrimary={() => router.push('/workspace')}
             secondaryCta="See how it works"
-            onSecondary={() => document.getElementById('handover-workflow')?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })}
+            onSecondary={() => document.getElementById('handover-workflow')?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })}
             proof={null}
             sculptureLabel=""
             sculptureHint=""
