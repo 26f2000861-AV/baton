@@ -11,32 +11,50 @@ export default function BatonMark({
   const isMedium = size === 'medium'
 
   const sizeClasses = isMedium
-    ? '!w-[42px] !h-[42px]'
+    ? '!w-[46px] !h-[46px]'
     : isCompact
     ? 'compact'
     : ''
 
   const svgSizeClasses = isMedium
-    ? '!w-[30px] !h-[30px]'
-    : ''
+    ? '!w-[34px] !h-[26px]'
+    : isCompact
+    ? '!w-[22px] !h-[16px]'
+    : '!w-[26px] !h-[19px]'
 
   return (
     <span
       className={`brand-mark ${sizeClasses} ${className}`.trim()}
       aria-hidden="true"
     >
-      <svg viewBox="0 0 72 70" focusable="false" className={svgSizeClasses}>
+      <svg
+        viewBox="0 0 74 52"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        focusable="false"
+        className={svgSizeClasses}
+      >
+        {/* Left handoff bracket (lead / leaver side) */}
         <path
-          className="relay-mark-outline"
-          d="M18 5h22a14 14 0 0 1 0 28H18zM18 33h24a15 15 0 0 1 0 30H18z"
-          fill="none"
-          stroke="var(--text)"
-          strokeWidth="4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+          d="M8 10h18l15 16-15 16H8z"
+          stroke="var(--text, #eeeeee)"
+          strokeWidth="3.5"
         />
-        <path className="relay-mark-line" d="M6 33h60" fill="none" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round" />
-        <circle cx="66" cy="33" r="4" fill="var(--accent)" />
+        {/* Right handoff bracket (successor / transfer side in teal) */}
+        <path
+          d="M66 10H48L33 26l15 16h18z"
+          stroke="#1B6C80"
+          strokeWidth="3.5"
+        />
+        {/* Handoff connection axis */}
+        <path
+          d="M27 26h20"
+          stroke="var(--text, #eeeeee)"
+          strokeWidth="2"
+        />
+        {/* Handoff transfer pivot */}
+        <circle cx="37" cy="26" r="4" fill="#1B6C80" stroke="none" />
       </svg>
     </span>
   )
