@@ -87,6 +87,9 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
   )
 
   const answerInterviewQuestion = (questionId: string, answerText: string) => {
+    const normalizedAnswer = answerText.trim()
+    const question = questions.find((q) => q.id === questionId)
+    if (!normalizedAnswer || !question || question.status !== 'pending_answer') return
     setQuestions((prev) =>
       prev.map((q) =>
         q.id === questionId
@@ -96,7 +99,7 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
               leaverResponse: {
                 answeredBy: 'Alex Chen (Staff Engineer)',
                 timestamp: new Date().toISOString(),
-                responseText: answerText,
+                responseText: normalizedAnswer,
               },
             }
           : q
@@ -104,7 +107,6 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
     )
 
     // Upgrade the associated claim to stated_by_leaver
-    const question = questions.find((q) => q.id === questionId)
     if (question?.associatedClaimId) {
       setClaims((prev) =>
         prev.map((c) =>
@@ -112,8 +114,12 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
             ? {
                 ...c,
                 status: 'stated_by_leaver',
-                statement: `${c.statement} [Stated by Alex Chen: "${answerText}"]`,
                 verificationMethod: 'human_attested',
+                history: [...(c.history ?? []), {
+                  action: `Leaver attestation recorded: ${normalizedAnswer}`,
+                  actor: 'Alex Chen (Staff Engineer)',
+                  timestamp: new Date().toISOString(),
+                }],
               }
             : c
         )
@@ -146,7 +152,7 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
         c.id === contradictionId
           ? {
               ...c,
-              status: 'settled_by_human',
+              status: resolutionType === 'clarification_note' ? 'open_unresolved' : 'settled_by_human',
               settlement: {
                 resolvedBy: 'Vikram Malhotra (Lead)',
                 resolutionTimestamp: new Date().toISOString(),
@@ -161,19 +167,24 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
     // Update associated claim to confirmed_by_lead
     const item = contradictions.find((c) => c.id === contradictionId)
     if (item?.associatedClaimId) {
-      const settledSource =
-        resolutionType === 'accept_source_b'
-          ? 'RabbitMQ retained as active live fallback due to AWS SQS regional burst quotas.'
-          : 'AWS SQS confirmed as primary with burst monitoring.'
+      const settledSource = resolutionType === 'accept_source_b'
+        ? 'Accepted Source B: RabbitMQ is the active live fallback.'
+        : resolutionType === 'accept_source_a'
+          ? 'Accepted Source A: AWS SQS FIFO is primary.'
+          : 'Lead clarification recorded; source precedence remains explicitly unresolved.'
 
       setClaims((prev) =>
         prev.map((claim) =>
           claim.id === item.associatedClaimId
             ? {
                 ...claim,
-                status: 'confirmed_by_lead',
-                statement: `Contradiction Resolved by Lead: ${settledSource} (Note: ${humanComment})`,
+                status: resolutionType === 'clarification_note' ? 'conflicting' : 'confirmed_by_lead',
                 verificationMethod: 'human_attested',
+                history: [...(claim.history ?? []), {
+                  action: `${settledSource} Note: ${humanComment.trim()}`,
+                  actor: 'Vikram Malhotra (Lead)',
+                  timestamp: new Date().toISOString(),
+                }],
               }
             : claim
         )

@@ -43,6 +43,7 @@ Respond ONLY with a valid JSON object matching this schema:
           temperature: 0.1,
         },
       }),
+      signal: AbortSignal.timeout(12_000),
     })
 
     if (!res.ok) {
@@ -56,12 +57,26 @@ Respond ONLY with a valid JSON object matching this schema:
       return mockEntailmentCheck(claimStatement, sourceQuote)
     }
 
-    const parsed = JSON.parse(textOutput) as GeminiEntailmentResponse
+    const parsed: unknown = JSON.parse(textOutput)
+    if (!isGeminiEntailmentResponse(parsed)) {
+      return mockEntailmentCheck(claimStatement, sourceQuote)
+    }
     return parsed
   } catch (err) {
     console.error('Error invoking Gemini API:', err)
     return mockEntailmentCheck(claimStatement, sourceQuote)
   }
+}
+
+function isGeminiEntailmentResponse(value: unknown): value is GeminiEntailmentResponse {
+  if (!value || typeof value !== 'object') return false
+  const result = value as Record<string, unknown>
+  return (result.entailment === 'entailed' || result.entailment === 'neutral' || result.entailment === 'contradicted')
+    && typeof result.confidenceScore === 'number'
+    && Number.isFinite(result.confidenceScore)
+    && result.confidenceScore >= 0 && result.confidenceScore <= 1
+    && typeof result.explanation === 'string'
+    && result.explanation.length <= 1000
 }
 
 function mockEntailmentCheck(

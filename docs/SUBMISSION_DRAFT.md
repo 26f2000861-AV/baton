@@ -49,7 +49,7 @@
 
 ### Pillar 5: Security & Governance (Reader-Scoped Access)
 - [x] **Persona Clearance Filter:** Instant switching between `Successor (Priya)`, `Leaver (Alex)`, and `Lead (Vikram)`.
-- [x] **Invisible Shielding:** Confidential HR compensation and severance discussions in Slack `#leadership-confidential` are completely omitted from the successor view without suspicious placeholders.
+- [x] **Persona-Scoped Demo View:** The synthetic sample ledger demonstrates filtering by selected persona. Personas are not authenticated identities; the zero-login demo does not provide production access control and must not contain real confidential data.
 - [x] **Lead Exposure Preview Diff:** Dedicated audit modal for managers showing exactly what claims were shielded and why.
 
 ### Pillar 6: Elicitation & Mutual Accountability

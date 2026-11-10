@@ -18,14 +18,14 @@ When software engineers leave an organization, tribal knowledge evaporates. Succ
 1. **Atomic Claim Ledger with Deterministic Verification:** Pure TypeScript substring checking (`verifyQuoteAgainstSource`) verifies quotes character-by-character against raw source documents before validating claims. Unverified quotes are automatically downgraded.
 2. **Contradiction Settlement Queue:** Disagreement *is* the product discovery. Cross-source contradictions (e.g. PR #204 claiming AWS SQS vs Slack #payment-eng revealing rollback to RabbitMQ) are surfaced side-by-side for human settlement.
 3. **Gap-Driven Leaver Focus Interview:** Generates 5 targeted questions derived strictly from detected gaps (`not_found`, `inferred_ai` rationale). Submitting answers immediately stamps claims as `stated_by_leaver`.
-4. **Reader-Scoped Security (Invisible Shield):** Compiles live views according to reader clearance (`Successor (Priya)`, `Leaver (Alex)`, `Lead (Vikram)`). Confidential management and HR threads vanish from the successor view without suspicious placeholders.
+4. **Reader-Scoped Demo Views:** Filters the sample claim ledger by the selected demo persona. This is a UI demonstration only: personas are selectable and are not authenticated identities or a security boundary. Do not use real confidential data with this zero-login build. A production deployment must authenticate users and enforce authorization on the server before returning claims or sources.
 5. **I-PASS Receiver Acceptance:** Successor validates section by section, raises inline queries on ambiguous items, and generates an official Handover Completion Certificate.
 
 ---
 
 ## Live Demo & Zero-Sign-in Access
 
-The application opens with **zero login barrier** in incognito/private windows, directly loading the high-fidelity **FinTrack Payment Core Handover** case:
+The application opens with **zero login barrier** in incognito/private windows, directly loading a **synthetic FinTrack Payment Core Handover** case. All names, records, conversations, and credentials are fabricated for demonstration; do not treat this app as a secure handover system:
 - **Alex Chen** (Staff Platform Engineer — Departing)
 - **Priya Sharma** (Senior Backend Engineer — Successor)
 - **Vikram Malhotra** (Engineering Director — Lead)

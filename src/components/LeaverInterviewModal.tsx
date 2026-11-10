@@ -117,7 +117,7 @@ export default function LeaverInterviewModal({
 
             <div>
               <label htmlFor="leaver-response-input" className="block text-xs font-semibold text-[#0A0A0A]">
-                Attested response (Logged as official statement by Alex Chen):
+                Demo attestation response (attributed to Alex Chen in this sample case):
               </label>
               <textarea
                 id="leaver-response-input"

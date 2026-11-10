@@ -26,6 +26,12 @@ export async function POST(req: Request) {
       )
     }
 
+    // Anonymous demo endpoint: never return restricted source records. Persona
+    // selection is a demo feature and is not an authenticated security boundary.
+    if (rawSource.requiredClearanceLevel === 'restricted_hr_legal' || rawSource.requiredClearanceLevel === 'confidential_lead') {
+      return NextResponse.json({ error: 'This source is not available through the public demo verifier.' }, { status: 403 })
+    }
+
     // Step 1: Deterministic Substring Verification
     const deterministicCheck = verifyQuoteAgainstSource(
       rawSource.content,

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "node --experimental-strip-types --test tests/verifier.test.mts"
   },
   "dependencies": {
     "@studio-freight/lenis": "^1.0.42",

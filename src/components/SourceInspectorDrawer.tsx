@@ -93,6 +93,20 @@ export default function SourceInspectorDrawer({
             </p>
           </div>
 
+          {claim.history && claim.history.length > 0 && (
+            <section className="mt-4 rounded-[6px] border border-[#E6E6E6] bg-white p-4" aria-label="Claim history">
+              <h3 className="text-[11px] font-semibold uppercase tracking-wider text-[#6B6B6B]">Claim history</h3>
+              <ol className="mt-3 space-y-3">
+                {claim.history.map((entry, index) => (
+                  <li key={`${entry.timestamp}-${index}`} className="border-l-2 border-[#1D5FBF] pl-3 text-xs">
+                    <p className="text-[#0A0A0A]">{entry.action}</p>
+                    <p className="mt-1 text-[#6B6B6B]">{entry.actor} · {new Date(entry.timestamp).toLocaleString()}</p>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )}
+
           {/* Verbatim Source Evidence Snippet */}
           {source && (
             <div className="mt-4 rounded-[6px] border border-[#E6E6E6] bg-[#F2F4F7]/60 p-4">

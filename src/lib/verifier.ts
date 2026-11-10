@@ -30,6 +30,17 @@ export function verifyQuoteAgainstSource(
   const normalizedSource = sourceRawText.replace(/\r\n/g, '\n')
   const normalizedQuote = quoteSnippet.trim().replace(/\r\n/g, '\n')
 
+  if (!normalizedQuote) {
+    return {
+      isExactMatch: false,
+      charStart: -1,
+      charEnd: -1,
+      normalizedQuote,
+      suggestedStatus: 'quoted_unverified',
+      explanation: 'Quote contains only whitespace.',
+    }
+  }
+
   const charStart = normalizedSource.indexOf(normalizedQuote)
 
   if (charStart === -1) {

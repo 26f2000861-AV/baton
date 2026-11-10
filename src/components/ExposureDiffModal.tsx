@@ -65,7 +65,7 @@ export default function ExposureDiffModal({
         </div>
 
         <p className="mt-4 text-xs text-[#6B6B6B]">
-          Baton enforces strict access control policies. Records classified above the active reader’s clearance level (<code className="font-mono text-[#0A0A0A]">team_internal</code> for Priya Sharma) are completely excluded from the successor handover ledger to guarantee zero data leakage.
+          This synthetic demo filters the visible ledger by the selected persona. Persona selection is not authentication, and this browser-only sample does not provide a security boundary or guarantee data isolation. Never enter real confidential records here.
         </p>
 
         <div className="mt-4 space-y-3">
