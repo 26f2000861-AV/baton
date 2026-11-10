@@ -6,7 +6,7 @@ import Link from 'next/link'
 import {
   AlertTriangle, ArrowDownUp, CheckSquare, ChevronDown,
   FileText, GitCommit, GitPullRequest, LayoutDashboard, Menu, MessageSquare,
-  RotateCcw, Search, ShieldAlert, ShieldCheck, User, X,
+  RotateCcw, Search, ShieldAlert, ShieldCheck, X,
 } from 'lucide-react'
 import PillarDecisions from '../../components/PillarDecisions'
 import PillarUnfinished from '../../components/PillarUnfinished'
@@ -239,6 +239,12 @@ export default function Home() {
     }
   }
   const activeClaim = claims.find((claim) => claim.id === selectedClaimId) ?? claims[0]
+  const personaInitials = activePersona.name.split(' ').map((part) => part[0]).join('')
+  const personaRoleLabel = activePersona.role === 'successor'
+    ? 'Successor'
+    : activePersona.role === 'leaver'
+      ? 'Departing engineer'
+      : 'Engineering lead'
   const drawerClaim = claims.find((claim) => claim.id === drawerClaimId)
   const activeConflict = contradictions.find((item) => item.id === selectedConflictId)
   const pendingQuestions = questions.filter((item) => item.status === 'pending_answer')
@@ -310,17 +316,17 @@ export default function Home() {
           <label className="global-search"><Search size={15} /><input ref={searchInputRef} value={search} onFocus={() => { if (route !== 'claims') navigate('claims') }} onChange={(event) => setSearch(event.target.value)} placeholder="Search claims and sources" aria-label="Search claims and sources" /><kbd>Ctrl K</kbd></label>
           <label
             className="persona-control"
-            title={`Reviewing as ${activePersona.name} (${activePersona.role})`}
+            title={`Reviewing as ${activePersona.name} · ${personaRoleLabel}`}
           >
-            <span className="sr-only">Reviewer</span>
-            <User size={13} className="persona-icon text-[#8d8d8d] flex-none" />
-            <span className="persona-mobile-label">
-              {activePersona.role === 'successor' ? 'Priya' : activePersona.role === 'leaver' ? 'Alex' : 'Vikram'}
+            <span className="persona-avatar" aria-hidden="true">{personaInitials}</span>
+            <span className="persona-copy" aria-hidden="true">
+              <span className="persona-name">{activePersona.name}</span>
+              <span className="persona-role">{personaRoleLabel}</span>
             </span>
             <select
               value={activePersona.role}
               onChange={(event) => handlePersonaChange(event.target.value as 'successor' | 'leaver' | 'lead')}
-              aria-label="Select reviewer"
+              aria-label={`Reviewer persona. Current reviewer: ${activePersona.name}, ${personaRoleLabel}`}
             >
               <option value="successor">Priya Sharma · Successor</option>
               <option value="leaver">Alex Chen · Leaver</option>
