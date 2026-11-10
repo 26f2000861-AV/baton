@@ -5,7 +5,7 @@ import BatonMark from "@/components/BatonMark"
 
 /**
  * Pushpin Tear Footer — a site footer made as a torn poster.
- * The sheet carries the footer chrome: back to top, socials, copy-email,
+ * The sheet carries the footer chrome: back to top, socials, an email link,
  * a newsletter field, an availability line, a live local clock and link columns.
  * Its bottom has been ripped away from a glossy pushpin, and the brand is printed
  * on the paper underneath with legal links, copyright, and handle.
@@ -188,7 +188,7 @@ export type PushpinTearFooterProps = {
   logo?: React.ReactNode
   logoHref?: string
   socials?: IconLink[]
-  /** Copied by the envelope button; also the default "talk." link. */
+  /** Contact address used by the envelope link and default "talk." link. */
   email?: string
   newsletter?: { label: string; placeholder?: string } | null
   /** One line about availability, under the newsletter. */
@@ -230,6 +230,7 @@ function Icon({ name }: { name: IconName | "chevL" | "copy" | "squiggle" | "arro
     case "arrow": return svg(<path d="M5 12h13M13 6.5 18.5 12 13 17.5" />)
     case "check": return svg(<path d="m5.5 12.5 4 4 9-9.5" />)
     case "copy": return svg(<><path d="M13.5 4.5H7A2.5 2.5 0 0 0 4.5 7v10A2.5 2.5 0 0 0 7 19.5h10a2.5 2.5 0 0 0 2.5-2.5v-6.5" /><circle cx="18.5" cy="5.5" r="2.3" /></>)
+    case "mail": return svg(<><rect x="3.5" y="5.5" width="17" height="13" rx="1.8" /><path d="m4.5 7 7.5 6 7.5-6" /></>)
     case "squiggle": return svg(<path d="M3.5 15c1.8-3.2 3.6-3.2 5.4 0s3.6 3.2 5.4 0 3.6-3.2 5.4 0" />)
     case "github":
       return svg(<path fillRule="evenodd" d="M12 2.8a9.3 9.3 0 0 0-2.9 18.1c.5.1.6-.2.6-.5v-1.7c-2.6.6-3.1-1.1-3.1-1.1-.4-1.1-1-1.4-1-1.4-.9-.6.1-.6.1-.6.9.1 1.4 1 1.4 1 .8 1.4 2.2 1 2.7.8.1-.6.3-1 .6-1.2-2.1-.2-4.2-1-4.2-4.6 0-1 .4-1.8 1-2.5-.1-.2-.4-1.2.1-2.5 0 0 .8-.3 2.6 1a8.8 8.8 0 0 1 4.6 0c1.8-1.2 2.6-1 2.6-1 .5 1.3.2 2.3.1 2.5.6.7 1 1.5 1 2.5 0 3.6-2.2 4.4-4.2 4.6.3.3.6.8.6 1.6v2.4c0 .3.2.6.7.5A9.3 9.3 0 0 0 12 2.8z" />, true)
@@ -456,7 +457,7 @@ const CSS =
   ".tpf-foot{left:0;right:0;bottom:5%;display:flex;align-items:center;justify-content:space-between;gap:1.5em;padding:0 15%;font-size:max(12px,1.85cqmin)}" +
   ".tpf-handle:hover{text-decoration:underline;text-underline-offset:.2em}" +
   "@container (max-width: 620px){" +
-  ".tpf-top{padding:0 max(16px,4cqw)}.tpf-flank{display:none}.tpf-top>.tpf-h{position:absolute!important;top:calc(100% + 8px);left:50%;right:auto;transform:translateX(-50%);width:max-content}.tpf-mail{gap:7px;font-size:13px}.tpf-mail span{display:inline;white-space:nowrap}" +
+  ".tpf-top{padding:0 max(16px,4cqw)}.tpf-flank{display:none}.tpf-mail span{display:none}" +
   ".tpf-news{top:16%}.tpf-pill{width:min(80cqw,320px)}" +
   ".tpf-status{top:29%}.tpf-badge{top:33%}" +
   ".tpf-col{top:36.5%}.tpf-col.l{left:max(16px,4cqw)}.tpf-col.r{right:max(16px,4cqw)}.tpf-col li:nth-child(n+3){display:none}" +
@@ -798,10 +799,6 @@ export default function PushpinTearFooter({
     setToast(msg)
     later(() => setToast(""), 1600)
   }
-  const copyEmail = () => {
-    if (navigator.clipboard?.writeText) navigator.clipboard.writeText(email).then(() => flash("email copied"), () => flash(email))
-    else flash(email)
-  }
   const toTop = () => window.scrollTo({ top: 0, behavior: still ? "auto" : "smooth" })
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -898,10 +895,10 @@ export default function PushpinTearFooter({
           {logo ?? <KMark />}
         </A>
         <div className="tpf-h" style={{ ...H(2), position: "relative" }}>
-          <button type="button" className="tpf-mail" onClick={copyEmail} aria-label={"Copy " + email} title="Copy email">
+          <A href={mailto} className="tpf-mail" label={"Email " + email}>
             <span>{email}</span>
-            <Icon name="copy" />
-          </button>
+            <Icon name="mail" />
+          </A>
           <span className={"tpf-toast" + (toast ? " on" : "")} role="status" aria-live="polite">
             {toast}
           </span>
