@@ -62,7 +62,7 @@ export default function ContradictionModal({
               {item.entityName} — {item.attributeName}
             </h2>
             <p className="mt-1 text-xs text-[#6B6B6B]">
-              Factual disagreement detected between official Git merge record and live Slack incident chat.
+              The sample records show different states. Compare their dates and context before recording a human decision.
             </p>
           </div>
           <button
@@ -84,7 +84,6 @@ export default function ContradictionModal({
             author={item.sourceA.author}
             extractedValue={item.sourceA.extractedValue}
             quote={item.sourceA.exactQuote}
-            url={item.sourceA.url}
           />
           <EvidenceBlock
             badge="SOURCE B · SLACK #PAYMENT-ENG"
@@ -93,7 +92,6 @@ export default function ContradictionModal({
             author={item.sourceB.author}
             extractedValue={item.sourceB.extractedValue}
             quote={item.sourceB.exactQuote}
-            url={item.sourceB.url}
           />
         </div>
 
@@ -149,7 +147,7 @@ export default function ContradictionModal({
           {isAlreadySettled && (
             <div className="mt-3 flex items-center gap-2 text-xs font-semibold text-[#0A0A0A]">
               <Check size={14} />
-              <span>This contradiction was formally settled and logged to the handover audit trail.</span>
+              <span>Decision saved in this browser’s sample state. It is not an audit-grade record.</span>
             </div>
           )}
         </div>
@@ -165,7 +163,6 @@ function EvidenceBlock({
   author,
   extractedValue,
   quote,
-  url,
 }: {
   badge: string
   icon: ReactNode
@@ -173,7 +170,6 @@ function EvidenceBlock({
   author: string
   extractedValue: string
   quote: string
-  url: string
 }) {
   return (
     <div className="flex flex-col justify-between rounded-[6px] border border-[#E6E6E6] bg-white p-4">
@@ -190,16 +186,7 @@ function EvidenceBlock({
           &ldquo;{quote}&rdquo;
         </blockquote>
       </div>
-      <div className="mt-3 pt-2 text-[11px]">
-        <a
-          href={url}
-          target="_blank"
-          rel="noreferrer"
-          className="text-[#1D5FBF] hover:underline"
-        >
-          View original document →
-        </a>
-      </div>
+      <p className="mt-3 pt-2 text-[11px] text-[#6B6B6B]">Illustrative source · synthetic, not connected</p>
     </div>
   )
 }

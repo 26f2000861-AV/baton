@@ -75,7 +75,7 @@ export default function PillarRisks({
                     {c.entityName} — {c.attributeName}
                   </h3>
                   <p className="mt-1 text-xs text-[#6B6B6B]">
-                    Discrepancy detected between production PR merge notice and real-time incident Slack channel.
+                    Sample records show different states. Compare their dates and context before recording a human decision.
                   </p>
                 </div>
 
