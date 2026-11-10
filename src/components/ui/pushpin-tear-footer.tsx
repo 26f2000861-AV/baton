@@ -538,7 +538,7 @@ export default function PushpinTearFooter({
   logo = <BatonMark compact />,
   logoHref = "/",
   socials = DEFAULT_SOCIALS,
-  email = "alex.chen@fintrack.internal",
+  email = "adityaverma200911@gmail.com",
   newsletter = { label: "weekly handover audit digest", placeholder: "engineer@company.com" },
   status = { label: "Payment Core: Verified State Ready", href: "/workspace#signoff" },
   mark = "BATON / 2026",

@@ -133,7 +133,7 @@ export default function HomeHero() {
       </div>
 
       {/* 3. Interactive Pushpin Tear Footer */}
-      <PushpinTearFooter />
+      <PushpinTearFooter email="adityaverma200911@gmail.com" />
     </div>
   )
 }
