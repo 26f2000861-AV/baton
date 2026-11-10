@@ -54,7 +54,7 @@
 
 ### Pillar 6: Elicitation & Mutual Accountability
 - [x] **Gap-Driven 5-Question Leaver Focus Drawer:** Asks only high-priority questions on detected gaps (`not_found`, `inferred_ai` rationale). Submitting answers immediately updates claims to `stated_by_leaver`.
-- [x] **I-PASS Receiver Acceptance Console:** Successor reviews section-by-section, raises inline queries on ambiguous items, and generates an official Handover Completion Certificate.
+- [x] **I-PASS-Inspired Receiver Acceptance:** Successor reviews sections individually, records acceptance, and can raise claim-linked questions. The current workspace does not issue a downloadable or signed certificate.
 
 ---
 
