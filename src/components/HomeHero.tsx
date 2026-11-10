@@ -22,7 +22,7 @@ export default function HomeHero() {
         </div>
       </header>
 
-      {/* 1. Scroll Reveal Entrance */}
+      {/* 1. Scroll Reveal with Center Artifact & Workspace Section */}
       <HeroScrollVideoReveal
         bgColor="#0b0b0b"
         topText={
@@ -44,31 +44,31 @@ export default function HomeHero() {
           </>
         }
         subText="From AWS SQS FIFO retries to legacy RabbitMQ clusters — Baton provides immutable source verification before successor sign-off."
-      />
-
-      {/* 2. Main Handover Workspace Hero Section (Section in image) */}
-      <div id="handover-core" className="flex flex-1 flex-col justify-center border-t border-[#262626]">
-        <InkOrbitHero
-          theme="dark"
-          titleTop="Accountable Handover With"
-          titleAccent={[
-            "Source-Backed Claims",
-            "Deterministic Proofs",
-            "Contradiction Resolvers",
-            "Successor Sign-Offs",
-          ]}
-          description="Baton transforms high-stakes engineering handovers into cryptographic, source-backed claim ledgers. Resolve hidden architecture contradictions, inspect evidence drawers, and achieve verified successor sign-off."
-          primaryCta="Enter Handover Workspace"
-          onPrimary={() => router.push('/workspace')}
-          secondaryCta="Inspect Routing Conflict"
-          onSecondary={() => router.push('/workspace#conflict')}
-          proof={null}
-          sculptureLabel="PAYMENT-CORE-V2"
-          sculptureHint="Drag to inspect topology"
-          hud={true}
-          minHeight="clamp(500px, 64svh, 680px)"
-        />
-      </div>
+      >
+        {/* Center: Artifact & Workspace Button Section (Between the Two Scroll Animations) */}
+        <div id="handover-core" className="flex flex-1 flex-col justify-center border-t border-[#262626]">
+          <InkOrbitHero
+            theme="dark"
+            titleTop="Accountable Handover With"
+            titleAccent={[
+              "Source-Backed Claims",
+              "Deterministic Proofs",
+              "Contradiction Resolvers",
+              "Successor Sign-Offs",
+            ]}
+            description="Baton transforms high-stakes engineering handovers into cryptographic, source-backed claim ledgers. Resolve hidden architecture contradictions, inspect evidence drawers, and achieve verified successor sign-off."
+            primaryCta="Enter Handover Workspace"
+            onPrimary={() => router.push('/workspace')}
+            secondaryCta="Inspect Routing Conflict"
+            onSecondary={() => router.push('/workspace#conflict')}
+            proof={null}
+            sculptureLabel="PAYMENT-CORE-V2"
+            sculptureHint="Drag to inspect topology"
+            hud={true}
+            minHeight="clamp(500px, 64svh, 680px)"
+          />
+        </div>
+      </HeroScrollVideoReveal>
 
       {/* 3. Product Highlights Strip (Section in image) */}
       <div className="border-t border-[#262626] bg-[#121212]/60 px-4 py-8 sm:px-6">

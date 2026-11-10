@@ -22,6 +22,7 @@ export interface HeroScrollVideoRevealProps {
   subText?: string;
   className?: string;
   bgColor?: string;
+  children?: React.ReactNode;
 }
 
 const DEFAULT_TAGS: TagItem[] = [
@@ -49,6 +50,7 @@ export const HeroScrollVideoReveal: React.FC<HeroScrollVideoRevealProps> = ({
   subText = 'From AWS SQS FIFO retries to legacy RabbitMQ clusters — Baton provides immutable source verification before successor sign-off.',
   className = '',
   bgColor = '#0b0b0b',
+  children,
 }) => {
   const benefitRef = useRef<HTMLDivElement>(null);
   const paraRef = useRef<HTMLParagraphElement>(null);
@@ -162,6 +164,9 @@ export const HeroScrollVideoReveal: React.FC<HeroScrollVideoRevealProps> = ({
           <span>&darr;</span>
         </div>
       </section>
+
+      {/* ── Center Content: Artifact & Workspace Section (Between Scroll Animations) ── */}
+      {children}
 
       {/* ── Section 2: Benefit & Headline Section (Without Video) ─────────── */}
       <section
