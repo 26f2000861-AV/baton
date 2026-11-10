@@ -456,7 +456,7 @@ const CSS =
   ".tpf-foot{left:0;right:0;bottom:5%;display:flex;align-items:center;justify-content:space-between;gap:1.5em;padding:0 15%;font-size:max(12px,1.85cqmin)}" +
   ".tpf-handle:hover{text-decoration:underline;text-underline-offset:.2em}" +
   "@container (max-width: 620px){" +
-  ".tpf-top{padding:0 max(16px,4cqw)}.tpf-flank,.tpf-mail span{display:none}" +
+  ".tpf-top{padding:0 max(16px,4cqw)}.tpf-flank{display:none}.tpf-top>.tpf-h{position:absolute!important;top:calc(100% + 8px);left:50%;right:auto;transform:translateX(-50%);width:max-content}.tpf-mail{gap:7px;font-size:13px}.tpf-mail span{display:inline;white-space:nowrap}" +
   ".tpf-news{top:16%}.tpf-pill{width:min(80cqw,320px)}" +
   ".tpf-status{top:29%}.tpf-badge{top:33%}" +
   ".tpf-col{top:36.5%}.tpf-col.l{left:max(16px,4cqw)}.tpf-col.r{right:max(16px,4cqw)}.tpf-col li:nth-child(n+3){display:none}" +
