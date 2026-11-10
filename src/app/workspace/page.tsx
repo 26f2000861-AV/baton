@@ -273,7 +273,7 @@ export default function Home() {
       <button className={`claim-row${selectedClaimId === claim.id ? ' selected' : ''}`} key={claim.id} onClick={() => openSource(claim.id)}>
         <span className="claim-status">{statusLabels[claim.status] ?? 'Pending'}</span>
         <span className="claim-copy"><span>{claim.statement}</span><span className="pass-line"><i /> <code>{source?.sourceId ?? '—'}</code></span></span>
-        {!compact && <span className="row-arrow" aria-hidden="true">↗</span>}
+        <span className="row-arrow">{compact ? 'Open evidence ↗' : '↗'}</span>
       </button>
     )
   })
@@ -322,10 +322,9 @@ export default function Home() {
         {menuOpen && <div id="mobile-navigation" className="mobile-menu" role="dialog" aria-modal="true" aria-label="Baton navigation"><Link href="/" className="nav-caption flex items-center gap-2 hover:text-[#eeeeee]" onClick={() => setMenuOpen(false)}><strong>Baton</strong> / Handover</Link>{routes.map(({ id, label, hash, icon: Icon }) => <a key={id} href={hash} aria-current={route === id ? 'page' : undefined} className={route === id ? 'selected' : undefined} onClick={(event) => { event.preventDefault(); navigate(id) }}><Icon size={17} />{label}</a>)}<button onClick={() => navigate('interview')}><MessageSquare size={17} />Leaver interview</button><button onClick={() => navigate('exposure')}><ShieldAlert size={17} />Exposure diff</button></div>}
         <main className={`sheet${clearancePulse ? ' clearance-pulse' : ''}`}>
           <div className="sheet-content">
-            <div className="sample-workspace-note"><span className="sample-indicator" />SAMPLE WORKSPACE<span className="sample-note-copy">Illustrative records; use this workflow to carry real work across a team transition.</span></div>
+            <div className="sample-workspace-note"><span className="sample-indicator" />SAMPLE WORKSPACE<span className="sample-note-copy">Synthetic records · changes reset on refresh · role switcher is a preview, not access control.</span></div>
             <div className="page-heading">
               <div><p className="breadcrumb">Engineering <span>/</span> Handover</p><h1>{title}</h1></div>
-              {route === 'overview' && <button className="primary-action" onClick={() => navigate('claims')}>Review handover</button>}
             </div>
 
             {route === 'overview' && <div className="view-stack">
@@ -336,14 +335,10 @@ export default function Home() {
               <section className="metric-strip" aria-label="Handover counts">
                 <Metric label="Claims" value={visibleClaims.length} sub={`${verifiedCount} with exact source matches`} /><Metric label="Open conflicts" value={openConflictCount} sub={openConflictCount === 0 ? 'No unresolved conflicts' : `${openConflictCount} ${openConflictCount === 1 ? 'needs' : 'need'} review`} /><Metric label="Unfinished work" value={unfinished.length} sub="Items to pick up" /><Metric label="Ownership" value={ownership.length} sub="Assets to transfer" />
               </section>
-              {/* Three equal columns: 3 × 368px + 2 × 24px gutters = 1152px content width. */}
+              {/* Keep the active conflict beside the evidence at narrower desktop widths. */}
               <div className="overview-grid">
                 <Card title="Claim evidence" action="View claims" onAction={() => navigate('claims')}>
                   <div className="claim-list">{renderClaimRows(visibleClaims.slice(0, 3), true)}</div>
-                </Card>
-                <Card title="Successor sign-off" action="Review sections" onAction={() => navigate('signoff')}>
-                  <div className="mini-rows">{(['decisions', 'unfinished', 'ownership', 'risks'] as const).map((id) => <div className="mini-row" key={id}><span>{sectionName(id)}</span><span className={`state-label ${sectionStates[id]?.isAccepted ? 'accepted' : ''}`}>{sectionStates[id]?.isAccepted ? 'Accepted' : 'Pending'}</span></div>)}</div>
-                  <p className="card-foot">{acceptedCount} of 4 sections accepted</p>
                 </Card>
                 <Card title="Risk to resolve" action="Review risk" onAction={() => navigate('risks')}>
                   {contradictions.slice(0, 1).map((item) => <div className="conflict-sources" key={item.id}>
@@ -352,6 +347,10 @@ export default function Home() {
                     </div>)}
                   </div>)}
                   <p className="source-key"><code>claim_09</code></p>
+                </Card>
+                <Card title="Successor sign-off" action="Review sections" onAction={() => navigate('signoff')}>
+                  <div className="mini-rows">{(['decisions', 'unfinished', 'ownership', 'risks'] as const).map((id) => <div className="mini-row" key={id}><span>{sectionName(id)}</span><span className={`state-label ${sectionStates[id]?.isAccepted ? 'accepted' : ''}`}>{sectionStates[id]?.isAccepted ? 'Accepted' : 'Pending'}</span></div>)}</div>
+                  <p className="card-foot">{acceptedCount} of 4 sections accepted</p>
                 </Card>
                 <Card title="Decisions" action="Review decisions" onAction={() => navigate('decisions')}>
                   {decisions.slice(0, 1).map((item) => <div className="work-preview" key={item.id}><span>{item.title}</span><small>{item.provenance.rationaleConfidence === 'inferred_ai' ? 'Rationale inferred' : item.provenance.rationaleConfidence === 'documented_explicit' ? 'Rationale documented' : 'Rationale stated'} · {new Date(`${item.timestamp}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })} · <code>{item.associatedClaimId}</code></small></div>)}
@@ -367,7 +366,6 @@ export default function Home() {
                   {pendingQuestions.slice(0, 1).map((question) => <div className="work-preview" key={question.id}><span>{question.promptText}</span><small>Claim {question.associatedClaimId} · Pending answer</small></div>)}
                 </Card>
               </div>
-              <div className="overview-bottom"><span>{acceptedCount} of 4 handover sections accepted</span><button className="text-action" onClick={() => navigate('signoff')}>Open sign-off <span aria-hidden="true">→</span></button></div>
             </div>}
 
             {route === 'claims' && <div className="view-stack"><div className="view-intro"><p>{visibleClaims.length} visible claims for {activePersona.name}</p><button className="secondary-action" onClick={() => navigate('exposure')}>View exposure diff</button></div><section className={`data-card claims-card${claimsUpdating ? ' is-updating' : ''}`}><div className="card-heading"><div><h2>Claims</h2><p>{filteredClaims.length} matching claims</p></div><button className="icon-action" aria-label="Sort claims by ID" aria-pressed={sortDescending} onClick={() => updateClaims(() => setSortDescending((value) => !value))}><ArrowDownUp size={16} /></button></div><label className="claims-mobile-search"><span className="sr-only">Search claims and sources</span><Search size={16} aria-hidden="true" /><input className="claims-search-input" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search claims and sources" /></label><div className="filter-tabs" role="tablist" aria-label="Filter claims by evidence state">{['all', 'verified', 'inferred', 'unverified', 'conflict'].map((item) => <button role="tab" aria-selected={filter === item} className={filter === item ? 'active' : ''} key={item} onClick={() => updateClaims(() => setFilter(item))}>{item === 'all' ? `All ${visibleClaims.length}` : `${item[0].toUpperCase()}${item.slice(1)} ${visibleClaims.filter((claim) => item === 'conflict' ? claim.status === 'conflicting' : claim.status === `quoted_${item === 'verified' ? 'verified' : item === 'unverified' ? 'unverified' : 'none'}` || (item === 'inferred' && claim.status === 'inferred_ai')).length}`}</button>)}</div><div className="claim-list">{renderClaimRows(filteredClaims)}</div></section></div>}
