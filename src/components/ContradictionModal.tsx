@@ -10,6 +10,7 @@ export default function ContradictionModal({
   onResolve,
   onClose,
   isClosing = false,
+  canResolve = true,
 }: {
   item?: ContradictionItem
   onResolve: (
@@ -18,6 +19,7 @@ export default function ContradictionModal({
   ) => void
   onClose: () => void
   isClosing?: boolean
+  canResolve?: boolean
 }) {
   const [note, setNote] = useState('')
   const containerRef = useRef<HTMLDivElement>(null)
@@ -33,6 +35,12 @@ export default function ContradictionModal({
   if (!item) return null
 
   const isAlreadySettled = item.status === 'settled_by_human'
+  const resolutionLabels = {
+    accept_source_a: 'Accepted Source A · AWS SQS FIFO is primary',
+    accept_source_b: 'Accepted Source B · RabbitMQ is the active fallback',
+    accept_dual_scope: 'Scoped both · SQS FIFO primary, RabbitMQ retry fallback',
+    clarification_note: 'Clarification recorded · source precedence remains open',
+  }
 
   return (
     <div
@@ -95,8 +103,25 @@ export default function ContradictionModal({
           />
         </div>
 
+        {item.settlement && (
+          <section className="mt-5 rounded-[6px] border border-[#245237] bg-[#14281c] p-4" aria-label="Saved human decision">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-sm font-semibold text-[#eeeeee]">{resolutionLabels[item.settlement.resolutionType]}</p>
+              <time className="text-xs text-[#b8c7bc]" dateTime={item.settlement.resolutionTimestamp}>
+                {new Date(item.settlement.resolutionTimestamp).toLocaleString()}
+              </time>
+            </div>
+            <p className="mt-2 text-xs leading-relaxed text-[#eeeeee]">
+              <strong>Lead note: </strong>{item.settlement.humanComment}
+            </p>
+            <p className="mt-2 text-[11px] text-[#b8c7bc]">
+              Recorded by {item.settlement.resolvedBy}. This decision is saved in this browser’s sample state, not in a shared audit log.
+            </p>
+          </section>
+        )}
+
         {/* Settlement Input and Choices */}
-        <div className="mt-6 rounded-[6px] border border-[#E6E6E6] bg-[#F2F4F7]/50 p-4">
+        {!isAlreadySettled && <div className="mt-6 rounded-[6px] border border-[#E6E6E6] bg-[#F2F4F7]/50 p-4">
           <label htmlFor="settlement-note" className="block text-xs font-semibold text-[#0A0A0A]">
             Decision note (required):
           </label>
@@ -104,17 +129,25 @@ export default function ContradictionModal({
             id="settlement-note"
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            disabled={isAlreadySettled}
+            disabled={isAlreadySettled || !canResolve}
             placeholder={
               isAlreadySettled
                 ? 'Contradiction has been settled.'
-                : 'State why this source is canonical, or clarify if both engines are operating in fallback mode...'
+                : canResolve
+                  ? 'State why this source is canonical, or clarify if both engines are operating in fallback mode...'
+                  : 'Close this window, switch to the lead preview, then reopen the conflict to record a decision.'
             }
             rows={2}
             className="mt-2 w-full rounded-[6px] border border-[#D4D4D4] bg-white p-3 text-xs text-[#0A0A0A] placeholder-[#767676] outline-none transition focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 focus-visible:border-[var(--accent)]"
           />
 
-          {!isAlreadySettled && (
+          {!isAlreadySettled && !canResolve && (
+            <p className="mt-3 text-xs leading-relaxed text-[#6B6B6B]" role="status">
+              Only the engineering lead can record a resolution in this sample flow. Close this window and switch to the lead preview.
+            </p>
+          )}
+
+          {!isAlreadySettled && canResolve && (
             <div className="mt-4 flex flex-wrap gap-2.5">
               <button
                 disabled={!note.trim()}
@@ -150,7 +183,13 @@ export default function ContradictionModal({
               <span>Decision saved in this browser’s sample state. It is not an audit-grade record.</span>
             </div>
           )}
-        </div>
+        </div>}
+        {isAlreadySettled && (
+          <p className="mt-4 flex items-center gap-2 text-xs font-semibold text-[#eeeeee]">
+            <Check size={14} aria-hidden="true" />
+            Decision recorded for the next owner. Review the saved note above.
+          </p>
+        )}
       </div>
     </div>
   )

@@ -24,11 +24,8 @@ export default function PillarRisks({
     <section id="risks" className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <span className="text-xs font-semibold uppercase tracking-wider text-[#6B6B6B]">
-            04 / Pillar
-          </span>
           <h2 className="mt-0.5 text-xl font-semibold tracking-tight text-[#0A0A0A]">
-            Risk and contradiction queue
+            Conflicts to review
           </h2>
           <p className="mt-1 text-xs text-[#6B6B6B]">
             Where do git commits and chat discussions disagree, and what failure modes are unhandled?

@@ -236,6 +236,7 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
     resolutionType: 'accept_source_a' | 'accept_source_b' | 'accept_dual_scope' | 'clarification_note',
     humanComment: string
   ) => {
+    if (activeRole !== 'lead' || !humanComment.trim()) return
     setContradictions((prev) =>
       prev.map((c) =>
         c.id === contradictionId
@@ -338,7 +339,7 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
     category: SuccessorQuery['queryCategory'],
     queryText: string
   ) => {
-    if (activeRole !== 'successor' || !queryText.trim()) return
+    if (activeRole !== 'successor' || !queryText.trim() || !visibleClaims.some((claim) => claim.id === claimId)) return
 
     const newQuery: SuccessorQuery = {
       id: `query_${crypto.randomUUID()}`,
@@ -347,7 +348,7 @@ export function HandoverProvider({ children }: { children: React.ReactNode }) {
       successorName: `${activePersona.name} (Successor)`,
       timestamp: new Date().toISOString(),
       queryCategory: category,
-      queryText,
+      queryText: queryText.trim(),
       status: 'open_pending_reply',
       assignedRespondent: {
         name: 'Vikram Malhotra',

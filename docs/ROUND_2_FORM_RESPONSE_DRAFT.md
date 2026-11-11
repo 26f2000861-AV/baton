@@ -7,14 +7,14 @@ Use this as a drafting aid for the official submission form. Replace every `TODO
 - **Hackathon:** CodersInPune
 - **Team name:** GIT LOST — confirm this exactly matches Round 1.
 - **Team leader:** Aditya Verma — confirm this exactly matches Round 1.
-- **Leader email:** TODO — use the exact address submitted in Round 1.
-- **Team members:** TODO — enter each member's full name on its own line, including Manas's full name.
+- **Leader email:** adityaverma200911@gmail.com — confirm this matches Round 1.
+- **Team members:** Manas Kapoor — Documentation. Aditya Verma — Team leader and full-stack development.
 
 ## Product links
 
 - **Functioning deployed project:** https://gitlostbaton.xyz/workspace#/
 - **Public source repository:** https://github.com/26f2000861-AV/baton
-- **Updated project PDF:** TODO — use a Drive link set to “Anyone with the link” as Viewer.
+- **Updated project PDF:** Upload `output/pdf/Baton_Round_2_Project_Proposal.pdf` to Drive, then paste the share link here. Set access to “Anyone with the link” as Viewer.
 
 ## What You Built — completed features
 

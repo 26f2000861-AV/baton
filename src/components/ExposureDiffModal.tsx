@@ -6,6 +6,7 @@ import { useFocusTrap } from '@/hooks/useFocusTrap'
 
 export default function ExposureDiffModal({
   details,
+  personaName,
   onClose,
   isClosing = false,
 }: {
@@ -15,11 +16,18 @@ export default function ExposureDiffModal({
     requiredClearance: string
     reason: string
   }[]
+  personaName: string
   onClose: () => void
   isClosing?: boolean
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const clearanceLabel = (value: string) => ({
+    public_open: 'Open to the team',
+    team_internal: 'Team members',
+    confidential_lead: 'Team leads',
+    restricted_hr_legal: 'Restricted HR or legal roles',
+  }[value] ?? value.replaceAll('_', ' '))
 
   useFocusTrap({
     containerRef,
@@ -46,12 +54,12 @@ export default function ExposureDiffModal({
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold uppercase tracking-wider text-[#6B6B6B]">
-                Reader-Scoped Compilation
+                Who can view each claim
               </span>
-              <span className="monochrome-pill">Lead-Only View</span>
+              <span className="monochrome-pill">Preview · {personaName}</span>
             </div>
             <h2 id="exposure-diff-title" className="mt-1 text-base font-semibold text-[#0A0A0A]">
-              Clearance exposure diff: Confidential claims shielded from successor
+              Claims hidden in this view
             </h2>
           </div>
           <button
@@ -65,13 +73,13 @@ export default function ExposureDiffModal({
         </div>
 
         <p className="mt-4 text-xs text-[#6B6B6B]">
-          This synthetic demo filters the visible ledger by the selected persona. Persona selection is not authentication, and this browser-only sample does not provide a security boundary or guarantee data isolation. Never enter real confidential records here.
+          This synthetic preview shows what {personaName} can see in the sample case. Persona switching is not authentication or access control; no data is actually protected. Use sample data only.
         </p>
 
         <div className="mt-4 space-y-3">
           {details.length === 0 ? (
             <div className="rounded-[6px] border border-[#E6E6E6] bg-[#F2F4F7] p-6 text-center text-xs text-[#6B6B6B]">
-              No confidential claims currently shielded.
+              No claims are hidden from this view.
             </div>
           ) : (
             details.map((d) => (
@@ -82,14 +90,14 @@ export default function ExposureDiffModal({
                 <div className="flex items-center justify-between">
                   <span className="font-mono font-bold text-[#0A0A0A]">{d.claimId}</span>
                   <span className="rounded bg-[#EEEEEE] px-2 py-0.5 font-mono text-[11px] font-semibold text-[#0A0A0A]">
-                    Required: {d.requiredClearance}
+                    Visible to: {clearanceLabel(d.requiredClearance)}
                   </span>
                 </div>
                 <p className="mt-2 text-xs font-medium leading-relaxed text-[#0A0A0A]">
                   {d.statement}
                 </p>
                 <div className="mt-2.5 rounded-[4px] border border-[#363636] bg-[#181818] p-2.5 text-[11px] text-[#8d8d8d]">
-                  <strong className="text-[#0A0A0A]">Reason withheld: </strong>
+                  <strong className="text-[#eeeeee]">Why it is hidden: </strong>
                   {d.reason}
                 </div>
               </div>
@@ -102,7 +110,7 @@ export default function ExposureDiffModal({
             onClick={onClose}
             className="btn-secondary min-hit text-xs px-5 focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
           >
-            Close Diff
+            Close
           </button>
         </div>
       </div>

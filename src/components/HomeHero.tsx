@@ -26,10 +26,23 @@ export default function HomeHero() {
     <div className="flex min-h-screen flex-col bg-[#0b0b0b] text-[#eeeeee]">
       {/* Brand Navigation Header */}
       <header className="sticky top-0 z-20 border-b border-[#262626] bg-[#0b0b0b]/85 px-4 py-3 backdrop-blur-md sm:px-6">
-        <div className="mx-auto flex max-w-[1200px] items-center justify-center">
-          <Link href="/" aria-label="Baton Home" className="inline-flex min-h-11 min-w-11 items-center justify-center transition-transform hover:scale-105">
+        <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4">
+          <Link href="/" aria-label="Baton Home" className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 transition-transform hover:scale-105">
             <BatonMark size="medium" />
+            <span className="text-sm font-semibold tracking-normal text-[#eeeeee]">Baton</span>
           </Link>
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="hidden text-xs text-[#a2a2a2] md:inline">Synthetic data · no live sources</span>
+            <Link
+              href="/workspace"
+              className="inline-flex min-h-11 items-center gap-2 border border-[#eeeeee] px-3 text-xs font-semibold text-[#eeeeee] transition-colors hover:bg-[#eeeeee] hover:text-[#0b0b0b] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#c9c9c9] sm:px-4 sm:text-sm"
+              aria-label="Open the synthetic sample workspace"
+            >
+              <span className="sm:hidden">Open sample</span>
+              <span className="hidden sm:inline">Open sample workspace</span>
+              <ArrowRight size={15} aria-hidden="true" />
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -38,7 +51,7 @@ export default function HomeHero() {
         bgColor="#0b0b0b"
         topText={
           <div className="flex flex-col items-center">
-            <span className="mb-4 text-xs font-mono uppercase tracking-widest text-[#8d8d8d]">
+            <span className="mb-4 text-xs font-mono uppercase tracking-widest text-[#a2a2a2]">
               Engineering handovers, made reviewable
             </span>
             <span>
@@ -46,12 +59,15 @@ export default function HomeHero() {
               <br />
               <span className="font-serif italic font-normal text-[#c9c9c9]">even when ownership changes.</span>
             </span>
+            <span className="mt-4 max-w-2xl font-sans text-sm font-normal leading-5 tracking-normal text-[#b8b8b8] sm:text-base">
+              Synthetic sample · GitHub says AWS SQS FIFO; Slack points to RabbitMQ retries.
+            </span>
           </div>
         }
         headingText={
           <>
-            Keep the context. <br />
-            Make the next step clear.
+            A decision carries its evidence. <br />
+            And its next owner.
           </>
         }
         tags={[
@@ -60,7 +76,7 @@ export default function HomeHero() {
           { text: 'Ownership transfer', background: '#20241e', color: '#d5dfca' },
           { text: 'Human-reviewed risks', background: '#222222', color: '#eeeeee' },
         ]}
-        subText="Bring decisions, unfinished work, ownership, and risk into one handover. Show what the evidence supports, what conflicts, and what the next owner still needs to check."
+        subText="Compare source excerpts, keep conflicting records visible until a lead explains the decision, then pass that context and the next action to its owner."
       >
         {/* Center: Artifact & Workspace Button Section (Between the Two Scroll Animations) */}
         <div id="handover-core" className="flex flex-1 flex-col justify-center border-t border-[#262626]">
@@ -68,16 +84,41 @@ export default function HomeHero() {
             theme="dark"
             titleTop="A practical handover for"
             titleAccent={["the work that matters"]}
-            description="Keep decisions, open work, owners, and risks connected to their evidence. Give the next person a clear place to review, question, and take responsibility."
+            description="Review the sample PR and Slack records side by side. Keep the source, conflict, lead rationale, and next owner in one handover."
             primaryCta="Open sample workspace"
             onPrimary={() => router.push('/workspace')}
             secondaryCta="See how it works"
             onSecondary={scrollToWorkflow}
             proof={null}
+            preview={
+              <div className="grid gap-3 border border-[#3b3b3b] bg-[#111111]/95 p-4 text-left shadow-[0_12px_36px_rgba(0,0,0,0.38)] sm:p-5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-[#b8b8b8]">Sample conflict</span>
+                  <span className="border border-[#5b4725] bg-[#2c2010] px-2 py-1 text-[10px] font-medium text-[#fbbf24]">Needs human review</span>
+                </div>
+                <div>
+                  <h2 className="text-sm font-semibold text-[#eeeeee]">Payment retry routing</h2>
+                  <p className="mt-1 text-xs leading-5 text-[#b8b8b8]">Two project records describe different paths.</p>
+                </div>
+                <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-stretch gap-2">
+                  <div className="min-w-0 border border-[#303030] bg-[#171717] p-2.5">
+                    <span className="block text-[10px] text-[#a2a2a2]">GitHub PR #204</span>
+                    <strong className="mt-1 block text-xs leading-5 text-[#eeeeee]">AWS SQS FIFO</strong>
+                  </div>
+                  <span className="self-center font-mono text-[10px] text-[#a2a2a2]" aria-hidden="true">vs</span>
+                  <div className="min-w-0 border border-[#303030] bg-[#171717] p-2.5">
+                    <span className="block text-[10px] text-[#a2a2a2]">Slack #payment-eng</span>
+                    <strong className="mt-1 block text-xs leading-5 text-[#eeeeee]">RabbitMQ retries</strong>
+                  </div>
+                </div>
+                <p className="text-[11px] leading-4 text-[#a2a2a2]">Synthetic records · no connected source systems</p>
+                <p className="text-[11px] leading-4 text-[#b8b8b8]">Lead records why · successor reviews the handover</p>
+              </div>
+            }
             sculptureLabel=""
             sculptureHint=""
             hud={false}
-            minHeight="clamp(480px, 60svh, 640px)"
+            minHeight="clamp(400px, 52svh, 500px)"
           />
         </div>
       </HeroScrollVideoReveal>
@@ -106,7 +147,7 @@ export default function HomeHero() {
                 <FileText size={17} aria-hidden="true" />
                 <span className="font-mono text-[11px] uppercase tracking-[0.14em]">01 · Capture</span>
               </div>
-              <h3 className="text-lg font-medium text-[#eeeeee]">Record what changed</h3>
+                <h3 className="text-lg font-medium text-[#eeeeee]">Record the choice and why</h3>
               <p className="mt-2 max-w-sm text-sm leading-6 text-[#a2a2a2]">
                 Add a decision, rationale, next action, and optional source reference while the work is fresh.
               </p>
@@ -117,9 +158,9 @@ export default function HomeHero() {
                 <GitPullRequest size={17} aria-hidden="true" />
                 <span className="font-mono text-[11px] uppercase tracking-[0.14em]">02 · Review</span>
               </div>
-              <h3 className="text-lg font-medium text-[#eeeeee]">Resolve what conflicts</h3>
+                <h3 className="text-lg font-medium text-[#eeeeee]">Compare conflicting sources</h3>
               <p className="mt-2 max-w-sm text-sm leading-6 text-[#a2a2a2]">
-                Compare the sample records, then record a human decision—or leave a clarification open.
+                Compare the PR and chat excerpts; keep the disagreement open until a lead records why.
               </p>
             </li>
 
@@ -128,9 +169,9 @@ export default function HomeHero() {
                 <ShieldCheck size={17} aria-hidden="true" />
                 <span className="font-mono text-[11px] uppercase tracking-[0.14em]">03 · Handover</span>
               </div>
-              <h3 className="text-lg font-medium text-[#eeeeee]">Give the next owner a route forward</h3>
+                <h3 className="text-lg font-medium text-[#eeeeee]">Pass context to the next owner</h3>
               <p className="mt-2 max-w-sm text-sm leading-6 text-[#a2a2a2]">
-                Review decisions, open work, ownership, and risks; accept sections or ask for missing context.
+                Carry the decision, open work, owner, and remaining question into the successor’s next step.
               </p>
             </li>
           </ol>
@@ -151,7 +192,7 @@ export default function HomeHero() {
       </section>
 
       {/* 3. Interactive Pushpin Tear Footer */}
-      <PushpinTearFooter email="adityaverma200911@gmail.com" />
+      <PushpinTearFooter email="adityaverma200911@gmail.com" socials={[]} timeZone="" />
     </div>
   )
 }

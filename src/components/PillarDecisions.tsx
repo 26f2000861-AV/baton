@@ -1,7 +1,7 @@
 'use client'
 
 import { FormEvent, useState } from 'react'
-import { FileText, Check, AlertCircle, ExternalLink } from 'lucide-react'
+import { FileText, Check, AlertCircle, ExternalLink, ChevronDown } from 'lucide-react'
 import { ArchitecturalDecision, WorkUpdate } from '@/lib/types'
 
 export default function PillarDecisions({
@@ -46,9 +46,6 @@ export default function PillarDecisions({
     <section id="decisions" className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <span className="text-xs font-semibold uppercase tracking-wider text-[#6B6B6B]">
-            01 / Pillar
-          </span>
           <h2 className="mt-0.5 text-xl font-semibold tracking-tight text-[#0A0A0A]">
             Architecture decisions
           </h2>
@@ -70,86 +67,6 @@ export default function PillarDecisions({
           {isAccepted ? 'Undo review' : 'Mark reviewed'}
         </button>
       </div>
-
-      <section className="data-card work-capture-card" aria-labelledby="capture-update-title">
-        <div className="card-heading">
-          <div>
-            <h3 id="capture-update-title">Capture a work update</h3>
-            <p>Record the why while the work is fresh. The successor can review it in this browser.</p>
-          </div>
-          <span className="state-label">Person-reported</span>
-        </div>
-        <form className="work-capture-form" onSubmit={submitWorkUpdate}>
-          <label htmlFor="work-update-decision">Decision or change <span aria-hidden="true">*</span></label>
-          <input
-            id="work-update-decision"
-            value={decisionText}
-            onChange={(event) => setDecisionText(event.target.value)}
-            maxLength={180}
-            placeholder="What changed or was decided?"
-            required
-          />
-          <label htmlFor="work-update-rationale">Why? <span aria-hidden="true">*</span></label>
-          <textarea
-            id="work-update-rationale"
-            value={rationale}
-            onChange={(event) => setRationale(event.target.value)}
-            maxLength={1200}
-            rows={2}
-            placeholder="What context or trade-off led to this?"
-            required
-          />
-          <div className="work-capture-optional-fields">
-            <div>
-              <label htmlFor="work-update-next">Next action</label>
-              <input
-                id="work-update-next"
-                value={nextAction}
-                onChange={(event) => setNextAction(event.target.value)}
-                maxLength={240}
-                placeholder="What should happen next?"
-              />
-            </div>
-            <div>
-              <label htmlFor="work-update-source">Source reference <span className="work-capture-optional">Optional · not checked</span></label>
-              <input
-                id="work-update-source"
-                value={sourceReference}
-                onChange={(event) => setSourceReference(event.target.value)}
-                maxLength={240}
-                placeholder="PR, issue, or document reference"
-              />
-            </div>
-          </div>
-          <div className="work-capture-submit-row">
-            <p>Recording as {activeAuthor} · sample workspace</p>
-            <button className="primary-action" type="submit" disabled={!decisionText.trim() || !rationale.trim()}>
-              Save update
-            </button>
-          </div>
-          {savedMessage && <p className="work-capture-feedback" role="status">{storageIssue ? 'The update is visible here, but browser storage could not save it. It may be lost after refresh.' : savedMessage}</p>}
-        </form>
-        {workUpdates.length > 0 ? (
-          <div className="work-update-list" aria-label="Captured work updates">
-            {workUpdates.slice(0, 5).map((update) => (
-              <article className="work-update-item" key={update.id}>
-                <time dateTime={update.capturedAt}>{new Date(update.capturedAt).toLocaleString()}</time>
-                <div className="work-update-copy">
-                  <h4>{update.decisionText}</h4>
-                  <p>{update.rationale}</p>
-                  {update.nextAction && <p><strong>Next:</strong> {update.nextAction}</p>}
-                  {update.sourceReference && <code className="work-update-reference">{update.sourceReference}</code>}
-                </div>
-                <span className="state-label">Person-reported · not source-verified</span>
-                <p className="work-update-author">Recorded by {update.capturedBy}</p>
-              </article>
-            ))}
-            {workUpdates.length > 5 && <p className="card-foot">Showing the 5 most recent updates.</p>}
-          </div>
-        ) : (
-          <p className="work-capture-empty">No work updates captured yet. Add one while the context is fresh.</p>
-        )}
-      </section>
 
       <div className="grid gap-4 lg:grid-cols-2">
         {decisions.map((d) => {
@@ -260,6 +177,88 @@ export default function PillarDecisions({
             </div>
           </div>
         </article>
+        <section className="data-card work-capture-card lg:col-span-2" aria-labelledby="capture-update-title">
+          <details id="work-update-capture" className="work-capture-details">
+          <summary className="work-capture-summary">
+            <div>
+              <h3 id="capture-update-title">Capture a work update</h3>
+              <p className="mt-1 text-xs text-[#8d8d8d]">Optional contributor action · person-reported · saved in this browser</p>
+            </div>
+            <span>Open form <ChevronDown size={16} aria-hidden="true" /></span>
+          </summary>
+        <form className="work-capture-form" onSubmit={submitWorkUpdate}>
+          <label htmlFor="work-update-decision">Decision or change <span aria-hidden="true">*</span></label>
+          <input
+            id="work-update-decision"
+            value={decisionText}
+            onChange={(event) => setDecisionText(event.target.value)}
+            maxLength={180}
+            placeholder="What changed or was decided?"
+            required
+          />
+          <label htmlFor="work-update-rationale">Why? <span aria-hidden="true">*</span></label>
+          <textarea
+            id="work-update-rationale"
+            value={rationale}
+            onChange={(event) => setRationale(event.target.value)}
+            maxLength={1200}
+            rows={2}
+            placeholder="What context or trade-off led to this?"
+            required
+          />
+          <div className="work-capture-optional-fields">
+            <div>
+              <label htmlFor="work-update-next">Next action</label>
+              <input
+                id="work-update-next"
+                value={nextAction}
+                onChange={(event) => setNextAction(event.target.value)}
+                maxLength={240}
+                placeholder="What should happen next?"
+              />
+            </div>
+            <div>
+              <label htmlFor="work-update-source">Source reference <span className="work-capture-optional">Optional · not checked</span></label>
+              <input
+                id="work-update-source"
+                value={sourceReference}
+                onChange={(event) => setSourceReference(event.target.value)}
+                maxLength={240}
+                placeholder="PR, issue, or document reference"
+              />
+            </div>
+          </div>
+          <div className="work-capture-submit-row">
+            <p>Recording as {activeAuthor} · sample workspace</p>
+            <button className="primary-action" type="submit" disabled={!decisionText.trim() || !rationale.trim()}>
+              Save update
+            </button>
+          </div>
+          {savedMessage && <p className="work-capture-feedback" role="status">{storageIssue ? 'The update is visible here, but browser storage could not save it. It may be lost after refresh.' : savedMessage}</p>}
+        </form>
+        </details>
+        {workUpdates.length > 0 ? (
+          <div className="work-update-list" aria-label="Captured work updates">
+            {workUpdates.slice(0, 5).map((update) => (
+              <article className="work-update-item" key={update.id}>
+                <time dateTime={update.capturedAt}>{new Date(update.capturedAt).toLocaleString()}</time>
+                <div className="work-update-copy">
+                  <h4>{update.decisionText}</h4>
+                  <p>{update.rationale}</p>
+                  {update.nextAction && <p><strong>Next:</strong> {update.nextAction}</p>}
+                  {update.sourceReference && <code className="work-update-reference">{update.sourceReference}</code>}
+                </div>
+                <span className="state-label">Person-reported · not source-verified</span>
+                <p className="work-update-author">Recorded by {update.capturedBy}</p>
+              </article>
+            ))}
+            {workUpdates.length > 5 && <p className="card-foot">Showing the 5 most recent updates.</p>}
+          </div>
+        ) : (
+          <p className="work-capture-empty">No work updates have been captured in this sample session.</p>
+        )}
+      </section>
+
       </div>
     </section>
   )

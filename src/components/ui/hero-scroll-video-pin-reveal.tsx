@@ -142,12 +142,12 @@ export const HeroScrollVideoReveal: React.FC<HeroScrollVideoRevealProps> = ({
     >
       {/* ── Section 1: Intro Bold Tagline ─────────────────────────────────── */}
       <section
-        className="w-full min-h-[32vh] sm:min-h-[48vh] flex flex-col justify-center items-center text-center px-4 sm:px-8 pt-16 sm:pt-28 pb-8 sm:pb-14 text-[clamp(1.45rem,4.8vw,3.8rem)] font-bold tracking-tight leading-tight text-white relative z-10"
+        className="w-full min-h-[26svh] sm:min-h-[30svh] flex flex-col justify-center items-center text-center px-4 sm:px-8 pt-10 sm:pt-12 pb-5 sm:pb-6 text-[clamp(1.45rem,4.8vw,3.8rem)] font-bold tracking-tight leading-tight text-white relative z-10"
         style={{ backgroundColor: bgColor }}
       >
         <div className="max-w-4xl">{topText}</div>
-        <div className="mt-8 flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-[#8d8d8d]">
-          <span>Scroll to inspect handover architecture</span>
+        <div className="mt-4 flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-[#a2a2a2]">
+          <span>Scroll to see the handover workflow</span>
           <span>&darr;</span>
         </div>
       </section>

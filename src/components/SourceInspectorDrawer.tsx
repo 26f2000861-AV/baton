@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { X, ShieldCheck, Clock, User } from 'lucide-react'
-import { Claim } from '@/lib/types'
+import type { Claim, ClearanceLevel } from '@/lib/types'
 import { CLAIM_STATUS_COPY } from '@/lib/claimStatus'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
 
@@ -74,6 +74,17 @@ export default function SourceInspectorDrawer({
 
   const status = CLAIM_STATUS_COPY[claim.status]
   const isExactVerified = claim.status === 'quoted_verified'
+  const verificationMethodLabel = {
+    exact_substring_match: 'Text match only',
+    llm_entailment: 'Inference · needs review',
+    human_attested: 'Human attestation',
+  }[claim.verificationMethod]
+  const clearanceLabel = (level: ClearanceLevel) => ({
+    public_open: 'Open to the team',
+    team_internal: 'Team members',
+    confidential_lead: 'Team leads',
+    restricted_hr_legal: 'Restricted HR or legal roles',
+  })[level]
 
   return (
     <div
@@ -91,14 +102,14 @@ export default function SourceInspectorDrawer({
         className="drawer-panel h-full w-full max-w-xl overflow-y-auto border-l border-[#262626] bg-[#121212] p-6 shadow-2xl flex flex-col justify-between"
       >
         <div>
-          <div className="flex items-start justify-between border-b border-[#F0F0F0] pb-4">
+          <div className="flex items-start justify-between border-b border-[#363636] pb-4">
             <div>
-              <span className="text-xs font-semibold uppercase tracking-wider text-[#6B6B6B]">
+              <span className="text-xs font-semibold uppercase tracking-wider text-[#a2a2a2]">
                 Source Evidence Inspector
               </span>
               <h2
                 id="source-inspector-title"
-                className="mt-1 text-base font-semibold text-[#0A0A0A]"
+                className="mt-1 text-base font-semibold text-[#eeeeee]"
               >
                 {source?.title || 'Ground Truth Evidence'}
               </h2>
@@ -121,11 +132,11 @@ export default function SourceInspectorDrawer({
                 {status.label}
               </span>
             </div>
-            <span className="font-mono text-[11px] text-[#6B6B6B]">
-              {claim.verificationMethod}
+            <span className="font-mono text-[11px] text-[#b8b8b8]">
+              {verificationMethodLabel}
             </span>
           </div>
-          <p className="mt-2 text-xs leading-relaxed text-[#555555]">{status.description}</p>
+          <p className="mt-2 text-xs leading-relaxed text-[#b8b8b8]">{status.description}</p>
 
           {/* Handover Claim Statement */}
           <div className="mt-4 rounded-[6px] border border-[#E6E6E6] bg-white p-4">
@@ -158,7 +169,7 @@ export default function SourceInspectorDrawer({
                 Verbatim Source Snippet ({source.sourceId})
               </span>
               <div className="mt-2 rounded-[4px] border border-[#262626] bg-[#181818] p-3 font-mono text-xs leading-relaxed text-[#eeeeee]">
-                <mark className="bg-[#1D5FBF]/10 font-bold text-[#0A0A0A] px-1 py-0.5 rounded">
+                <mark className="rounded bg-[#1D5FBF] px-1 py-0.5 font-bold text-white">
                   {source.exactSnippet}
                 </mark>
               </div>
@@ -204,7 +215,7 @@ export default function SourceInspectorDrawer({
                 <span>Captured Timestamp: <strong className="text-[#0A0A0A]">{new Date(source.timestamp).toUTCString()}</strong></span>
               </div>
               <div>
-                Clearance Required: <span className="font-mono text-[#0A0A0A]">{source.requiredClearanceLevel}</span>
+                Who can view: <span className="font-medium text-[#0A0A0A]">{clearanceLabel(source.requiredClearanceLevel)}</span>
               </div>
               <div className="pt-2">
                 <span className="block font-medium text-[#0A0A0A]">Illustrative source reference · synthetic, not connected</span>

@@ -26,9 +26,16 @@ const routes = [
   { id: 'claims', label: 'Claims', hash: '#/claims', icon: FileText },
   { id: 'decisions', label: 'Decisions', hash: '#/decisions', icon: GitCommit },
   { id: 'ownership', label: 'Ownership', hash: '#/ownership', icon: ShieldCheck },
-  { id: 'risks', label: 'Risks', hash: '#/risks', icon: AlertTriangle },
+  { id: 'risks', label: 'Conflicts', hash: '#/risks', icon: AlertTriangle },
   { id: 'unfinished', label: 'Unfinished work', hash: '#/unfinished', icon: GitPullRequest },
   { id: 'signoff', label: 'Sign-off', hash: '#/signoff', icon: CheckSquare },
+]
+
+const routeGroups = [
+  { label: 'Start', items: [routes[0]] },
+  { label: 'Review evidence', items: [routes[1], routes[4]] },
+  { label: 'Work in progress', items: [routes[2], routes[5]] },
+  { label: 'Transfer', items: [routes[3], routes[6]] },
 ]
 
 const statusLabels: Record<string, { label: string; description: string }> = CLAIM_STATUS_COPY
@@ -45,6 +52,7 @@ export default function Home() {
   const [search, setSearch] = useState('')
   const [queryText, setQueryText] = useState('')
   const [queryClaimId, setQueryClaimId] = useState('')
+  const [queryClaimSearch, setQueryClaimSearch] = useState('')
   const [filter, setFilter] = useState('all')
   const [sortDescending, setSortDescending] = useState(false)
   const [claimsUpdating, setClaimsUpdating] = useState(false)
@@ -175,8 +183,14 @@ export default function Home() {
   const closeDialog = (kind: 'interview' | 'exposure' | 'conflict' | 'drawer') => {
     if (dialogCloseTimerRef.current !== null) return
     const finishClose = () => {
-      if (kind === 'interview') setInterviewOpen(false)
-      if (kind === 'exposure') setExposureOpen(false)
+      if (kind === 'interview') {
+        setInterviewOpen(false)
+        if (typeof window !== 'undefined' && window.location.hash.includes('interview')) window.location.hash = '#/'
+      }
+      if (kind === 'exposure') {
+        setExposureOpen(false)
+        if (typeof window !== 'undefined' && window.location.hash.includes('exposure')) window.location.hash = '#/'
+      }
       if (kind === 'conflict') {
         setSelectedConflictId(null)
         if (typeof window !== 'undefined' && window.location.hash.includes('conflict')) {
@@ -230,6 +244,7 @@ export default function Home() {
   }
 
   const openSource = (id: string) => {
+    if (!visibleClaims.some((claim) => claim.id === id)) return
     rememberFocus()
     setSelectedClaimId(id)
     setDrawerClaimId(id)
@@ -237,13 +252,17 @@ export default function Home() {
 
   const handlePersonaChange = (role: 'successor' | 'leaver' | 'lead') => {
     setActivePersonaRole(role)
+    setQueryClaimId('')
+    setQueryClaimSearch('')
+    setDrawerClaimId(null)
+    setSelectedClaimId('')
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       setClearancePulse(true)
       window.setTimeout(() => setClearancePulse(false), 360)
     }
   }
   const activeClaim = claims.find((claim) => claim.id === selectedClaimId) ?? claims[0]
-  const drawerClaim = claims.find((claim) => claim.id === drawerClaimId)
+  const drawerClaim = visibleClaims.find((claim) => claim.id === drawerClaimId)
   const activeConflict = contradictions.find((item) => item.id === selectedConflictId)
   const pendingQuestions = questions.filter((item) => item.status === 'pending_answer')
   const openConflictCount = contradictions.filter((item) => item.status === 'open_unresolved').length
@@ -256,18 +275,41 @@ export default function Home() {
       : 'A lead recorded a decision and rationale for the next owner.'
   const reviewedCount = Object.values(sectionStates).filter((item) => item.isAccepted).length
   const exactQuoteCount = visibleClaims.filter((item) => item.status === 'quoted_verified').length
+  const filterCounts = {
+    all: visibleClaims.length,
+    needs_review: visibleClaims.filter((claim) => claim.status !== 'confirmed_by_lead').length,
+    verified: visibleClaims.filter((claim) => claim.status === 'quoted_verified').length,
+    inferred: visibleClaims.filter((claim) => claim.status === 'inferred_ai').length,
+    unverified: visibleClaims.filter((claim) => claim.status === 'quoted_unverified').length,
+    conflict: visibleClaims.filter((claim) => claim.status === 'conflicting').length,
+    missing: visibleClaims.filter((claim) => claim.status === 'not_found').length,
+    leaver: visibleClaims.filter((claim) => claim.status === 'stated_by_leaver').length,
+    lead: visibleClaims.filter((claim) => claim.status === 'confirmed_by_lead').length,
+  }
+  const detailedFilters = [
+    { id: 'inferred', label: 'Inferred', count: filterCounts.inferred },
+    { id: 'unverified', label: 'Unverified', count: filterCounts.unverified },
+    { id: 'conflict', label: 'Conflict', count: filterCounts.conflict },
+    { id: 'missing', label: 'Missing', count: filterCounts.missing },
+    { id: 'leaver', label: 'Leaver stated', count: filterCounts.leaver },
+    { id: 'lead', label: 'Lead confirmed', count: filterCounts.lead },
+  ]
   const filteredClaims = useMemo(() => {
     const searchTerm = search.trim().toLowerCase()
     return visibleClaims
-      .filter((claim) => filter === 'all' || (filter === 'verified' && claim.status === 'quoted_verified') || (filter === 'inferred' && claim.status === 'inferred_ai') || (filter === 'conflict' && claim.status === 'conflicting') || (filter === 'unverified' && claim.status === 'quoted_unverified'))
+      .filter((claim) => filter === 'all' || (filter === 'needs_review' && claim.status !== 'confirmed_by_lead') || (filter === 'verified' && claim.status === 'quoted_verified') || (filter === 'inferred' && claim.status === 'inferred_ai') || (filter === 'conflict' && claim.status === 'conflicting') || (filter === 'unverified' && claim.status === 'quoted_unverified') || (filter === 'missing' && claim.status === 'not_found') || (filter === 'leaver' && claim.status === 'stated_by_leaver') || (filter === 'lead' && claim.status === 'confirmed_by_lead'))
       .filter((claim) => !searchTerm || `${claim.id} ${claim.statement} ${claim.sourceQuotes[0]?.sourceId} ${claim.sourceQuotes[0]?.title}`.toLowerCase().includes(searchTerm))
       .sort((a, b) => sortDescending ? b.id.localeCompare(a.id) : a.id.localeCompare(b.id))
   }, [visibleClaims, filter, search, sortDescending])
+  const matchingQueryClaims = useMemo(() => {
+    const term = queryClaimSearch.trim().toLowerCase()
+    return visibleClaims.filter((claim) => !term || `${claim.id} ${claim.statement}`.toLowerCase().includes(term))
+  }, [visibleClaims, queryClaimSearch])
 
   const titleMap: Record<string, string> = {
     overview: 'Handover overview', claims: 'Claims', decisions: 'Decisions',
-    ownership: 'Ownership', risks: 'Risks and conflicts', unfinished: 'Unfinished work',
-    signoff: 'Successor sign-off', interview: 'Leaver interview', source: 'Source evidence', exposure: 'Exposure diff',
+    ownership: 'Ownership', risks: 'Conflicts to review', unfinished: 'Unfinished work',
+    signoff: 'Successor sign-off', interview: 'Leaver interview', source: 'Source evidence', exposure: 'Access visibility',
   }
   const title = titleMap[route] ?? titleMap.overview
 
@@ -277,7 +319,7 @@ export default function Home() {
     const source = claim.sourceQuotes[0]
     return (
       <button className={`claim-row${selectedClaimId === claim.id ? ' selected' : ''}`} key={claim.id} onClick={() => openSource(claim.id)}>
-        <span className="claim-status">{statusLabels[claim.status]?.label ?? 'Pending'}</span>
+        <span className="claim-status" data-status={claim.status}>{statusLabels[claim.status]?.label ?? 'Pending'}</span>
         <span className="claim-copy"><span>{claim.statement}</span><span className="pass-line"><i /> <code>{source?.sourceId ?? '—'}</code></span></span>
         <span className="row-arrow">{compact ? 'Open evidence ↗' : '↗'}</span>
       </button>
@@ -291,18 +333,25 @@ export default function Home() {
           <BatonMark />
           <span><strong>Baton</strong><small>Engineering handover</small></span>
         </Link>
-        <p className="nav-caption">Handover</p>
+        <p className="nav-caption">Handover workflow</p>
         <nav className="side-nav" aria-label="Handover views">
-          {routes.map(({ id, label, hash, icon: Icon }) => (
-            <a key={id} href={hash} className={`nav-link ${route === id ? 'selected' : ''}`} aria-current={route === id ? 'page' : undefined} onClick={(event) => { event.preventDefault(); navigate(id) }}>
-              <Icon size={17} strokeWidth={1.7} /><span>{label}</span>
-              {id === 'risks' && openConflictCount > 0 && <span className="nav-count">{openConflictCount}</span>}
-            </a>
+          {routeGroups.map((group) => (
+            <div className="nav-group" key={group.label}>
+              <p className="nav-group-label">{group.label}</p>
+              {group.items.map(({ id, label, hash, icon: Icon }) => (
+                <a key={id} href={hash} className={`nav-link ${route === id ? 'selected' : ''}`} aria-current={route === id ? 'page' : undefined} onClick={(event) => { event.preventDefault(); navigate(id) }}>
+                  <Icon size={17} strokeWidth={1.7} /><span>{label}</span>
+                  {id === 'risks' && openConflictCount > 0 && <span className="nav-count">{openConflictCount}</span>}
+                </a>
+              ))}
+            </div>
           ))}
         </nav>
         <div className="sidebar-tools">
+          <p className="nav-group-label">More tools</p>
           <button className="nav-link" onClick={() => navigate('interview')}><MessageSquare size={17} /><span>Leaver interview</span><span className="nav-count">{pendingQuestions.length}</span></button>
-          <button className="nav-link" onClick={() => navigate('exposure')}><ShieldAlert size={17} /><span>Exposure diff</span></button>
+          <button className="nav-link" onClick={() => navigate('exposure')}><ShieldAlert size={17} /><span>Access visibility</span></button>
+          <p className="nav-group-label">Sample session</p>
           <button className="nav-link" onClick={() => { if (window.confirm('Reset this browser\'s sample handover and clear local changes?')) resetDemoData() }}><RotateCcw size={17} /><span>Reset sample data</span></button>
         </div>
       </aside>
@@ -315,32 +364,51 @@ export default function Home() {
           <div className="persona-switcher" role="group" aria-label="Preview handover as">
             <span className="persona-switcher-label" aria-hidden="true">VIEW AS</span>
             <button type="button" className={`persona-chip${activePersona.role === 'successor' ? ' selected' : ''}`} aria-pressed={activePersona.role === 'successor'} aria-label="Preview as Priya Sharma, successor" title="Priya Sharma · Successor" onClick={() => handlePersonaChange('successor')}>
-              <span className="persona-chip-name">Priya</span><span className="persona-chip-role">Successor</span>
+              <span className="persona-chip-name">Priya</span><span className="persona-chip-role"><span className="persona-chip-role-full">Successor</span><span className="persona-chip-role-compact">Next</span></span>
             </button>
             <button type="button" className={`persona-chip${activePersona.role === 'leaver' ? ' selected' : ''}`} aria-pressed={activePersona.role === 'leaver'} aria-label="Preview as Alex Chen, departing engineer" title="Alex Chen · Departing engineer" onClick={() => handlePersonaChange('leaver')}>
-              <span className="persona-chip-name">Alex</span><span className="persona-chip-role">Departing</span>
+              <span className="persona-chip-name">Alex</span><span className="persona-chip-role"><span className="persona-chip-role-full">Departing</span><span className="persona-chip-role-compact">Leaver</span></span>
             </button>
             <button type="button" className={`persona-chip${activePersona.role === 'lead' ? ' selected' : ''}`} aria-pressed={activePersona.role === 'lead'} aria-label="Preview as Vikram Malhotra, engineering lead" title="Vikram Malhotra · Engineering lead" onClick={() => handlePersonaChange('lead')}>
-              <span className="persona-chip-name">Vikram</span><span className="persona-chip-role">Lead</span>
+              <span className="persona-chip-name">Vikram</span><span className="persona-chip-role"><span className="persona-chip-role-full">Lead</span><span className="persona-chip-role-compact">Lead</span></span>
             </button>
           </div>
         </header>
-        {menuOpen && <div id="mobile-navigation" className="mobile-menu" role="dialog" aria-modal="true" aria-label="Baton navigation"><Link href="/" className="nav-caption flex items-center gap-2 hover:text-[#eeeeee]" onClick={() => setMenuOpen(false)}><strong>Baton</strong> / Handover</Link>{routes.map(({ id, label, hash, icon: Icon }) => <a key={id} href={hash} aria-current={route === id ? 'page' : undefined} className={route === id ? 'selected' : undefined} onClick={(event) => { event.preventDefault(); navigate(id) }}><Icon size={17} />{label}</a>)}<button onClick={() => navigate('interview')}><MessageSquare size={17} />Leaver interview</button><button onClick={() => navigate('exposure')}><ShieldAlert size={17} />Exposure diff</button><button onClick={() => { if (window.confirm('Reset this browser\'s sample handover and clear local changes?')) { resetDemoData(); setMenuOpen(false) } }}><RotateCcw size={17} />Reset sample data</button></div>}
+        {menuOpen && <div id="mobile-navigation" className="mobile-menu" role="dialog" aria-modal="true" aria-label="Baton navigation"><Link href="/" className="mobile-menu-brand" onClick={() => setMenuOpen(false)}><strong>Baton</strong><span>Handover</span></Link>{routeGroups.map((group) => <section className="mobile-nav-group" key={group.label} aria-label={group.label}><p className="mobile-menu-section-title">{group.label}</p>{group.items.map(({ id, label, hash, icon: Icon }) => <a key={id} href={hash} aria-current={route === id ? 'page' : undefined} className={route === id ? 'selected' : undefined} onClick={(event) => { event.preventDefault(); navigate(id) }}><Icon size={17} />{label}{id === 'risks' && openConflictCount > 0 && <span className="nav-count">{openConflictCount}</span>}</a>)}</section>)}<section className="mobile-nav-group" aria-label="More tools"><p className="mobile-menu-section-title">More tools</p><button onClick={() => navigate('interview')}><MessageSquare size={17} />Leaver interview<span className="nav-count">{pendingQuestions.length}</span></button><button onClick={() => navigate('exposure')}><ShieldAlert size={17} />Access visibility</button></section><section className="mobile-nav-group" aria-label="Sample session"><p className="mobile-menu-section-title">Sample session</p><button onClick={() => { if (window.confirm('Reset this browser\'s sample handover and clear local changes?')) { resetDemoData(); setMenuOpen(false) } }}><RotateCcw size={17} />Reset sample data</button></section></div>}
         <main className={`sheet${clearancePulse ? ' clearance-pulse' : ''}`}>
           <div className="sheet-content">
             <div className="sample-workspace-note"><span className="sample-indicator" />SAMPLE WORKSPACE<span className="sample-note-copy" role="status" aria-live="polite">{storageIssue ? 'Browser storage is unavailable; changes may be lost after refresh. Use synthetic data only.' : 'Synthetic records · saved in this browser only · role switcher is a preview, not access control.'}</span></div>
             <div className="page-heading">
             <div><p className="breadcrumb">Engineering <span aria-hidden="true">/</span> Handover</p><h1>{title}</h1></div>
-              {route === 'overview' && <button className="primary-action page-capture-action" onClick={() => navigate('decisions')}>
+              {route === 'overview' && <button className="primary-action page-capture-action" onClick={() => {
+                navigate('decisions')
+                window.requestAnimationFrame(() => {
+                  const capturePanel = document.getElementById('work-update-capture')
+                  if (capturePanel instanceof HTMLDetailsElement) {
+                    capturePanel.open = true
+                    capturePanel.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' })
+                    capturePanel.querySelector('summary')?.focus({ preventScroll: true })
+                  }
+                })
+              }}>
                 <GitCommit size={16} aria-hidden="true" /> Capture a work update
               </button>}
             </div>
 
             {route === 'overview' && <div className="view-stack">
               <section className="finding-panel" aria-labelledby="finding-title">
-                <div className="finding-copy"><span className="section-kicker">{conflictSettled ? 'Decision recorded' : openConflictCount > 0 ? `Start here · ${openConflictCount} open ${openConflictCount === 1 ? 'conflict' : 'conflicts'}` : 'All conflicts reviewed'}</span><h2 id="finding-title">{conflictSettled ? 'Risk decision recorded for handover' : 'Conflicting records need a decision'}</h2><p>{conflictSettled ? conflictResolutionSummary : 'Two project records describe different states. Review the source and timing before the next owner takes over.'}</p></div>
+                <div className="finding-copy"><span className="section-kicker">{conflictSettled ? 'Decision recorded' : openConflictCount > 0 ? `Start here · ${openConflictCount} open ${openConflictCount === 1 ? 'conflict' : 'conflicts'}` : 'All conflicts reviewed'}</span><h2 id="finding-title">{conflictSettled ? 'Conflict decision recorded for handover' : 'Conflicting records need a decision'}</h2><p>{conflictSettled ? conflictResolutionSummary : 'Two project records describe different states. Review the source and timing before the next owner takes over.'}</p></div>
                 <button className="secondary-action" onClick={() => navigate('risks')}>{conflictSettled ? 'Review decision' : 'Review conflict'}</button>
               </section>
+              <details className="sample-guide">
+                <summary>How to run this sample</summary>
+                <ol>
+                  <li>Open the conflict and compare the GitHub and Slack excerpts.</li>
+                  <li>Switch to Vikram, the lead preview, to record a resolution and rationale.</li>
+                  <li>Switch to Priya to review the handover and raise a question if context is missing.</li>
+                </ol>
+                <p>All records are synthetic. Changes are saved only in this browser; the role switcher is a preview, not access control.</p>
+              </details>
               <section className="metric-strip" aria-label="Handover counts">
                 <Metric label="Claims" value={visibleClaims.length} sub={`${exactQuoteCount} exact quotes found · claims still need review`} /><Metric label="Open conflicts" value={openConflictCount} sub={openConflictCount === 0 ? 'No unresolved conflicts' : `${openConflictCount} ${openConflictCount === 1 ? 'needs' : 'need'} review`} /><Metric label="Unfinished work" value={unfinished.length} sub="Items to pick up" /><Metric label="Ownership" value={ownership.length} sub="Assets to transfer" />
               </section>
@@ -349,7 +417,7 @@ export default function Home() {
                 <Card title="Claim evidence" action="View claims" onAction={() => navigate('claims')}>
                   <div className="claim-list">{renderClaimRows(visibleClaims.slice(0, 3), true)}</div>
                 </Card>
-                <Card title="Risk to resolve" action="Review risk" onAction={() => navigate('risks')}>
+                <Card title="Open conflict" action="Review conflict" onAction={() => navigate('risks')}>
                   {contradictions.slice(0, 1).map((item) => <div className="conflict-sources" key={item.id}>
                     {[item.sourceA, item.sourceB].map((source) => <div className="conflict-source" key={source.title}>
                       <strong>{source.extractedValue}</strong><span>{source.title}</span><small>{source.author} · {new Date(source.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}</small><p>{source.exactQuote}</p>
@@ -378,26 +446,48 @@ export default function Home() {
               </div>
             </div>}
 
-            {route === 'claims' && <div className="view-stack"><div className="view-intro"><p>{visibleClaims.length} visible claims for {activePersona.name}</p><button className="secondary-action" onClick={() => navigate('exposure')}>View exposure diff</button></div><section className={`data-card claims-card${claimsUpdating ? ' is-updating' : ''}`}><div className="card-heading"><div><h2>Claims</h2><p>{filteredClaims.length} matching claims</p></div><button className="icon-action" aria-label="Sort claims by ID" aria-pressed={sortDescending} onClick={() => updateClaims(() => setSortDescending((value) => !value))}><ArrowDownUp size={16} /></button></div><label className="claims-mobile-search"><span className="sr-only">Search claims and sources</span><Search size={16} aria-hidden="true" /><input className="claims-search-input" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search claims and sources" /></label><p className="evidence-clarifier">“Quote found” means the source contains that text. It does not confirm the claim is true.</p><div className="filter-tabs" role="group" aria-label="Filter claims by evidence state">{['all', 'verified', 'inferred', 'unverified', 'conflict'].map((item) => <button type="button" aria-pressed={filter === item} className={filter === item ? 'active' : ''} key={item} onClick={() => updateClaims(() => setFilter(item))}>{item === 'all' ? `All ${visibleClaims.length}` : `${item === 'verified' ? 'Quote found' : `${item[0].toUpperCase()}${item.slice(1)}`} ${visibleClaims.filter((claim) => item === 'conflict' ? claim.status === 'conflicting' : claim.status === `quoted_${item === 'verified' ? 'verified' : item === 'unverified' ? 'unverified' : 'none'}` || (item === 'inferred' && claim.status === 'inferred_ai')).length}`}</button>)}</div><details className="evidence-help"><summary>How to read these labels</summary><p className="evidence-help-intro">Labels describe the source and review state. An exact quote does not prove the whole claim is correct.</p><dl>{Object.entries(CLAIM_STATUS_COPY).map(([key, status]) => <div key={key}><dt>{status.label}</dt><dd>{status.description}</dd></div>)}</dl></details><div className="claim-list">{renderClaimRows(filteredClaims)}</div></section></div>}
+            {route === 'claims' && <div className="view-stack"><div className="view-intro"><p>{visibleClaims.length} visible claims for {activePersona.name}</p><button className="secondary-action" onClick={() => navigate('exposure')}>View access visibility</button></div><section className={`data-card claims-card${claimsUpdating ? ' is-updating' : ''}`}><div className="card-heading"><div><h2>Claims</h2><p>{filteredClaims.length} matching claims</p></div><button className="icon-action" aria-label="Sort claims by ID" aria-pressed={sortDescending} onClick={() => updateClaims(() => setSortDescending((value) => !value))}><ArrowDownUp size={16} /></button></div><label className="claims-mobile-search"><span className="sr-only">Search claims and sources</span><Search size={16} aria-hidden="true" /><input className="claims-search-input" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search claims and sources" /></label><p className="evidence-clarifier">“Quote found” means the source contains that text; it does not confirm the claim is true. Counts can overlap: a quoted claim may still need a lead review.</p><div className="filter-tabs" role="group" aria-label="Filter claims by evidence state">
+                  <button type="button" aria-pressed={filter === 'all'} className={filter === 'all' ? 'active' : ''} onClick={() => updateClaims(() => setFilter('all'))}>All {filterCounts.all}</button>
+                  <button type="button" aria-pressed={filter === 'needs_review'} className={filter === 'needs_review' ? 'active' : ''} onClick={() => updateClaims(() => setFilter('needs_review'))}>Needs review {filterCounts.needs_review}</button>
+                  <button type="button" aria-pressed={filter === 'verified'} className={filter === 'verified' ? 'active' : ''} onClick={() => updateClaims(() => setFilter('verified'))}>Quote found {filterCounts.verified}</button>
+                  <details className="filter-more">
+                    <summary>More statuses</summary>
+                    <div className="filter-more-options" role="group" aria-label="Additional claim statuses">
+                      {detailedFilters.map(({ id, label, count }) => <button type="button" aria-pressed={filter === id} className={filter === id ? 'active' : ''} key={id} onClick={() => updateClaims(() => setFilter(id))}>{label} {count}</button>)}
+                    </div>
+                  </details>
+                </div><details className="evidence-help"><summary>How to read these labels</summary><p className="evidence-help-intro">Labels describe the source and review state. An exact quote does not prove the whole claim is correct.</p><dl>{Object.entries(CLAIM_STATUS_COPY).map(([key, status]) => <div key={key}><dt>{status.label}</dt><dd>{status.description}</dd></div>)}</dl></details><div className="claim-list">{renderClaimRows(filteredClaims)}</div></section></div>}
 
             {route === 'decisions' && <div className="native-component"><PillarDecisions decisions={decisions} workUpdates={workUpdates} activeAuthor={activePersona.name} storageIssue={storageIssue} onCapture={captureWorkUpdate} isAccepted={sectionStates.decisions?.isAccepted ?? false} onInspect={openSource} onAccept={() => acceptSection('decisions')} onUndo={() => undoSectionAcceptance('decisions')} /></div>}
             {route === 'ownership' && <div className="native-component"><PillarOwnership assets={ownership} isAccepted={sectionStates.ownership?.isAccepted ?? false} onInspect={openSource} onAccept={() => acceptSection('ownership')} onUndo={() => undoSectionAcceptance('ownership')} /></div>}
             {route === 'risks' && <div className="native-component"><PillarRisks contradictions={contradictions} isAccepted={sectionStates.risks?.isAccepted ?? false} onContradiction={openConflict} onInspect={openSource} onAccept={() => acceptSection('risks')} onUndo={() => undoSectionAcceptance('risks')} /></div>}
             {route === 'unfinished' && <div className="native-component"><PillarUnfinished items={unfinished} isAccepted={sectionStates.unfinished?.isAccepted ?? false} onAdopt={adoptUnfinishedItem} onInspect={openSource} onAccept={() => acceptSection('unfinished')} onUndo={() => undoSectionAcceptance('unfinished')} /></div>}
 
-            {route === 'signoff' && <div className="view-stack"><div className="view-intro"><p>{reviewedCount} of 4 sections reviewed · {queries.length} successor questions raised</p></div><section className="data-card"><div className="card-heading"><div><h2>Handover sections</h2><p>Mark a section reviewed after checking it. This records your review; it does not certify every claim as correct. You can undo it at any time.</p></div></div><div className="mini-rows">{(['decisions', 'unfinished', 'ownership', 'risks'] as const).map((id) => { const reviewed = sectionStates[id]?.isAccepted ?? false; return <div className="signoff-row" key={id}><div><strong>{sectionName(id)}</strong><small>{sectionDetail(id)}</small></div><div className="signoff-actions"><span className={`state-label ${reviewed ? 'accepted' : ''}`}>{reviewed ? 'Reviewed' : 'Needs review'}</span><button className="secondary-action" aria-pressed={reviewed} onClick={() => reviewed ? undoSectionAcceptance(id) : acceptSection(id)}>{reviewed ? 'Undo review' : 'Mark reviewed'}</button></div></div>})}</div></section><section className="data-card"><div className="card-heading"><div><h2>Successor questions</h2><p>Ask the engineering lead about unclear evidence. Replies are recorded in this sample session; no message is sent.</p></div></div>{activePersona.role !== 'successor' && <p className="sample-notice">Switch to the successor preview to ask a handover question.</p>}<form className="query-form" onSubmit={(event) => { event.preventDefault(); if (queryText.trim() && queryClaimId) { submitSuccessorQuery(queryClaimId, 'unclear_rationale', queryText.trim()); setQueryText('') } }}><label htmlFor="query-claim">Related claim</label><select id="query-claim" value={queryClaimId} onChange={(event) => setQueryClaimId(event.target.value)} required><option value="">Choose a claim</option>{visibleClaims.map((claim) => <option key={claim.id} value={claim.id}>{claim.id} · {claim.statement.slice(0, 90)}</option>)}</select><label htmlFor="successor-query">Question for the handover</label><textarea id="successor-query" value={queryText} onChange={(event) => setQueryText(event.target.value)} placeholder="Ask about a decision or missing context" /><button className="primary-action" disabled={!queryText.trim() || !queryClaimId || activePersona.role !== 'successor'}>Send question</button></form><SuccessorQuestionReplies queries={queries.slice(0, 3)} role={activePersona.role} onResolve={resolveSuccessorQuery} /></section></div>}
+            {route === 'signoff' && <div className="view-stack"><div className="view-intro"><p>{reviewedCount} of 4 sections reviewed · {queries.length} successor questions raised</p></div><section className="data-card"><div className="card-heading"><div><h2>Handover sections</h2><p>Mark a section reviewed after checking it. This records your review; it does not certify every claim as correct. You can undo it at any time.</p></div></div><div className="mini-rows">{(['decisions', 'unfinished', 'ownership', 'risks'] as const).map((id) => { const reviewed = sectionStates[id]?.isAccepted ?? false; return <div className="signoff-row" key={id}><div><strong>{sectionName(id)}</strong><small>{sectionDetail(id)}</small></div><div className="signoff-actions"><span className={`state-label ${reviewed ? 'accepted' : ''}`}>{reviewed ? 'Reviewed' : 'Needs review'}</span><button className="secondary-action" aria-pressed={reviewed} onClick={() => reviewed ? undoSectionAcceptance(id) : acceptSection(id)}>{reviewed ? 'Undo review' : 'Mark reviewed'}</button></div></div>})}</div></section><section className="data-card"><div className="card-heading"><div><h2>Successor questions</h2><p>Ask the engineering lead about unclear evidence. Replies are recorded in this sample session; no message is sent.</p></div></div>{activePersona.role !== 'successor' && <p className="sample-notice">Switch to the successor preview to ask a handover question.</p>}<form className="query-form" onSubmit={(event) => { event.preventDefault(); if (queryText.trim() && queryClaimId && visibleClaims.some((claim) => claim.id === queryClaimId) && activePersona.role === 'successor') { submitSuccessorQuery(queryClaimId, 'unclear_rationale', queryText.trim()); setQueryText('') } }}>
+                  <label htmlFor="query-claim-search">Find a claim</label>
+                  <input id="query-claim-search" type="search" value={queryClaimSearch} onChange={(event) => { setQueryClaimSearch(event.target.value); setQueryClaimId('') }} placeholder="Search by ID or a word from the claim" disabled={activePersona.role !== 'successor'} />
+                  <label htmlFor="query-claim">Related claim</label>
+                  <select id="query-claim" value={queryClaimId} onChange={(event) => setQueryClaimId(event.target.value)} required disabled={activePersona.role !== 'successor'}>
+                    <option value="">Choose a claim</option>
+                    {matchingQueryClaims.map((claim) => <option key={claim.id} value={claim.id}>{claim.id} · {claim.statement.slice(0, 72)}</option>)}
+                  </select>
+                  {queryClaimSearch.trim() && matchingQueryClaims.length === 0 && <p className="query-empty">No visible claims match this search.</p>}
+                  <label htmlFor="successor-query">Question for the handover</label>
+                  <textarea id="successor-query" value={queryText} onChange={(event) => setQueryText(event.target.value)} placeholder="Ask about a decision or missing context" disabled={activePersona.role !== 'successor'} />
+                  <button className="primary-action" disabled={!queryText.trim() || !queryClaimId || !visibleClaims.some((claim) => claim.id === queryClaimId) || activePersona.role !== 'successor'}>Send question</button>
+                </form><SuccessorQuestionReplies queries={queries.slice(0, 3)} role={activePersona.role} onResolve={resolveSuccessorQuery} /></section></div>}
 
             {route === 'interview' && <div className="view-stack"><div className="view-intro"><p>{pendingQuestions.length} questions awaiting an answer</p><button className="primary-action" onClick={() => { rememberFocus(); setInterviewOpen(true) }}>Answer questions</button></div><section className="data-card"><div className="card-heading"><div><h2>Pending questions</h2><p>Context from the departing engineer</p></div></div>{questions.map((question) => <button key={question.id} className="question-row" onClick={() => { rememberFocus(); setInterviewOpen(true) }}><span className="question-priority">{question.priorityRank}</span><span><strong>{question.promptText}</strong><small>Claim {question.associatedClaimId} · {statusLabels[claims.find((claim) => claim.id === question.associatedClaimId)?.status ?? '']?.label ?? 'Pending'}</small></span><span className="state-label">{question.status === 'pending_answer' ? 'Pending' : question.status === 'answered' ? 'Answered' : 'Escalated'}</span></button>)}</section></div>}
 
-            {route === 'source' && activeClaim && <section className="data-card source-view"><div className="card-heading"><div><h2>{activeClaim.sourceQuotes[0]?.title ?? 'Source record'}</h2><p>Source inspection</p></div><span className="state-label">{statusLabels[activeClaim.status]?.label ?? 'Pending'}</span></div><dl className="source-meta"><div><dt>Source key</dt><dd><code>{activeClaim.sourceQuotes[0]?.sourceId ?? '—'}</code></dd></div><div><dt>Author</dt><dd>{activeClaim.sourceQuotes[0]?.author ?? '—'}</dd></div><div><dt>Recorded</dt><dd>{activeClaim.sourceQuotes[0]?.timestamp ? new Date(activeClaim.sourceQuotes[0].timestamp).toISOString().slice(0, 10) : '—'}</dd></div><div><dt>Clearance</dt><dd>{activeClaim.sourceQuotes[0]?.requiredClearanceLevel?.replaceAll('_', ' ') ?? '—'}</dd></div></dl><div className="source-claim"><span>Claim · {activeClaim.id}</span><p>{activeClaim.statement}</p></div><blockquote>{activeClaim.sourceQuotes[0]?.exactSnippet ?? 'No source excerpt is available.'}</blockquote><p className="source-status-help">{statusLabels[activeClaim.status]?.description}</p><button className="text-action" onClick={() => navigate('claims')}>← Return to claims</button></section>}
+            {route === 'source' && activeClaim && <section className="data-card source-view"><div className="card-heading"><div><h2>{activeClaim.sourceQuotes[0]?.title ?? 'Source record'}</h2><p>Source inspection</p></div><span className="state-label">{statusLabels[activeClaim.status]?.label ?? 'Pending'}</span></div><dl className="source-meta"><div><dt>Source key</dt><dd><code>{activeClaim.sourceQuotes[0]?.sourceId ?? '—'}</code></dd></div><div><dt>Author</dt><dd>{activeClaim.sourceQuotes[0]?.author ?? '—'}</dd></div><div><dt>Recorded</dt><dd>{activeClaim.sourceQuotes[0]?.timestamp ? new Date(activeClaim.sourceQuotes[0].timestamp).toISOString().slice(0, 10) : '—'}</dd></div><div><dt>Who can view</dt><dd>{({ public_open: 'Open to the team', team_internal: 'Team members', confidential_lead: 'Team leads', restricted_hr_legal: 'Restricted HR or legal roles' } as Record<string, string>)[activeClaim.sourceQuotes[0]?.requiredClearanceLevel ?? ''] ?? 'Not specified'}</dd></div></dl><div className="source-claim"><span>Claim · {activeClaim.id}</span><p>{activeClaim.statement}</p></div><blockquote>{activeClaim.sourceQuotes[0]?.exactSnippet ?? 'No source excerpt is available.'}</blockquote><p className="source-status-help">{statusLabels[activeClaim.status]?.description}</p><button className="text-action" onClick={() => navigate('claims')}>← Return to claims</button></section>}
 
-            {route === 'exposure' && <div className="view-stack"><div className="view-intro"><p>Reviewer: {activePersona.name}</p><button className="secondary-action" onClick={() => { rememberFocus(); setExposureOpen(true) }}>Open visibility details</button></div><section className="data-card"><div className="card-heading"><div><h2>Visible claims</h2><p>{visibleClaims.length} claims available at this clearance</p></div></div><div className="claim-list">{renderClaimRows(visibleClaims.slice(0, 5), true)}</div></section><section className="data-card"><div className="card-heading"><div><h2>Withheld claims</h2><p>{withheldCount} restricted by reviewer clearance</p></div></div>{withheldDetails.length ? withheldDetails.map((item) => <div className="withheld-row" key={item.claimId}><strong>{item.claimId}</strong><span>{item.reason}</span><small>Requires {item.requiredClearance}</small></div>) : <p className="empty-state">No claims are withheld for this reviewer.</p>}</section></div>}
+            {route === 'exposure' && <div className="view-stack"><div className="view-intro"><p>Reviewer: {activePersona.name}</p><button className="secondary-action" onClick={() => { rememberFocus(); setExposureOpen(true) }}>Open visibility details</button></div><section className="data-card"><div className="card-heading"><div><h2>Visible claims</h2><p>{visibleClaims.length} claims available in this view</p></div></div><div className="claim-list">{renderClaimRows(visibleClaims.slice(0, 5), true)}</div></section><section className="data-card"><div className="card-heading"><div><h2>Withheld claims</h2><p>{withheldCount} claims hidden from this view</p></div></div>{withheldDetails.length ? withheldDetails.map((item) => <div className="withheld-row" key={item.claimId}><strong>{item.claimId}</strong><span>{item.reason}</span><small>Visible to: {({ public_open: 'Open to the team', team_internal: 'Team members', confidential_lead: 'Team leads', restricted_hr_legal: 'Restricted HR or legal roles' } as Record<string, string>)[item.requiredClearance] ?? item.requiredClearance.replaceAll('_', ' ')}</small></div>) : <p className="empty-state">No claims are withheld for this reviewer.</p>}</section></div>}
           </div>
         </main>
       </div>
-      {activeConflict && <ContradictionModal item={activeConflict} onResolve={(type, note) => { resolveContradiction(activeConflict.id, type, note); closeConflict() }} onClose={closeConflict} isClosing={closingDialog === 'conflict'} />}
+      {activeConflict && <ContradictionModal item={activeConflict} canResolve={activePersona.role === 'lead'} onResolve={(type, note) => { resolveContradiction(activeConflict.id, type, note); closeConflict() }} onClose={closeConflict} isClosing={closingDialog === 'conflict'} />}
       {interviewOpen && <LeaverInterviewModal questions={questions} onAnswer={answerInterviewQuestion} onClose={closeInterview} isClosing={closingDialog === 'interview'} />}
-      {exposureOpen && <ExposureDiffModal details={withheldDetails} onClose={closeExposure} isClosing={closingDialog === 'exposure'} />}
+      {exposureOpen && <ExposureDiffModal details={withheldDetails} personaName={activePersona.name} onClose={closeExposure} isClosing={closingDialog === 'exposure'} />}
       {drawerClaim && <SourceInspectorDrawer claim={drawerClaim} onClose={closeDrawer} isClosing={closingDialog === 'drawer'} />}
     </div>
   )
@@ -451,7 +541,7 @@ function Card({ title, action, onAction, children }: { title: string; action: st
 }
 
 function sectionName(id: string) {
-  return ({ decisions: 'Architecture decisions', unfinished: 'Unfinished work', ownership: 'Ownership', risks: 'Risks and conflicts' } as Record<string, string>)[id] ?? id
+  return ({ decisions: 'Architecture decisions', unfinished: 'Unfinished work', ownership: 'Ownership', risks: 'Conflicts to review' } as Record<string, string>)[id] ?? id
 }
 
 function sectionDetail(id: string) {

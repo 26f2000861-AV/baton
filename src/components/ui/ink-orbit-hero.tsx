@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import Image from "next/image"
 import { ArrowRight, Check, Play, X } from "lucide-react"
 
 export type InkDemoStep = { label: string; detail: string }
@@ -16,6 +17,7 @@ export type InkOrbitHeroProps = {
   onSecondary?: () => void
   demoSteps?: InkDemoStep[]
   proof?: { before: string; value: string; after: string; avatars?: string[] } | null
+  preview?: React.ReactNode
   sculptureSeed?: number
   onReforge?: (seed: number) => void
   sculptureLabel?: string
@@ -49,6 +51,7 @@ export default function InkOrbitHero({
   onSecondary,
   demoSteps = DEFAULT_STEPS,
   proof = null,
+  preview = null,
   sculptureSeed = 7,
   onReforge,
   sculptureLabel = "",
@@ -147,13 +150,14 @@ export default function InkOrbitHero({
                   <span className="ih-proof-faces">
                     {(proof.avatars || DEFAULT_AVATARS).slice(0, 4).map((avatarSrc, i) => (
                       <span key={i} className="inline-block overflow-hidden rounded-full border-2 border-[var(--ih-paper)]">
-                        <img
+                        <Image
                           src={avatarSrc}
                           alt="Team member"
                           width={24}
                           height={24}
                           className="h-6 w-6 rounded-full object-cover"
                           loading="lazy"
+                          unoptimized
                         />
                       </span>
                     ))}
@@ -178,6 +182,7 @@ export default function InkOrbitHero({
                 hud={hud ?? sculptureHud}
               />
             </div>
+            {preview && <div className="ih-art-preview">{preview}</div>}
           </div>
         </section>
       </div>
@@ -992,7 +997,7 @@ const IH_CSS = `
 .ih-step[data-state="done"] .ih-step-ix{background:var(--ih-inv);color:var(--ih-inv-ink);border-color:var(--ih-inv)}
 .ih-step-t{font-family:var(--ih-mono);font-size:11px;color:var(--ih-faint)}
 .ih-bar{height:2px;margin:0 16px;background:var(--ih-line)}
-.ih-bar>i{display:block;height:2px;background:var(--ih-ink);transition:width .3s linear}
+.ih-bar>i{display:block;height:2px;background:var(--ih-ink)}
 .ih-dialog-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;font-size:12.5px;color:var(--ih-muted)}
 @keyframes ih-rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @keyframes ih-fade{from{opacity:0}to{opacity:1}}
@@ -1002,6 +1007,7 @@ const IH_CSS = `
 @keyframes ih-spin{to{transform:rotate(360deg)}}
 @keyframes ih-ping{0%{box-shadow:0 0 0 0 rgba(34,197,94,.55)}80%,100%{box-shadow:0 0 0 7px rgba(34,197,94,0)}}
 .ih-art-fill{position:absolute;inset:0}
+.ih-art-preview{position:absolute;z-index:2;top:clamp(12px,2vw,24px);right:clamp(12px,2vw,24px);width:min(390px,calc(100% - 28px));}
 @media (prefers-reduced-motion:reduce){
 .ih-h1-top,.ih-word,.ih-word-out,.ih-lede,.ih-hero-ctas,.ih-proof,.ih-modal,.ih-dialog{animation:none}
 .ih-live{animation:none}

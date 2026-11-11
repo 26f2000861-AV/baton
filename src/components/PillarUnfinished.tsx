@@ -28,9 +28,6 @@ export default function PillarUnfinished({
     <section id="unfinished" className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <span className="text-xs font-semibold uppercase tracking-wider text-[#6B6B6B]">
-            02 / Pillar
-          </span>
           <h2 className="mt-0.5 text-xl font-semibold tracking-tight text-[#0A0A0A]">
             Unfinished work roadmap
           </h2>

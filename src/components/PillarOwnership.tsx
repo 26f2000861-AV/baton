@@ -20,14 +20,11 @@ export default function PillarOwnership({
     <section id="ownership" className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <span className="text-xs font-semibold uppercase tracking-wider text-[#6B6B6B]">
-            03 / Pillar
-          </span>
           <h2 className="mt-0.5 text-xl font-semibold tracking-tight text-[#0A0A0A]">
             Ownership matrix
           </h2>
           <p className="mt-1 text-xs text-[#6B6B6B]">
-            Who holds sole credentials, which assets have a truck factor of 1, and what access transfers by Nov 11?
+            What must transfer, who can do it, and by when?
           </p>
         </div>
         <button
@@ -81,7 +78,7 @@ export default function PillarOwnership({
 
       <div className="grid gap-4 lg:grid-cols-2">
         {assets.map((asset) => {
-          const isHighRiskTruckFactor = asset.ownershipIndex > 0.75
+          const isConcentratedWithOneOwner = asset.ownershipIndex > 0.75
           return (
             <article
               key={asset.id}
@@ -98,11 +95,11 @@ export default function PillarOwnership({
                     </h3>
                   </div>
                   <div className="text-right">
-                    <span className="monochrome-pill">
-                      OCI {Math.round(asset.ownershipIndex * 100)}%
+                    <span className="block max-w-[180px] text-xs font-semibold leading-snug text-[#0A0A0A]">
+                      Owner concentration · {Math.round(asset.ownershipIndex * 100)}%
                     </span>
-                    <span className="mt-1 block text-[10px] text-[#6B6B6B]">
-                      {isHighRiskTruckFactor ? 'Truck factor 1.0 (Critical)' : 'Co-maintained'}
+                    <span className="mt-1 block max-w-[180px] text-[10px] leading-snug text-[#6B6B6B]">
+                      {isConcentratedWithOneOwner ? 'Knowledge concentrated with one maintainer' : 'Shared across maintainers'}
                     </span>
                   </div>
                 </div>
