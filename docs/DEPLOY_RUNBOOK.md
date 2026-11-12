@@ -57,11 +57,14 @@ The FinTrack… → Helios template is **auto-seeded** on first use by
 
 ## 4. Deploy sequence (after Round 3 opens)
 
+Local `main` already carries the full Round 3 work (the `round3/improvements`
+branch is kept at the same commit), so the push is a single step:
+
 ```bash
-git checkout round3/improvements
+# from the local clone (branch main, clean tree):
+git push origin main
+# optionally mirror the feature branch too:
 git push origin round3/improvements
-# if main is the tracked branch on Vercel:
-git checkout main && git merge --ff-only round3/improvements && git push origin main
 ```
 
 Vercel auto-deploys. Post-deploy checklist:
