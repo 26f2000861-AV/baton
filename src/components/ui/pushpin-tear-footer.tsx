@@ -492,7 +492,7 @@ const DEFAULT_COLUMNS: FooterColumn[] = [
   {
     title: "verification",
     links: [
-      { label: "ADR-004 Decision", href: "/workspace#decisions" },
+      { label: "ADR-011 Decision", href: "/workspace#decisions" },
       { label: "Ownership Transfer", href: "/workspace#ownership" },
       { label: "Leaver Interview", href: "/workspace#interview" },
     ],

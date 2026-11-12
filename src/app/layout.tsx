@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import Providers from './providers'
 
 export const metadata: Metadata = {
   title: 'Baton — Accountable Engineering Handover Ledger',
@@ -23,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className="antialiased bg-[#0b0b0b] text-[#eeeeee]">
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   )

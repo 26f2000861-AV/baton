@@ -93,8 +93,128 @@ export interface WorkUpdate {
   rationale: string
   nextAction: string
   sourceReference: string
-  capturedBy: string
   capturedAt: string
+  /** Round 3: real author identity from the session — never free text. */
+  author: {
+    userId: string
+    name: string
+    githubLogin: string | null
+    image: string | null
+  }
+  /** Round 3: optional evidence link to a handover source record. */
+  linkedSource?: {
+    legacyId: string
+    sourceType: SourceSpan['sourceType']
+    title: string
+    uri: string
+  } | null
+  /**
+   * Round 3: machine verification, computed server-side at capture time and
+   * never editable by the author. Rendered separately from the author's text.
+   */
+  verification?: WorkUpdateVerification
+}
+
+export type WorkUpdateVerification =
+  | { state: 'no_evidence' }
+  | { state: 'linked_no_quote'; sourceTitle: string }
+  | {
+      state: 'checked'
+      checkedAt: string
+      sourceLegacyId: string
+      sourceTitle: string
+      isExactMatch: boolean
+      charStart: number
+      charEnd: number
+      explanation: string
+    }
+
+/** Round 3: server-computed viewer identity replacing the persona switcher. */
+export interface ViewerIdentity {
+  userId: string
+  name: string
+  githubLogin: string | null
+  image: string | null
+  role: PersonaRole
+  clearanceLevel: ClearanceLevel
+}
+
+/** Round 3: source record meta (content delivered on demand by the inspector). */
+export interface SourceMeta {
+  legacyId: string
+  origin: 'seed' | 'github_import'
+  sourceType: SourceSpan['sourceType']
+  title: string
+  uri: string
+  author: string
+  timestamp: string
+  requiredClearanceLevel: ClearanceLevel
+  contentPreview: string
+}
+
+/** Round 3: one shared activity trail entry (Improvement 3). */
+export interface ActivityEntry {
+  id: string
+  action: string
+  actorName: string | null
+  actorImage: string | null
+  detail: Record<string, unknown> | null
+  createdAt: string
+}
+
+/** Round 3: import job status rows for the Sources panel (Improvement 2). */
+export interface ImportJobDTO {
+  id: string
+  repoOwner: string
+  repoName: string
+  status: 'running' | 'succeeded' | 'failed'
+  prCount: number
+  commitCount: number
+  claimCount: number
+  error: string | null
+  startedByName: string | null
+  startedAt: string
+  finishedAt: string | null
+}
+
+/** Round 3: full hydrated state for one handover as seen by one member. */
+export interface HandoverState {
+  handover: {
+    id: string
+    name: string
+    description: string
+    isTemplate: boolean
+    createdAt: string
+    isCreator: boolean
+  }
+  me: ViewerIdentity
+  members: {
+    userId: string
+    name: string
+    githubLogin: string | null
+    image: string | null
+    role: PersonaRole
+    createdAt: string
+  }[]
+  visibleClaims: Claim[]
+  withheldCount: number
+  withheldDetails: {
+    claimId: string
+    statement: string
+    requiredClearance: string
+    reason: string
+  }[]
+  decisions: ArchitecturalDecision[]
+  unfinished: UnfinishedWorkItem[]
+  ownership: OwnershipAsset[]
+  contradictions: ContradictionItem[]
+  questions: LeaverInterviewQuestion[]
+  queries: SuccessorQuery[]
+  sectionStates: Record<string, HandoverSectionState>
+  workUpdates: WorkUpdate[]
+  activity: ActivityEntry[]
+  sources: SourceMeta[]
+  imports: ImportJobDTO[]
 }
 
 export interface UnfinishedWorkItem {

@@ -12,13 +12,14 @@ export default function LeaverInterviewModal({
   isClosing = false,
 }: {
   questions: LeaverInterviewQuestion[]
-  onAnswer: (id: string, text: string) => void
+  onAnswer: (id: string, text: string) => Promise<boolean> | void
   onClose: () => void
   isClosing?: boolean
 }) {
   const pending = questions.filter((q) => q.status === 'pending_answer')
   const [index, setIndex] = useState(0)
   const [answer, setAnswer] = useState('')
+  const [submitting, setSubmitting] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
 
@@ -31,10 +32,13 @@ export default function LeaverInterviewModal({
 
   const question = pending[index]
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!answer.trim() || !question) return
-    onAnswer(question.id, answer.trim())
+    if (!answer.trim() || !question || submitting) return
+    setSubmitting(true)
+    const ok = await onAnswer(question.id, answer.trim())
+    setSubmitting(false)
+    if (ok === false) return // keep the answer in the box; the store surfaces the error
     setAnswer('')
     if (index >= pending.length - 1) {
       setIndex(0)
@@ -88,7 +92,7 @@ export default function LeaverInterviewModal({
               All priority interview questions answered
             </h3>
             <p className="mt-1 text-xs text-[#6B6B6B]">
-              Alex Chen has attested responses for the 72h token TTL and Stripe 2FA root backup credentials. All answers are preserved in the ledger.
+              Alex Chen has attested responses for the alert dedup window and the Grafana break-glass 2FA device. All answers are preserved in the ledger.
             </p>
             <button
               onClick={onClose}

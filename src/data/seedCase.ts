@@ -7,26 +7,40 @@ import {
   UnfinishedWorkItem,
 } from '../lib/types'
 
+/**
+ * Helios Observability Platform — Round 3 sample handover case.
+ *
+ * Synthetic scenario: the departing staff platform engineer ran the metrics
+ * platform (OTel collector fleet, Prometheus/Thanos, Grafana, PagerDuty) and a
+ * Thanos → VictoriaMetrics migration is mid-flight. Every claim, quote and
+ * record below is invented for the demo; no real system data.
+ *
+ * Structural contract (asserted at the bottom of this file):
+ *   10 claims (claim_10 is HR-restricted), 2 decisions, 2 unfinished items,
+ *   2 ownership records, 1 contradiction (id `conflict_01` so the #/conflict
+ *   deep link resolves), 2 leaver interview questions.
+ */
+
 export const INITIAL_CLAIMS: Claim[] = [
   {
     id: 'claim_01',
     sectionId: 'decisions',
     statement:
-      'Postgres FOR UPDATE SKIP LOCKED provides ACID-compliant persistence, ensuring zero dropped payment transactions during worker node restarts.',
+      'VictoriaMetrics cuts dashboard query p99 latency by 60% and halves metrics storage cost compared with Thanos.',
     status: 'quoted_verified',
     category: 'fact',
     verificationMethod: 'exact_substring_match',
     sourceQuotes: [
       {
-        sourceId: 'pr_189',
+        sourceId: 'pr_142',
         sourceType: 'github_pr',
-        title: 'PR #189: Migrate queue worker from Redis to Postgres SKIP LOCKED',
-        uri: 'https://github.com/fintrack/payment-core/pull/189',
+        title: 'PR #142: Introduce VictoriaMetrics dual-write and capacity benchmark',
+        uri: 'https://github.com/helios/helios-metrics-migration/pull/142',
         author: 'Alex Chen',
-        timestamp: '2026-08-14T14:32:00Z',
+        timestamp: '2026-08-20T14:32:00Z',
         requiredClearanceLevel: 'team_internal',
         exactSnippet:
-          'Postgres FOR UPDATE SKIP LOCKED provides ACID-compliant persistence, ensuring zero dropped payment transactions during worker node restarts.',
+          'VictoriaMetrics cuts dashboard query p99 latency by 60% and halves metrics storage cost compared with Thanos.',
       },
     ],
   },
@@ -34,21 +48,21 @@ export const INITIAL_CLAIMS: Claim[] = [
     id: 'claim_02',
     sectionId: 'decisions',
     statement:
-      'Worker pool concurrency is capped at 16 threads per pod to avoid connection pool exhaustion on the main database cluster.',
+      'Collector fleet is capped at 200 spans/sec per pod; batches flush every 5 seconds to protect the ingest path.',
     status: 'quoted_verified',
     category: 'process',
     verificationMethod: 'exact_substring_match',
     sourceQuotes: [
       {
-        sourceId: 'pr_189',
+        sourceId: 'pr_142',
         sourceType: 'github_pr',
-        title: 'PR #189: Migrate queue worker from Redis to Postgres SKIP LOCKED',
-        uri: 'https://github.com/fintrack/payment-core/pull/189',
+        title: 'PR #142: Introduce VictoriaMetrics dual-write and capacity benchmark',
+        uri: 'https://github.com/helios/helios-metrics-migration/pull/142',
         author: 'Alex Chen',
-        timestamp: '2026-08-14T14:32:00Z',
+        timestamp: '2026-08-20T14:32:00Z',
         requiredClearanceLevel: 'team_internal',
         exactSnippet:
-          'Worker pool concurrency is capped at 16 threads per pod to avoid connection pool exhaustion on the main database cluster.',
+          'Collector fleet is capped at 200 spans/sec per pod; batches flush every 5 seconds to protect the ingest path.',
       },
     ],
   },
@@ -56,21 +70,21 @@ export const INITIAL_CLAIMS: Claim[] = [
     id: 'claim_03',
     sectionId: 'decisions',
     statement:
-      'Authentication session token TTL was lengthened to 72 hours (marked with comment: // quick fix). Rationale undocumented.',
+      "Alert dedup window in the PagerDuty integration was silently extended from 10 to 30 minutes (marked with comment: // tunable later). Rationale undocumented.",
     status: 'inferred_ai',
     category: 'rationale',
     verificationMethod: 'llm_entailment',
     unresolvedQuestionId: 'q_01',
     sourceQuotes: [
       {
-        sourceId: 'commit_8f4a1',
+        sourceId: 'commit_77e2d',
         sourceType: 'github_commit',
-        title: 'Commit 8f4a179: Auth session token TTL extended to 72 hours',
-        uri: 'https://github.com/fintrack/payment-core/commit/8f4a179c3b8',
+        title: 'Commit 77e2d9: Alert dedup window extended to 30 minutes',
+        uri: 'https://github.com/helios/helios-alertbridge/commit/77e2d91c3b8',
         author: 'Alex Chen',
-        timestamp: '2026-10-04T22:11:00Z',
+        timestamp: '2026-10-02T22:11:00Z',
         requiredClearanceLevel: 'team_internal',
-        exactSnippet: "+  expiresIn: '72h', // quick fix",
+        exactSnippet: "+  dedupWindow: '30m', // tunable later",
       },
     ],
   },
@@ -78,21 +92,21 @@ export const INITIAL_CLAIMS: Claim[] = [
     id: 'claim_04',
     sectionId: 'decisions',
     statement:
-      'Payment queue throughput was measured at 4,200 transactions per second under simulated peak load.',
+      'The ingest path sustains 1.8 million active time series with headroom to 2.4 million before the latency SLO is breached.',
     status: 'quoted_unverified',
     category: 'fact',
     verificationMethod: 'exact_substring_match',
     sourceQuotes: [
       {
-        sourceId: 'pr_189',
+        sourceId: 'pr_142',
         sourceType: 'github_pr',
-        title: 'PR #189 (Paraphrase Check)',
-        uri: 'https://github.com/fintrack/payment-core/pull/189',
+        title: 'PR #142 (Paraphrase Check)',
+        uri: 'https://github.com/helios/helios-metrics-migration/pull/142',
         author: 'AI Summarizer',
-        timestamp: '2026-08-14T14:32:00Z',
+        timestamp: '2026-08-20T14:32:00Z',
         requiredClearanceLevel: 'team_internal',
         exactSnippet:
-          'Payment queue throughput benchmark achieved 4,200 tx/sec with sub-50ms latency.',
+          'Benchmark runs sustained 1.8M active series with headroom to 2.4M before SLO breach.',
       },
     ],
   },
@@ -100,21 +114,21 @@ export const INITIAL_CLAIMS: Claim[] = [
     id: 'claim_05',
     sectionId: 'unfinished',
     statement:
-      'PR #214 implements randomized full-jitter exponential backoff for webhooks, but integration test line 84 fails on random seed collision.',
+      'PR #167 adds adaptive cardinality limiting for the collector fleet, but the e2e suite fails on line 132 with a fixture port collision.',
     status: 'quoted_verified',
     category: 'action_item',
     verificationMethod: 'exact_substring_match',
     sourceQuotes: [
       {
-        sourceId: 'pr_214',
+        sourceId: 'pr_167',
         sourceType: 'github_pr',
-        title: 'PR #214 (Draft): Exponential backoff with jitter for webhook retries',
-        uri: 'https://github.com/fintrack/payment-core/pull/214',
+        title: 'PR #167 (Draft): Adaptive cardinality limiting for the collector fleet',
+        uri: 'https://github.com/helios/otel-collector-fleet/pull/167',
         author: 'Alex Chen',
-        timestamp: '2026-10-28T16:45:00Z',
+        timestamp: '2026-10-30T16:45:00Z',
         requiredClearanceLevel: 'team_internal',
         exactSnippet:
-          'Integration tests: FAILED (AssertionError in test_retry_jitter_bounds on line 84: random seed collision).',
+          'e2e suite: FAILED (fixture port collision in test_cardinality_limit on line 132).',
       },
     ],
   },
@@ -122,20 +136,20 @@ export const INITIAL_CLAIMS: Claim[] = [
     id: 'claim_06',
     sectionId: 'unfinished',
     statement:
-      'Merchant webhook retry branch feat/webhook-backoff must be adopted, fixed, and merged by successor in Days 1 to 7.',
+      'Branch feat/vm-single-store-swap must be completed and merged by the successor within the first week of the cutover plan.',
     status: 'inferred_ai',
     category: 'action_item',
     verificationMethod: 'llm_entailment',
     sourceQuotes: [
       {
-        sourceId: 'pr_214',
+        sourceId: 'pr_167',
         sourceType: 'github_pr',
-        title: 'PR #214 (Draft)',
-        uri: 'https://github.com/fintrack/payment-core/pull/214',
+        title: 'PR #167 (Draft)',
+        uri: 'https://github.com/helios/otel-collector-fleet/pull/167',
         author: 'Alex Chen',
-        timestamp: '2026-10-28T16:45:00Z',
+        timestamp: '2026-10-30T16:45:00Z',
         requiredClearanceLevel: 'team_internal',
-        exactSnippet: 'TODO: Needs seed initialization fix before merging.',
+        exactSnippet: 'TODO: needs fixture port fix before merging.',
       },
     ],
   },
@@ -143,21 +157,21 @@ export const INITIAL_CLAIMS: Claim[] = [
     id: 'claim_07',
     sectionId: 'ownership',
     statement:
-      'Alex Chen is the sole custodian for Stripe Webhook Signing Secret in AWS Secrets Manager; rotation scheduled for Dec 1, 2026.',
+      'Alex Chen is the sole custodian of the Grafana org admin token in Vault; rotation scheduled for Dec 5, 2026.',
     status: 'quoted_verified',
     category: 'credential',
     verificationMethod: 'exact_substring_match',
     sourceQuotes: [
       {
-        sourceId: 'aws_secrets',
+        sourceId: 'vault_grafana',
         sourceType: 'aws_secret',
-        title: 'AWS Secrets Manager: prod/stripe/webhook_key',
-        uri: 'arn:aws:secretsmanager:ap-south-1:123456789012:secret:prod/stripe/webhook_key',
+        title: 'Vault: secret/helios/prod/grafana-admin',
+        uri: 'vault: kv/helios/prod/grafana-admin',
         author: 'Alex Chen',
-        timestamp: '2026-09-01T08:00:00Z',
+        timestamp: '2026-09-05T08:00:00Z',
         requiredClearanceLevel: 'team_internal',
         exactSnippet:
-          'Last Rotated: Sept 1, 2026 by Alex Chen (Sole Key Custodian)',
+          'Sole Token Custodian: Alex Chen (Last rotated Sept 5, 2026)',
       },
     ],
   },
@@ -165,21 +179,21 @@ export const INITIAL_CLAIMS: Claim[] = [
     id: 'claim_08',
     sectionId: 'ownership',
     statement:
-      'For any Redis caching or cluster eviction queries, route escalation to Dev Patel (Staff SRE).',
+      'For Prometheus recording-rule debugging or Thanos compactor failures, escalate to Meera Iyer (Staff SRE) in #sre-infra.',
     status: 'stated_by_leaver',
     category: 'process',
     verificationMethod: 'human_attested',
     sourceQuotes: [
       {
-        sourceId: 'pr_189',
+        sourceId: 'pr_142',
         sourceType: 'github_pr',
-        title: 'PR #189 Discussion',
-        uri: 'https://github.com/fintrack/payment-core/pull/189',
-        author: 'Dev Patel',
-        timestamp: '2026-08-14T14:32:00Z',
+        title: 'PR #142 Discussion',
+        uri: 'https://github.com/helios/helios-metrics-migration/pull/142',
+        author: 'Meera Iyer',
+        timestamp: '2026-08-21T10:05:00Z',
         requiredClearanceLevel: 'team_internal',
         exactSnippet:
-          'Dev Patel: "Makes sense. Redis OOM crashes during flash sales were causing orphaned transactions."',
+          'Meera Iyer: "Makes sense. I can take recording-rule debugging and compactor failures in #sre-infra after Alex leaves."',
       },
     ],
   },
@@ -187,33 +201,33 @@ export const INITIAL_CLAIMS: Claim[] = [
     id: 'claim_09',
     sectionId: 'risks',
     statement:
-      'Contradiction Detected: PR #204 claims full migration to AWS SQS FIFO, but Slack #payment-eng reveals webhook retries fell back to RabbitMQ due to throttling latency.',
+      'Contradiction Detected: PR #155 claims the VictoriaMetrics dual-write is fully live, but Slack #helios-eng shows dashboard reads were rolled back to Thanos after a 4% query failure rate.',
     status: 'conflicting',
     category: 'fact',
     verificationMethod: 'llm_entailment',
-    contradictionId: 'c_01',
+    contradictionId: 'conflict_01',
     sourceQuotes: [
       {
-        sourceId: 'pr_204',
+        sourceId: 'pr_155',
         sourceType: 'github_pr',
-        title: 'PR #204: AWS SQS Migration',
-        uri: 'https://github.com/fintrack/payment-core/pull/204',
+        title: 'PR #155: Cut dashboards over to VictoriaMetrics',
+        uri: 'https://github.com/helios/helios-metrics-migration/pull/155',
         author: 'Alex Chen',
-        timestamp: '2026-10-14T09:15:00Z',
+        timestamp: '2026-10-18T09:15:00Z',
         requiredClearanceLevel: 'team_internal',
         exactSnippet:
-          'All batch settlement events now stream through `fintrack-settlement-fifo.fifo` with exactly-once delivery guarantees.',
+          'Dashboards now read from VictoriaMetrics; the Thanos dual-write is fully live and the legacy path can be decommissioned next sprint.',
       },
       {
-        sourceId: 'slack_payment_eng',
+        sourceId: 'slack_helios',
         sourceType: 'slack_chat',
-        title: 'Slack #payment-eng Throttling Rollback',
-        uri: 'https://fintrack.slack.com/archives/C081PAY/p1730538000',
+        title: 'Slack #helios-eng: VM query failures and rollback',
+        uri: 'https://helios.slack.com/archives/C081HELIOS/p1730638000',
         author: 'Alex Chen',
-        timestamp: '2026-11-02T11:20:00Z',
+        timestamp: '2026-11-03T11:20:00Z',
         requiredClearanceLevel: 'team_internal',
         exactSnippet:
-          'Temporarily routed webhook retries back to our RabbitMQ cluster while AWS support investigates the burst quota.',
+          'Rolled the dashboard reads back to Thanos after VictoriaMetrics returned 4% query failures on the range-heavy panels. VM ingest stays dual-write; reads are not on VM yet.',
       },
     ],
   },
@@ -230,7 +244,7 @@ export const INITIAL_CLAIMS: Claim[] = [
         sourceId: 'slack_leadership',
         sourceType: 'slack_chat',
         title: 'Slack #leadership-confidential (HR/Management)',
-        uri: 'https://fintrack.slack.com/archives/C099LEAD/p1730712000',
+        uri: 'https://helios.slack.com/archives/C099LEAD/p1730712000',
         author: 'Vikram Malhotra & HR',
         timestamp: '2026-11-04T15:00:00Z',
         requiredClearanceLevel: 'restricted_hr_legal',
@@ -244,70 +258,70 @@ export const INITIAL_CLAIMS: Claim[] = [
 export const INITIAL_DECISIONS: ArchitecturalDecision[] = [
   {
     id: 'dec_01',
-    title: 'ADR-004: Migrate Payment Event Queue Worker to Postgres SKIP LOCKED',
-    timestamp: '2026-08-14',
+    title: 'ADR-011: Adopt VictoriaMetrics as the long-term metrics store',
+    timestamp: '2026-08-20',
     status: 'active',
     context:
-      'In-memory Redis instance experienced Out-Of-Memory termination during high-volume flash sales, dropping unacknowledged merchant settlement events.',
+      'Thanos query p99 latency repeatedly breached the 2s dashboard SLO during weekly peaks, and the compactor backlog pushed staleness past alert thresholds.',
     decisionTaken:
-      'Migrated queue persistence directly to PostgreSQL utilizing `FOR UPDATE SKIP LOCKED`. Provides full ACID compliance and zero dropped events across pod restarts.',
+      'Adopt VictoriaMetrics as the long-term store; run a Thanos dual-write until dashboard parity is proven, then decommission the legacy path.',
     alternativesConsidered: [
       {
-        technology: 'Redis Sentinel / Redis Cluster',
+        technology: 'Grafana Mimir',
         rejectionReason:
-          'Requires managing separate persistent in-memory infra; failure recovery still lacked ACID transaction guarantees with main database.',
+          'Object-storage churn and multi-tenant complexity are too heavy for a four-person platform team.',
       },
       {
-        technology: 'Kafka',
+        technology: 'Thanos status quo',
         rejectionReason:
-          'Substantial operational complexity and JVM overhead for a single microservice team.',
+          'Recurring query p99 SLO misses and compactor backlog were already degrading dashboards.',
       },
     ],
     tradeOffsAccepted: [
-      'Higher write amplification on Postgres primary disk IOPS.',
-      'Worker concurrency strictly capped at 16 threads per pod to avoid DB connection pool exhaustion.',
+      'Dual-write doubles ingest cost during the migration window.',
+      'Grafana dashboards need per-panel datasource migration before reads can cut over.',
     ],
     keyStakeholders: {
       proposer: 'Alex Chen (Staff Engineer)',
       approver: 'Vikram Malhotra (Lead)',
     },
     provenance: {
-      sourceId: 'pr_189',
+      sourceId: 'pr_142',
       sourceType: 'github_pr',
-      url: 'https://github.com/fintrack/payment-core/pull/189',
+      url: 'https://github.com/helios/helios-metrics-migration/pull/142',
       exactQuote:
-        'Postgres FOR UPDATE SKIP LOCKED provides ACID-compliant persistence, ensuring zero dropped payment transactions during worker node restarts.',
+        'VictoriaMetrics cuts dashboard query p99 latency by 60% and halves metrics storage cost compared with Thanos.',
       rationaleConfidence: 'documented_explicit',
     },
     associatedClaimId: 'claim_01',
   },
   {
     id: 'dec_02',
-    title: 'Commit 8f4a1: Mobile Auth Session Token TTL Extension to 72h',
-    timestamp: '2026-10-04',
+    title: 'Commit 77e2d: Alert dedup window extended to 30 minutes',
+    timestamp: '2026-10-02',
     status: 'active',
     context:
-      'JWT session duration was abruptly increased from 15 minutes to 72 hours in auth service with commit note // quick fix.',
+      "The PagerDuty dedup window in helios-alertbridge was silently raised from 10 to 30 minutes with the commit note '// tunable later'.",
     decisionTaken:
-      'Extended token expiration to 72 hours. No formal ADR or Jira ticket was referenced.',
+      'Dedup window now 30 minutes. No ADR or ticket was referenced in the commit.',
     alternativesConsidered: [
       {
-        technology: 'Silent Refresh Tokens',
-        rejectionReason: 'Undocumented in commit; required client-side mobile refactor.',
+        technology: 'Per-alert-class dedup windows',
+        rejectionReason: 'Not implemented; nothing in the commit documents the intent.',
       },
     ],
     tradeOffsAccepted: [
-      'Stale JWT tokens remain valid for 3 days if credentials are leaked.',
+      'Genuine second-page alerts within 30 minutes are suppressed.',
     ],
     keyStakeholders: {
       proposer: 'Alex Chen',
       approver: 'Self-merged (Direct to main)',
     },
     provenance: {
-      sourceId: 'commit_8f4a1',
+      sourceId: 'commit_77e2d',
       sourceType: 'github_commit',
-      url: 'https://github.com/fintrack/payment-core/commit/8f4a179c3b8',
-      exactQuote: "+  expiresIn: '72h', // quick fix",
+      url: 'https://github.com/helios/helios-alertbridge/commit/77e2d91c3b8',
+      exactQuote: "+  dedupWindow: '30m', // tunable later",
       rationaleConfidence: 'inferred_ai',
     },
     associatedClaimId: 'claim_03',
@@ -317,26 +331,26 @@ export const INITIAL_DECISIONS: ArchitecturalDecision[] = [
 export const INITIAL_UNFINISHED: UnfinishedWorkItem[] = [
   {
     id: 'unf_01',
-    title: 'PR #214: Exponential backoff with jitter for webhook retries',
+    title: 'PR #167: Adaptive cardinality limiting for the collector fleet',
     type: 'open_pr',
     status: 'ready_to_merge',
     urgency: 'p0_immediate',
     description:
-      'Adds randomized full-jitter backoff to outbound merchant notifications to stop partner server thundering-herd outages.',
+      'Adds adaptive cardinality limiting to stop label explosions from overwriting the ingest ring during traffic spikes.',
     location: {
-      repository: 'fintrack/payment-core',
-      branchOrPath: 'feat/webhook-backoff',
-      prNumber: 214,
-      lineRange: [80, 95],
+      repository: 'helios/otel-collector-fleet',
+      branchOrPath: 'feat/cardinality-limit',
+      prNumber: 167,
+      lineRange: [126, 140],
     },
     associatedBlockers: [
-      'CI test failure: AssertionError in test_retry_jitter_bounds on line 84 (random seed collision).',
+      'CI e2e failure: fixture port collision in test_cardinality_limit on line 132.',
     ],
     recommendedSuccessorAction:
-      'Pull branch feat/webhook-backoff, initialize deterministic test random seed on line 84, rerun CI, and merge.',
+      'Pull feat/cardinality-limit, assign deterministic e2e fixture ports on line 132, rerun CI, and merge.',
     provenance: {
-      lastActivityDate: '2026-10-28',
-      commitHash: 'd7a90f1',
+      lastActivityDate: '2026-10-30',
+      commitHash: 'a3f19d2',
       author: 'Alex Chen',
       reviewState: 'approved',
     },
@@ -344,24 +358,24 @@ export const INITIAL_UNFINISHED: UnfinishedWorkItem[] = [
   },
   {
     id: 'unf_02',
-    title: 'Merchant Profile Database Dual-Write Triggers Cleanup',
+    title: 'Thanos compactor decommission checklist',
     type: 'unmerged_migration',
     status: 'needs_triage',
     urgency: 'p1_first_two_weeks',
     description:
-      'Legacy dual-write PostgreSQL triggers synchronizing merchant billing profiles to MongoDB analytics warehouse.',
+      'The legacy Thanos compactor and store gateways still serve Q3 capacity reports from the object-storage bucket.',
     location: {
-      repository: 'fintrack/payment-core',
-      branchOrPath: 'src/db/migrations/20260710_dual_write.sql',
+      repository: 'helios/helios-metrics-migration',
+      branchOrPath: 'infra/thanos-decommission/runbook.md',
     },
     associatedBlockers: [
-      'Analytics team still queries MongoDB cluster for Q3 historical reports.',
+      'Analytics still reads the Thanos store for Q3 capacity reports.',
     ],
     recommendedSuccessorAction:
-      'Coordinate with Data Engineering lead (Aditi) before dropping dual-write triggers on Dec 15.',
+      'Coordinate with Meera Iyer before deleting the bucket on Dec 20, 2026.',
     provenance: {
-      lastActivityDate: '2026-09-12',
-      commitHash: 'b4412e8',
+      lastActivityDate: '2026-09-15',
+      commitHash: 'b7712c4',
       author: 'Alex Chen',
     },
     associatedClaimId: 'claim_06',
@@ -371,55 +385,54 @@ export const INITIAL_UNFINISHED: UnfinishedWorkItem[] = [
 export const INITIAL_OWNERSHIP: OwnershipAsset[] = [
   {
     id: 'own_01',
-    assetName: 'Stripe Webhook Gateway & Secret Custody',
+    assetName: 'Grafana org admin & Vault token custody',
     assetType: 'third_party_saas',
     criticality: 'tier_1_mission_critical',
     currentOwner: {
       name: 'Alex Chen',
-      email: 'alex.chen@fintrack.internal',
+      email: 'alex.chen@helios.internal',
       slackHandle: '@alexchen',
       status: 'leaving',
     },
     proposedSuccessor: {
       name: 'Priya Sharma',
-      email: 'priya.sharma@fintrack.internal',
+      email: 'priya.sharma@helios.internal',
       approvalState: 'pending_lead_confirmation',
     },
     coMaintainers: [],
     credentialsAndAccess: {
-      credentialVaultPath:
-        'arn:aws:secretsmanager:ap-south-1:123456789012:secret:prod/stripe/webhook_key',
+      credentialVaultPath: 'vault: kv/helios/prod/grafana-admin',
       adminAccessRequiresTransfer: true,
       transferDeadlineDate: '2026-11-10',
     },
     escalationContact: {
       role: 'Engineering Director',
       name: 'Vikram Malhotra',
-      slackChannel: '#payment-eng',
+      slackChannel: '#helios-eng',
     },
-    ownershipIndex: 0.88,
+    ownershipIndex: 0.91,
     associatedClaimId: 'claim_07',
   },
   {
     id: 'own_02',
-    assetName: 'Payment Core Event Dispatcher Service',
+    assetName: 'OTel Collector Gateway Fleet',
     assetType: 'microservice',
     criticality: 'tier_1_mission_critical',
     currentOwner: {
       name: 'Alex Chen',
-      email: 'alex.chen@fintrack.internal',
+      email: 'alex.chen@helios.internal',
       slackHandle: '@alexchen',
       status: 'leaving',
     },
     proposedSuccessor: {
       name: 'Priya Sharma',
-      email: 'priya.sharma@fintrack.internal',
+      email: 'priya.sharma@helios.internal',
       approvalState: 'confirmed',
     },
     coMaintainers: [
       {
-        name: 'Dev Patel',
-        contributionShare: 0.28,
+        name: 'Meera Iyer',
+        contributionShare: 0.34,
         lastActiveDate: '2026-11-01',
       },
     ],
@@ -429,41 +442,41 @@ export const INITIAL_OWNERSHIP: OwnershipAsset[] = [
     },
     escalationContact: {
       role: 'Staff SRE',
-      name: 'Dev Patel',
+      name: 'Meera Iyer',
       slackChannel: '#sre-infra',
     },
-    ownershipIndex: 0.65,
+    ownershipIndex: 0.63,
     associatedClaimId: 'claim_08',
   },
 ]
 
 export const INITIAL_CONTRADICTIONS: ContradictionItem[] = [
   {
-    id: 'c_01',
-    entityName: 'Payment Settlement Event Dispatcher',
-    attributeName: 'Active Delivery Engine',
+    id: 'conflict_01',
+    entityName: 'VictoriaMetrics ingest path',
+    attributeName: 'Dual-write live state',
     type: 'genuine_disagreement',
     severity: 'critical_blocker',
     status: 'open_unresolved',
     sourceA: {
       sourceType: 'github_pr',
-      title: 'GitHub PR #204: AWS SQS Migration',
-      url: 'https://github.com/fintrack/payment-core/pull/204',
-      timestamp: '2026-10-14T09:15:00Z',
+      title: 'GitHub PR #155: Cut dashboards over to VictoriaMetrics',
+      url: 'https://github.com/helios/helios-metrics-migration/pull/155',
+      timestamp: '2026-10-18T09:15:00Z',
       author: 'Alex Chen (Staff Engineer)',
-      extractedValue: 'AWS SQS FIFO Queue (fintrack-settlement-fifo.fifo)',
+      extractedValue: 'VictoriaMetrics dual-write live for all dashboard reads',
       exactQuote:
-        'All batch settlement events now stream through `fintrack-settlement-fifo.fifo` with exactly-once delivery guarantees. Deprecates the legacy RabbitMQ cluster on ECS.',
+        'Dashboards now read from VictoriaMetrics; the Thanos dual-write is fully live and the legacy path can be decommissioned next sprint.',
     },
     sourceB: {
       sourceType: 'slack_chat',
-      title: 'Slack #payment-eng Throttling Rollback',
-      url: 'https://fintrack.slack.com/archives/C081PAY/p1730538000',
-      timestamp: '2026-11-02T11:20:00Z',
+      title: 'Slack #helios-eng: VM query failures and rollback',
+      url: 'https://helios.slack.com/archives/C081HELIOS/p1730638000',
+      timestamp: '2026-11-03T11:20:00Z',
       author: 'Alex Chen',
-      extractedValue: 'RabbitMQ Cluster (Active Fallback for Retries)',
+      extractedValue: 'VM ingest rolled back for dashboards; Thanos still serving reads',
       exactQuote:
-        'Temporarily routed webhook retries back to our RabbitMQ cluster while AWS support investigates the burst quota. RabbitMQ is currently handling live delivery fallback.',
+        'Rolled the dashboard reads back to Thanos after VictoriaMetrics returned 4% query failures on the range-heavy panels. VM ingest stays dual-write; reads are not on VM yet.',
     },
     associatedClaimId: 'claim_09',
   },
@@ -476,11 +489,11 @@ export const INITIAL_QUESTIONS: LeaverInterviewQuestion[] = [
     priorityRank: 1,
     category: 'architecture_rationale',
     promptText:
-      "In commit 8f4a1 on Oct 4, you extended JWT auth token TTL from 15m to 72h with the comment '// quick fix'. No Jira ticket was linked. Why was this extended, and is it safe to revert?",
+      "In commit 77e2d on Oct 2, you raised the PagerDuty alert dedup window from 10 to 30 minutes with the comment '// tunable later'. No ticket was linked. Why was it extended, and is it safe to revert before the on-call rotation changes?",
     groundingContext: {
       sourceType: 'commit',
-      sourceId: 'commit_8f4a1',
-      snippetText: "+  expiresIn: '72h', // quick fix",
+      sourceId: 'commit_77e2d',
+      snippetText: "+  dedupWindow: '30m', // tunable later",
     },
     status: 'pending_answer',
   },
@@ -490,12 +503,12 @@ export const INITIAL_QUESTIONS: LeaverInterviewQuestion[] = [
     priorityRank: 2,
     category: 'missing_credential',
     promptText:
-      'AWS Secrets Manager shows you are sole custodian for Stripe Webhook Signing Secret. Who has the root 2FA backup device for the Stripe Developer Dashboard?',
+      'Vault shows you are the sole custodian of the Grafana org admin token. Who holds the break-glass 2FA device for the Grafana org admin account?',
     groundingContext: {
       sourceType: 'commit',
-      sourceId: 'aws_secrets',
+      sourceId: 'vault_grafana',
       snippetText:
-        'Last Rotated: Sept 1, 2026 by Alex Chen (Sole Key Custodian)',
+        'Sole Token Custodian: Alex Chen (Last rotated Sept 5, 2026)',
     },
     status: 'pending_answer',
   },
@@ -511,14 +524,15 @@ console.assert(
 console.assert(INITIAL_DECISIONS.length === 2, 'Seed should contain 2 architecture decisions.')
 console.assert(INITIAL_UNFINISHED.length === 2, 'Seed should contain 2 unfinished work items.')
 console.assert(INITIAL_OWNERSHIP.length === 2, 'Seed should contain 2 ownership records.')
-console.assert(INITIAL_CONTRADICTIONS.length === 1, 'Seed should contain 1 routing contradiction.')
+console.assert(INITIAL_CONTRADICTIONS.length === 1, 'Seed should contain 1 dual-write contradiction.')
 console.assert(INITIAL_QUESTIONS.length === 2, 'Seed should contain 2 leaver interview questions.')
 console.assert(
-  INITIAL_CONTRADICTIONS[0]?.sourceA.extractedValue.includes('SQS FIFO') &&
-    INITIAL_CONTRADICTIONS[0]?.sourceB.extractedValue.includes('RabbitMQ') &&
-    INITIAL_CONTRADICTIONS[0]?.sourceA.timestamp.startsWith('2026-10-14') &&
-    INITIAL_CONTRADICTIONS[0]?.sourceB.timestamp.startsWith('2026-11-02'),
-  'Routing conflict should preserve both source values.'
+  INITIAL_CONTRADICTIONS[0]?.id === 'conflict_01' &&
+    INITIAL_CONTRADICTIONS[0]?.sourceA.extractedValue.includes('VictoriaMetrics') &&
+    INITIAL_CONTRADICTIONS[0]?.sourceB.extractedValue.includes('Thanos') &&
+    INITIAL_CONTRADICTIONS[0]?.sourceA.timestamp.startsWith('2026-10-18') &&
+    INITIAL_CONTRADICTIONS[0]?.sourceB.timestamp.startsWith('2026-11-03'),
+  'Dual-write conflict should use the deep-link id and preserve both source values.'
 )
 console.assert(
   INITIAL_OWNERSHIP.map((asset) => asset.credentialsAndAccess.transferDeadlineDate).join(',') ===
@@ -526,7 +540,7 @@ console.assert(
   'Ownership transfer dates should remain Nov 10 and Nov 11, 2026.'
 )
 console.assert(
-  INITIAL_CLAIMS.find((claim) => claim.id === 'claim_07')?.statement.includes('Dec 1, 2026'),
-  'Credential rotation date should remain Dec 1, 2026.'
+  INITIAL_CLAIMS.find((claim) => claim.id === 'claim_07')?.statement.includes('Dec 5, 2026'),
+  'Grafana token rotation date should remain Dec 5, 2026.'
 )
 console.assert(new Set(['decisions', 'unfinished', 'ownership', 'risks']).size === 4, 'Sign-off should track four distinct sections.')

@@ -59,7 +59,7 @@ export default function PillarOwnership({
               November 10 & 11, 2026
             </p>
             <p className="mt-1 text-xs text-[#6B6B6B]">
-              Stripe admin IAM access transfers to Priya on Nov 10; Alex Chen offboarding completed on Nov 11.
+              Grafana org admin access transfers to Priya on Nov 10; Alex Chen offboarding completes on Nov 11.
             </p>
           </div>
           <div className="rounded-[6px] border border-[#E6E6E6] bg-[#F2F4F7]/50 p-3">
@@ -67,10 +67,10 @@ export default function PillarOwnership({
               Scheduled Credential Rotation Date
             </span>
             <p className="mt-1 font-mono text-sm font-bold text-[#0A0A0A]">
-              December 1, 2026
+              December 5, 2026
             </p>
             <p className="mt-1 text-xs text-[#6B6B6B]">
-              AWS Secrets Manager bi-annual Stripe webhook signing secret rotation (<code className="font-mono text-[11px]">prod/stripe/webhook_key</code>).
+              Vault bi-annual Grafana org admin token rotation (<code className="font-mono text-[11px]">kv/helios/prod/grafana-admin</code>).
             </p>
           </div>
         </div>
@@ -138,7 +138,7 @@ export default function PillarOwnership({
               <div className="mt-5 pt-3 border-t border-[#F0F0F0]">
                 <div className="baton-pass-line">
                   <span className="text-xs text-[#6B6B6B]">
-                    {asset.id === 'own_01' ? 'Secrets Manager' : 'Service maintainers'}
+                    {asset.id === 'own_01' ? 'Vault (KV v2)' : 'Service maintainers'}
                   </span>
                   <div className="pass-rule" />
                   <button
@@ -146,7 +146,7 @@ export default function PillarOwnership({
                     className="min-hit flex items-center gap-1 font-mono text-xs text-[#0A0A0A] hover:underline"
                     aria-label={`Inspect evidence for ${asset.assetName}`}
                   >
-                    <span>{asset.id === 'own_01' ? 'aws_secrets' : 'pr_189'}</span>
+                    <span>{asset.id === 'own_01' ? 'vault_grafana' : 'pr_142'}</span>
                     <ExternalLink size={12} className="text-[#6B6B6B]" />
                   </button>
                 </div>
@@ -169,15 +169,15 @@ export default function PillarOwnership({
             </h3>
             <div className="mt-3 grid gap-3 sm:grid-cols-2 text-xs">
               <div className="rounded-[6px] border border-[#E6E6E6] bg-[#F2F4F7]/40 p-3">
-                <span className="font-semibold text-[#0A0A0A]">Redis caching & cluster eviction queries:</span>
+                <span className="font-semibold text-[#0A0A0A]">Prometheus rule debugging & Thanos compactor failures:</span>
                 <p className="mt-1 text-[#6B6B6B]">
-                  Route directly to <strong className="text-[#0A0A0A]">Dev Patel (Staff SRE)</strong> in <code className="font-mono text-[11px]">#sre-infra</code>. Decommissioned for payment transactions per ADR-004.
+                  Route directly to <strong className="text-[#0A0A0A]">Meera Iyer (Staff SRE)</strong> in <code className="font-mono text-[11px]">#sre-infra</code>. Confirmed by Alex in the PR #142 handover discussion.
                 </p>
               </div>
               <div className="rounded-[6px] border border-[#E6E6E6] bg-[#F2F4F7]/40 p-3">
-                <span className="font-semibold text-[#0A0A0A]">Database replication & skip locked:</span>
+                <span className="font-semibold text-[#0A0A0A]">Collector fleet capacity & ingest caps:</span>
                 <p className="mt-1 text-[#6B6B6B]">
-                  Postgres pool concurrency capped at 16 threads per pod; escalation contact is <strong className="text-[#0A0A0A]">Vikram Malhotra</strong> in <code className="font-mono text-[11px]">#payment-eng</code>.
+                  Collector fleet capped at 200 spans/sec per pod; escalation contact is <strong className="text-[#0A0A0A]">Vikram Malhotra</strong> in <code className="font-mono text-[11px]">#helios-eng</code>.
                 </p>
               </div>
             </div>

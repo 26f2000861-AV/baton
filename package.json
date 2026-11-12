@@ -3,19 +3,28 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3000 2>&1 | tee dev.log",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "node --experimental-strip-types --test tests/verifier.test.mts"
+    "test": "node --experimental-strip-types --test tests/verifier.test.mts tests/github-mappers.test.mts",
+    "typecheck": "tsc --noEmit",
+    "db:push": "bash scripts/dev-db.sh push",
+    "db:generate": "bash scripts/dev-db.sh generate",
+    "db:seed": "bash scripts/dev-db.sh seed",
+    "db:studio": "bash scripts/dev-db.sh studio"
   },
   "dependencies": {
+    "@next-auth/prisma-adapter": "1.0.7",
+    "@prisma/client": "6",
     "@studio-freight/lenis": "^1.0.42",
     "clsx": "^2.1.1",
     "gsap": "^3.15.1",
     "lucide-react": "^0.454.0",
     "motion": "^14.10.1",
     "next": "^14.2.15",
+    "next-auth": "4.24.11",
+    "prisma": "6",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tailwind-merge": "^2.5.4"

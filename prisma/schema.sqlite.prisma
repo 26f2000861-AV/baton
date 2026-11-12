@@ -1,0 +1,289 @@
+// Baton — Round 3 schema
+// Authoritative provider: postgresql (Neon in production).
+// Local sandbox dev uses prisma/schema.sqlite.prisma generated from this file
+// (see scripts/dev-db.sh) because the sandbox has no PostgreSQL service.
+//
+// Payload columns (payload, sourceQuotes, history, verification, detail) are
+// TEXT strings holding JSON owned by src/lib/serializers.ts — deliberately
+// provider-agnostic and typed at the application boundary.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Auth (NextAuth v4 Prisma adapter) ----------
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  githubLogin   String?   @unique
+  createdAt     DateTime  @default(now())
+  accounts      Account[]
+  sessions      Session[]
+  memberships   Membership[]
+  workUpdates   WorkUpdate[]
+  activities    ActivityLog[]
+  importsStarted ImportJob[] @relation("ImportJobsStarted")
+}
+
+model Account {
+  id                String   @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  createdAt         DateTime @default(now())
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ---------- Handover core ----------
+
+model Handover {
+  id           String   @id @default(cuid())
+  name         String
+  description  String   @default("")
+  isTemplate   Boolean  @default(false)
+  templateKey  String?
+  createdById  String
+  createdAt    DateTime @default(now())
+
+  memberships    Membership[]
+  sources        SourceRecord[]
+  claims         Claim[]
+  decisions      ArchitecturalDecision[]
+  unfinished     UnfinishedWorkItem[]
+  ownership      OwnershipAsset[]
+  contradictions Contradiction[]
+  questions      LeaverInterviewQuestion[]
+  queries        SuccessorQuery[]
+  sectionStates  SectionState[]
+  workUpdates    WorkUpdate[]
+  imports        ImportJob[]
+  activities     ActivityLog[]
+}
+
+model Membership {
+  id         String   @id @default(cuid())
+  handoverId String
+  userId     String
+  role       String // lead | successor | leaver
+  invitedBy  String?
+  createdAt  DateTime @default(now())
+
+  handover Handover @relation(fields: [handoverId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([handoverId, userId])
+}
+
+model SourceRecord {
+  id                     String   @id @default(cuid())
+  handoverId             String
+  legacyId               String // stable within handover: "pr_204", "gh_pr_123", "gh_commit_ab12cd3"
+  origin                 String   @default("seed") // seed | github_import
+  sourceType             String // github_pr | github_commit | slack_chat | jira_ticket | aws_secret | notion_doc
+  title                  String
+  uri                    String
+  author                 String
+  timestamp              String // ISO 8601, kept as text to match existing DTOs
+  requiredClearanceLevel String   @default("team_internal")
+  content                String // raw text the verifier matches against
+  importJobId            String?
+  updatedAt              DateTime @updatedAt
+  createdAt              DateTime @default(now())
+
+  handover    Handover      @relation(fields: [handoverId], references: [id], onDelete: Cascade)
+  workUpdates WorkUpdate[]
+
+  @@unique([handoverId, legacyId])
+}
+
+model Claim {
+  id                String   @id @default(cuid())
+  handoverId        String
+  legacyId          String // "claim_09" etc.
+  sectionId         String // decisions | unfinished | ownership | risks
+  statement         String
+  status            String
+  category          String
+  verificationMethod String
+  sourceQuotes      String // JSON: SourceSpan[] (clearance metadata travels with the span)
+  history           String? // JSON: {action, actor, timestamp}[] appended on every mutation
+  origin            String   @default("seed")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  handover Handover @relation(fields: [handoverId], references: [id], onDelete: Cascade)
+
+  @@unique([handoverId, legacyId])
+}
+
+model ArchitecturalDecision {
+  id         String @id @default(cuid())
+  handoverId String
+  legacyId   String
+  payload    String // JSON: ArchitecturalDecision DTO
+
+  handover Handover @relation(fields: [handoverId], references: [id], onDelete: Cascade)
+
+  @@unique([handoverId, legacyId])
+}
+
+model UnfinishedWorkItem {
+  id         String @id @default(cuid())
+  handoverId String
+  legacyId   String
+  payload    String // JSON: UnfinishedWorkItem DTO (mutable status inside)
+
+  handover Handover @relation(fields: [handoverId], references: [id], onDelete: Cascade)
+
+  @@unique([handoverId, legacyId])
+}
+
+model OwnershipAsset {
+  id         String @id @default(cuid())
+  handoverId String
+  legacyId   String
+  payload    String // JSON: OwnershipAsset DTO
+
+  handover Handover @relation(fields: [handoverId], references: [id], onDelete: Cascade)
+
+  @@unique([handoverId, legacyId])
+}
+
+model Contradiction {
+  id         String @id @default(cuid())
+  handoverId String
+  legacyId   String
+  payload    String // JSON: ContradictionItem DTO (status + settlement inside)
+
+  handover Handover @relation(fields: [handoverId], references: [id], onDelete: Cascade)
+
+  @@unique([handoverId, legacyId])
+}
+
+model LeaverInterviewQuestion {
+  id         String @id @default(cuid())
+  handoverId String
+  legacyId   String
+  payload    String // JSON: LeaverInterviewQuestion DTO (status + response inside)
+
+  handover Handover @relation(fields: [handoverId], references: [id], onDelete: Cascade)
+
+  @@unique([handoverId, legacyId])
+}
+
+model SuccessorQuery {
+  id         String @id @default(cuid())
+  handoverId String
+  legacyId   String
+  payload    String // JSON: SuccessorQuery DTO (status + resolution inside)
+
+  handover Handover @relation(fields: [handoverId], references: [id], onDelete: Cascade)
+
+  @@unique([handoverId, legacyId])
+}
+
+model SectionState {
+  id         String  @id @default(cuid())
+  handoverId String
+  sectionId  String // decisions | unfinished | ownership | risks
+  isAccepted Boolean @default(false)
+  acceptedAt String?
+  acceptedBy String?
+  queryCount Int     @default(0)
+
+  handover Handover @relation(fields: [handoverId], references: [id], onDelete: Cascade)
+
+  @@unique([handoverId, sectionId])
+}
+
+// ---------- Improvement 3: shared work history ----------
+
+model WorkUpdate {
+  id              String   @id @default(cuid())
+  handoverId      String
+  authorId        String
+  decisionText    String
+  rationale       String
+  nextAction      String
+  sourceReference String // free text, as in Round 2
+  linkedSourceId  String?
+  verification    String? // JSON: { checkedAt, sourceId, isExactMatch, charStart, charEnd } | { state: "no_evidence" | "linked_no_quote" }
+  capturedAt      DateTime @default(now())
+
+  author       User          @relation(fields: [authorId], references: [id])
+  handover     Handover      @relation(fields: [handoverId], references: [id], onDelete: Cascade)
+  linkedSource SourceRecord? @relation(fields: [linkedSourceId], references: [id])
+
+  @@index([handoverId, capturedAt])
+}
+
+model ActivityLog {
+  id         String   @id @default(cuid())
+  handoverId String
+  actorId    String?
+  action     String // enumerated in src/lib/activity.ts
+  detail     String? // JSON
+  createdAt  DateTime @default(now())
+
+  actor    User?    @relation(fields: [actorId], references: [id])
+  handover Handover @relation(fields: [handoverId], references: [id], onDelete: Cascade)
+
+  @@index([handoverId, createdAt])
+}
+
+// ---------- Improvement 2: import jobs ----------
+
+model ImportJob {
+  id          String    @id @default(cuid())
+  handoverId  String
+  startedById String
+  repoOwner   String
+  repoName    String
+  status      String // running | succeeded | failed
+  prCount     Int       @default(0)
+  commitCount Int       @default(0)
+  claimCount  Int       @default(0)
+  error       String?
+  startedAt   DateTime  @default(now())
+  finishedAt  DateTime?
+
+  handover Handover @relation(fields: [handoverId], references: [id], onDelete: Cascade)
+  startedBy User     @relation("ImportJobsStarted", fields: [startedById], references: [id])
+
+  @@index([handoverId, startedAt])
+}

@@ -7,7 +7,7 @@ export const PERSONA_PROFILES: Record<PersonaRole, PersonaProfile> = {
     title: 'Senior Backend Engineer (Successor)',
     clearanceLevel: 'team_internal',
     avatar: '👩🏽‍💻',
-    email: 'priya.sharma@fintrack.internal',
+    email: 'priya.sharma@helios.internal',
   },
   leaver: {
     role: 'leaver',
@@ -15,7 +15,7 @@ export const PERSONA_PROFILES: Record<PersonaRole, PersonaProfile> = {
     title: 'Staff Platform Engineer (Departing)',
     clearanceLevel: 'team_internal',
     avatar: '👨🏻‍💻',
-    email: 'alex.chen@fintrack.internal',
+    email: 'alex.chen@helios.internal',
   },
   lead: {
     role: 'lead',
@@ -23,7 +23,7 @@ export const PERSONA_PROFILES: Record<PersonaRole, PersonaProfile> = {
     title: 'Engineering Director / Lead',
     clearanceLevel: 'confidential_lead',
     avatar: '👨🏽‍💼',
-    email: 'vikram.malhotra@fintrack.internal',
+    email: 'vikram.malhotra@helios.internal',
   },
 }
 

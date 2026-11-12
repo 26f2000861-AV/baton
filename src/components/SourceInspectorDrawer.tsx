@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { X, ShieldCheck, Clock, User } from 'lucide-react'
+import { X, ShieldCheck, Clock, User, ExternalLink } from 'lucide-react'
 import type { Claim, ClearanceLevel } from '@/lib/types'
 import { CLAIM_STATUS_COPY } from '@/lib/claimStatus'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
+import { useHandover } from '@/lib/handoverStore'
 
 interface QuoteCheck {
   isExactMatch: boolean
@@ -29,6 +30,7 @@ export default function SourceInspectorDrawer({
   const [quoteCheck, setQuoteCheck] = useState<QuoteCheck | null>(null)
   const [checkingQuote, setCheckingQuote] = useState(false)
   const [quoteCheckError, setQuoteCheckError] = useState('')
+  const { verifyQuote: verifyViaApi, sources } = useHandover()
 
   useFocusTrap({
     containerRef,
@@ -51,18 +53,14 @@ export default function SourceInspectorDrawer({
     setQuoteCheck(null)
     setQuoteCheckError('')
     try {
-      const response = await fetch('/api/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sourceId: source.sourceId, quoteSnippet: quoteToCheck }),
-      })
-      const payload = await response.json()
-      if (!response.ok) throw new Error(payload.error ?? 'Quote check could not be completed.')
+      const outcome = await verifyViaApi(source.sourceId, quoteToCheck)
+      if (!outcome.ok) throw new Error(outcome.message ?? 'Quote check could not be completed.')
+      const payload = outcome.result as { deterministicCheck?: QuoteCheck }
       const result = payload?.deterministicCheck
       if (!result || typeof result.isExactMatch !== 'boolean' || typeof result.charStart !== 'number' || typeof result.charEnd !== 'number' || typeof result.explanation !== 'string') {
         throw new Error('The verifier returned an unexpected response.')
       }
-      setQuoteCheck(result as QuoteCheck)
+      setQuoteCheck(result)
     } catch (error) {
       setQuoteCheckError(error instanceof Error ? error.message : 'Quote check could not be completed.')
     } finally {
@@ -74,6 +72,8 @@ export default function SourceInspectorDrawer({
 
   const status = CLAIM_STATUS_COPY[claim.status]
   const isExactVerified = claim.status === 'quoted_verified'
+  const sourceMeta = sources.find((meta) => meta.legacyId === source?.sourceId)
+  const isImported = sourceMeta?.origin === 'github_import'
   const verificationMethodLabel = {
     exact_substring_match: 'Text match only',
     llm_entailment: 'Inference · needs review',
@@ -174,7 +174,7 @@ export default function SourceInspectorDrawer({
                 </mark>
               </div>
               <label htmlFor="quote-check-input" className="mt-4 block text-[11px] font-semibold uppercase tracking-wider text-[#6B6B6B]">
-                Check whether this quote appears in the sample source
+                Check whether this quote appears in this handover’s source record
               </label>
               <textarea
                 id="quote-check-input"
@@ -199,7 +199,7 @@ export default function SourceInspectorDrawer({
                 </p>
               )}
               {quoteCheckError && <p className="mt-3 text-xs text-[#f87171]" role="alert">{quoteCheckError}</p>}
-              <p className="mt-2 text-[11px] leading-relaxed text-[#6B6B6B]">This checks the app’s synthetic source corpus. It does not connect to GitHub or update the claim’s status.</p>
+              <p className="mt-2 text-[11px] leading-relaxed text-[#6B6B6B]">{isImported ? 'This checks the text imported from GitHub. It confirms text presence only; it does not prove the full claim is true.' : 'This checks this handover’s stored source text. It confirms text presence only; it does not prove the full claim is true or update the claim’s status.'}</p>
             </div>
           )}
 
@@ -218,8 +218,18 @@ export default function SourceInspectorDrawer({
                 Who can view: <span className="font-medium text-[#0A0A0A]">{clearanceLabel(source.requiredClearanceLevel)}</span>
               </div>
               <div className="pt-2">
-                <span className="block font-medium text-[#0A0A0A]">Illustrative source reference · synthetic, not connected</span>
+                <span className="block font-medium text-[#0A0A0A]">{isImported ? 'Imported source · link back to origin' : 'Illustrative source reference · synthetic, not connected'}</span>
                 <code className="mt-1 block break-all text-[11px]">{source.uri}</code>
+                {source.uri.startsWith('http') && (
+                  <a
+                    href={source.uri}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-[#1D5FBF] underline-offset-2 hover:underline"
+                  >
+                    Open origin <ExternalLink size={11} aria-hidden="true" />
+                  </a>
+                )}
               </div>
             </div>
           )}

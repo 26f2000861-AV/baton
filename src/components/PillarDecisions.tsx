@@ -1,14 +1,24 @@
 'use client'
 
 import { FormEvent, useState } from 'react'
-import { FileText, Check, AlertCircle, ExternalLink, ChevronDown } from 'lucide-react'
-import { ArchitecturalDecision, WorkUpdate } from '@/lib/types'
+import { FileText, Check, AlertCircle, ExternalLink, ChevronDown, ShieldCheck, ShieldAlert } from 'lucide-react'
+import type { ArchitecturalDecision, SourceMeta, WorkUpdate } from '@/lib/types'
+import type { CaptureWorkUpdateInput } from '@/lib/handoverStore'
 
+/**
+ * Decisions pillar + the shared work-history capture form (Improvement 3).
+ * The capture form records entries under the signed-in author and optionally
+ * links evidence: a source record + a quote. The server verifies the quote and
+ * the result is displayed as a separate machine-check block — never merged
+ * with the author's explanation.
+ */
 export default function PillarDecisions({
   decisions,
   workUpdates,
   activeAuthor,
-  storageIssue,
+  syncError,
+  sources,
+  pending,
   onCapture,
   isAccepted,
   onInspect,
@@ -18,8 +28,10 @@ export default function PillarDecisions({
   decisions: ArchitecturalDecision[]
   workUpdates: WorkUpdate[]
   activeAuthor: string
-  storageIssue: boolean
-  onCapture: (update: Omit<WorkUpdate, 'id' | 'capturedBy' | 'capturedAt'>) => void
+  syncError: string | null
+  sources: SourceMeta[]
+  pending: string | null
+  onCapture: (update: CaptureWorkUpdateInput) => Promise<boolean>
   isAccepted: boolean
   onInspect: (claimId: string) => void
   onAccept: () => void
@@ -29,17 +41,38 @@ export default function PillarDecisions({
   const [rationale, setRationale] = useState('')
   const [nextAction, setNextAction] = useState('')
   const [sourceReference, setSourceReference] = useState('')
+  const [linkedSourceId, setLinkedSourceId] = useState('')
+  const [quote, setQuote] = useState('')
   const [savedMessage, setSavedMessage] = useState('')
 
-  const submitWorkUpdate = (event: FormEvent<HTMLFormElement>) => {
+  const linkableSources = sources.filter(
+    (source) => source.requiredClearanceLevel !== 'restricted_hr_legal'
+  )
+
+  const submitWorkUpdate = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!decisionText.trim() || !rationale.trim()) return
-    onCapture({ decisionText, rationale, nextAction, sourceReference })
-    setDecisionText('')
-    setRationale('')
-    setNextAction('')
-    setSourceReference('')
-    setSavedMessage('Saved in this browser. The entry is person-reported, not source-verified.')
+    const ok = await onCapture({
+      decisionText,
+      rationale,
+      nextAction,
+      sourceReference,
+      linkedSourceId: linkedSourceId || null,
+      quote: linkedSourceId ? quote : '',
+    })
+    if (ok) {
+      setDecisionText('')
+      setRationale('')
+      setNextAction('')
+      setSourceReference('')
+      setLinkedSourceId('')
+      setQuote('')
+      setSavedMessage(
+        'Saved to the shared handover history with your name. Linked quotes are machine-checked against the source separately.'
+      )
+    } else {
+      setSavedMessage('')
+    }
   }
 
   return (
@@ -84,7 +117,7 @@ export default function PillarDecisions({
               <div>
                 <div className="flex items-start justify-between gap-3">
                   <span className="rounded bg-[#EEEEEE] px-2 py-0.5 font-mono text-[11px] font-semibold text-[#0A0A0A]">
-                    {d.id === 'dec_01' ? 'ADR-004' : 'COMMIT 8f4a1'}
+                    {d.id === 'dec_01' ? 'ADR-011' : 'COMMIT 77e2d'}
                   </span>
                   <span className="monochrome-pill">
                     {rationaleLabel}
@@ -142,7 +175,7 @@ export default function PillarDecisions({
           )
         })}
 
-        {/* 4,200 tx/sec Benchmark Fact Card - explicitly labeled 'unverified' */}
+        {/* 1.8M active-series Benchmark Fact Card - explicitly labeled 'unverified' */}
         <article className="ledger-panel lg:col-span-2 flex flex-col justify-between transition hover:border-[#0A0A0A]">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
@@ -152,11 +185,11 @@ export default function PillarDecisions({
                 </span>
                 <span className="monochrome-pill">Unverified</span>
               </div>
-              <h3 className="mt-2 text-base font-semibold text-[#0A0A0A]">
-                Payment queue throughput measured at 4,200 transactions per second under simulated load
+              <h3 className="mt-2 text-base font-semibold leading-snug text-[#0A0A0A]">
+                Ingest benchmark sustained 1.8M active series with headroom to 2.4M under simulated load
               </h3>
               <p className="mt-1 text-xs text-[#6B6B6B]">
-                Sample data: Cited in PR #189 summary discussion, but synthetic stress test run logs were uncommitted. Labeled unverified per review rules.
+                Sample data: Cited in the PR #142 summary discussion, but the synthetic stress-test run logs were uncommitted. Labeled unverified per review rules.
               </p>
             </div>
             <button
@@ -173,7 +206,7 @@ export default function PillarDecisions({
             <div className="baton-pass-line">
               <span className="text-xs text-[#6B6B6B]">Paraphrase check required</span>
               <div className="pass-rule" />
-              <span className="evidence-key">pr_189</span>
+              <span className="evidence-key">pr_142</span>
             </div>
           </div>
         </article>
@@ -182,7 +215,7 @@ export default function PillarDecisions({
           <summary className="work-capture-summary">
             <div>
               <h3 id="capture-update-title">Capture a work update</h3>
-              <p className="mt-1 text-xs text-[#8d8d8d]">Optional contributor action · person-reported · saved in this browser</p>
+              <p className="mt-1 text-xs text-[#8d8d8d]">Person-reported · saved to the shared history with your name · optional evidence is machine-checked</p>
             </div>
             <span>Open form <ChevronDown size={16} aria-hidden="true" /></span>
           </summary>
@@ -218,7 +251,7 @@ export default function PillarDecisions({
               />
             </div>
             <div>
-              <label htmlFor="work-update-source">Source reference <span className="work-capture-optional">Optional · not checked</span></label>
+              <label htmlFor="work-update-source">Source reference <span className="work-capture-optional">Optional · free text</span></label>
               <input
                 id="work-update-source"
                 value={sourceReference}
@@ -228,13 +261,45 @@ export default function PillarDecisions({
               />
             </div>
           </div>
+          <div className="work-capture-optional-fields">
+            <div>
+              <label htmlFor="work-update-evidence">Link evidence <span className="work-capture-optional">Optional · machine-checked</span></label>
+              <select
+                id="work-update-evidence"
+                value={linkedSourceId}
+                onChange={(event) => { setLinkedSourceId(event.target.value); if (!event.target.value) setQuote('') }}
+              >
+                <option value="">No linked source</option>
+                {linkableSources.map((source) => (
+                  <option key={source.legacyId} value={source.legacyId}>
+                    {source.legacyId} · {source.title.slice(0, 70)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="work-update-quote">
+                Quote from that source <span className="work-capture-optional">Checked verbatim by the server</span>
+              </label>
+              <textarea
+                id="work-update-quote"
+                value={quote}
+                onChange={(event) => setQuote(event.target.value)}
+                maxLength={8000}
+                rows={2}
+                placeholder={linkedSourceId ? 'Paste the exact text you are citing' : 'Pick a source first'}
+                disabled={!linkedSourceId}
+              />
+            </div>
+          </div>
           <div className="work-capture-submit-row">
-            <p>Recording as {activeAuthor} · sample workspace</p>
-            <button className="primary-action" type="submit" disabled={!decisionText.trim() || !rationale.trim()}>
-              Save update
+            <p>Recording as {activeAuthor} · visible to every member of this handover</p>
+            <button className="primary-action" type="submit" disabled={!decisionText.trim() || !rationale.trim() || pending === 'capture'}>
+              {pending === 'capture' ? 'Saving…' : 'Save update'}
             </button>
           </div>
-          {savedMessage && <p className="work-capture-feedback" role="status">{storageIssue ? 'The update is visible here, but browser storage could not save it. It may be lost after refresh.' : savedMessage}</p>}
+          {savedMessage && <p className="work-capture-feedback" role="status">{savedMessage}</p>}
+          {syncError && <p className="work-capture-feedback" role="alert">The update could not be saved: {syncError}</p>}
         </form>
         </details>
         {workUpdates.length > 0 ? (
@@ -247,15 +312,43 @@ export default function PillarDecisions({
                   <p>{update.rationale}</p>
                   {update.nextAction && <p><strong>Next:</strong> {update.nextAction}</p>}
                   {update.sourceReference && <code className="work-update-reference">{update.sourceReference}</code>}
+                  {update.linkedSource && (
+                    <p className="work-update-linked-source">
+                      Evidence: <code>{update.linkedSource.legacyId}</code>
+                      {update.linkedSource.sourceType.startsWith('github') && update.linkedSource.uri.startsWith('http') && (
+                        <a href={update.linkedSource.uri} target="_blank" rel="noopener noreferrer"> Open on GitHub <ExternalLink size={11} className="inline" aria-hidden="true" /></a>
+                      )}
+                    </p>
+                  )}
+                  {update.verification && (
+                    <div className={`work-update-verification ${update.verification.state === 'checked' ? (update.verification.isExactMatch ? 'verified' : 'failed') : 'neutral'}`} aria-label="Machine verification result">
+                      {update.verification.state === 'checked' && update.verification.isExactMatch && (
+                        <p><ShieldCheck size={12} aria-hidden="true" /> Machine check: quote found verbatim in {update.verification.sourceTitle} (chars {update.verification.charStart}&ndash;{update.verification.charEnd}). Checked automatically &mdash; separate from the author&apos;s words above.</p>
+                      )}
+                      {update.verification.state === 'checked' && !update.verification.isExactMatch && (
+                        <p><ShieldAlert size={12} aria-hidden="true" /> Machine check: quote NOT found verbatim in {update.verification.sourceTitle}. {update.verification.explanation}</p>
+                      )}
+                      {update.verification.state === 'linked_no_quote' && (
+                        <p><ShieldAlert size={12} aria-hidden="true" /> Machine check: source linked, but no quote was provided to verify.</p>
+                      )}
+                      {update.verification.state === 'no_evidence' && (
+                        <p><ShieldAlert size={12} aria-hidden="true" /> No source evidence attached — author-reported only.</p>
+                      )}
+                    </div>
+                  )}
                 </div>
-                <span className="state-label">Person-reported · not source-verified</span>
-                <p className="work-update-author">Recorded by {update.capturedBy}</p>
+                <span className="state-label">
+                  {update.verification?.state === 'checked' && update.verification.isExactMatch
+                    ? 'Author-reported · quote verified'
+                    : 'Person-reported · not source-verified'}
+                </span>
+                <p className="work-update-author">Recorded by {update.author.name}{update.author.githubLogin ? ` (@${update.author.githubLogin})` : ''}</p>
               </article>
             ))}
             {workUpdates.length > 5 && <p className="card-foot">Showing the 5 most recent updates.</p>}
           </div>
         ) : (
-          <p className="work-capture-empty">No work updates have been captured in this sample session.</p>
+          <p className="work-capture-empty">No work updates have been captured on this handover yet.</p>
         )}
       </section>
 

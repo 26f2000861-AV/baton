@@ -39,3 +39,25 @@ next-env.d.ts
 .taste-skill/
 tmp/
 
+
+# round 3 working docs (temp, stripped before submission)
+/.round3/
+
+# sandbox-only artifacts
+/.zscripts/
+/download/
+/skills/
+/db/
+/bun.lock
+/dev.log
+/dev-boot.log
+/Caddyfile
+
+# local env files
+.env
+/upload/
+/tool-results/
+
+# sandbox-only local postgres runtime
+/.localpg/
+/.localpg-runtime/

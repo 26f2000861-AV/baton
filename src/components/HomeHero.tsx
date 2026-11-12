@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useRef } from 'react'
+import { useSession } from 'next-auth/react'
 import InkOrbitHero from '@/components/ui/ink-orbit-hero'
 import BatonMark from '@/components/BatonMark'
 import HeroScrollVideoReveal from '@/components/ui/hero-scroll-video-pin-reveal'
@@ -11,7 +12,11 @@ import { ArrowRight, ShieldCheck, GitPullRequest, FileText } from 'lucide-react'
 
 export default function HomeHero() {
   const router = useRouter()
+  const { status } = useSession()
   const workflowRef = useRef<HTMLElement>(null)
+  const signedIn = status === 'authenticated'
+  const entryHref = signedIn ? '/workspace' : '/signin'
+  const entryLabel = signedIn ? 'Open my workspace' : 'Sign in with GitHub'
 
   const scrollToWorkflow = () => {
     const workflow = workflowRef.current
@@ -34,12 +39,12 @@ export default function HomeHero() {
           <div className="flex min-w-0 items-center gap-3">
             <span className="hidden text-xs text-[#a2a2a2] md:inline">Synthetic data · no live sources</span>
             <Link
-              href="/workspace"
+              href={entryHref}
               className="inline-flex min-h-11 items-center gap-2 border border-[#eeeeee] px-3 text-xs font-semibold text-[#eeeeee] transition-colors hover:bg-[#eeeeee] hover:text-[#0b0b0b] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#c9c9c9] sm:px-4 sm:text-sm"
-              aria-label="Open the synthetic sample workspace"
+              aria-label={signedIn ? 'Open your Baton workspace' : 'Sign in to Baton with GitHub'}
             >
-              <span className="sm:hidden">Open sample</span>
-              <span className="hidden sm:inline">Open sample workspace</span>
+              <span className="sm:hidden">{signedIn ? 'Workspace' : 'Sign in'}</span>
+              <span className="hidden sm:inline">{entryLabel}</span>
               <ArrowRight size={15} aria-hidden="true" />
             </Link>
           </div>
@@ -60,7 +65,7 @@ export default function HomeHero() {
               <span className="font-serif italic font-normal text-[#c9c9c9]">even when ownership changes.</span>
             </span>
             <span className="mt-4 max-w-2xl font-sans text-sm font-normal leading-5 tracking-normal text-[#b8b8b8] sm:text-base">
-              Synthetic sample · GitHub says AWS SQS FIFO; Slack points to RabbitMQ retries.
+              Synthetic sample · GitHub says the VM dual-write is live; Slack shows a dashboard rollback.
             </span>
           </div>
         }
@@ -85,8 +90,8 @@ export default function HomeHero() {
             titleTop="A practical handover for"
             titleAccent={["the work that matters"]}
             description="Review the sample PR and Slack records side by side. Keep the source, conflict, lead rationale, and next owner in one handover."
-            primaryCta="Open sample workspace"
-            onPrimary={() => router.push('/workspace')}
+            primaryCta={entryLabel}
+            onPrimary={() => router.push(entryHref)}
             secondaryCta="See how it works"
             onSecondary={scrollToWorkflow}
             proof={null}
@@ -97,18 +102,18 @@ export default function HomeHero() {
                   <span className="border border-[#5b4725] bg-[#2c2010] px-2 py-1 text-[10px] font-medium text-[#fbbf24]">Needs human review</span>
                 </div>
                 <div>
-                  <h2 className="text-sm font-semibold text-[#eeeeee]">Payment retry routing</h2>
-                  <p className="mt-1 text-xs leading-5 text-[#b8b8b8]">Two project records describe different paths.</p>
+                  <h2 className="text-sm font-semibold text-[#eeeeee]">Metrics read path</h2>
+                  <p className="mt-1 text-xs leading-5 text-[#b8b8b8]">Two project records describe different states.</p>
                 </div>
                 <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-stretch gap-2">
                   <div className="min-w-0 border border-[#303030] bg-[#171717] p-2.5">
-                    <span className="block text-[10px] text-[#a2a2a2]">GitHub PR #204</span>
-                    <strong className="mt-1 block text-xs leading-5 text-[#eeeeee]">AWS SQS FIFO</strong>
+                    <span className="block text-[10px] text-[#a2a2a2]">GitHub PR #155</span>
+                    <strong className="mt-1 block text-xs leading-5 text-[#eeeeee]">VM dual-write live</strong>
                   </div>
                   <span className="self-center font-mono text-[10px] text-[#a2a2a2]" aria-hidden="true">vs</span>
                   <div className="min-w-0 border border-[#303030] bg-[#171717] p-2.5">
-                    <span className="block text-[10px] text-[#a2a2a2]">Slack #payment-eng</span>
-                    <strong className="mt-1 block text-xs leading-5 text-[#eeeeee]">RabbitMQ retries</strong>
+                    <span className="block text-[10px] text-[#a2a2a2]">Slack #helios-eng</span>
+                    <strong className="mt-1 block text-xs leading-5 text-[#eeeeee]">Thanos reads restored</strong>
                   </div>
                 </div>
                 <p className="text-[11px] leading-4 text-[#a2a2a2]">Synthetic records · no connected source systems</p>
@@ -178,13 +183,14 @@ export default function HomeHero() {
 
           <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
             <p className="max-w-xl text-xs leading-5 text-[#8d8d8d]">
-              Walkthrough uses a synthetic sample case. Changes stay in this browser.
+              Walkthrough uses a synthetic sample case, cloned privately for you when you sign in. Your
+              workspace, history and sign-offs are saved on the server — across devices.
             </p>
             <Link
-              href="/workspace"
+              href={entryHref}
               className="inline-flex min-h-11 items-center gap-2 border border-[#eeeeee] px-4 py-2 text-sm font-medium text-[#eeeeee] transition-colors hover:bg-[#eeeeee] hover:text-[#0b0b0b] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#c9c9c9]"
             >
-              Open sample workspace
+              {entryLabel}
               <ArrowRight size={15} aria-hidden="true" />
             </Link>
           </div>

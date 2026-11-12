@@ -91,8 +91,8 @@ export default function PillarRisks({
               <div className="mt-4 grid gap-3 sm:grid-cols-2 text-xs">
                 <div className="rounded-[6px] border border-[#E6E6E6] bg-[#F2F4F7]/60 p-3">
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-[#0A0A0A]">Source A (GitHub PR #204)</span>
-                    <span className="font-mono text-[11px] text-[#6B6B6B]">pr_204</span>
+                    <span className="font-semibold text-[#0A0A0A]">Source A (GitHub PR #155)</span>
+                    <span className="font-mono text-[11px] text-[#6B6B6B]">pr_155</span>
                   </div>
                   <p className="mt-1.5 font-medium text-[#0A0A0A]">
                     {c.sourceA.extractedValue}
@@ -104,8 +104,8 @@ export default function PillarRisks({
 
                 <div className="rounded-[6px] border border-[#E6E6E6] bg-[#F2F4F7]/60 p-3">
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-[#0A0A0A]">Source B (Slack #payment-eng)</span>
-                    <span className="font-mono text-[11px] text-[#6B6B6B]">slack_payment_eng</span>
+                    <span className="font-semibold text-[#0A0A0A]">Source B (Slack #helios-eng)</span>
+                    <span className="font-mono text-[11px] text-[#6B6B6B]">slack_helios</span>
                   </div>
                   <p className="mt-1.5 font-medium text-[#0A0A0A]">
                     {c.sourceB.extractedValue}
@@ -148,20 +148,20 @@ export default function PillarRisks({
           <div className="mt-3 divide-y divide-[#F0F0F0] text-xs">
             <div className="py-2.5 flex flex-wrap items-center justify-between gap-2">
               <div>
-                <p className="font-semibold text-[#0A0A0A]">Thundering herd outage on merchant gateways</p>
-                <p className="text-[#6B6B6B]">Outbound retries lack jitter backoff; failing partner servers will crash upon restart.</p>
+                <p className="font-semibold text-[#0A0A0A]">Cardinality explosion overwrites the ingest ring</p>
+                <p className="text-[#6B6B6B]">Adaptive limiting is stuck in an open PR; a label burst during peak traffic drops series.</p>
               </div>
               <span className="rounded bg-[#EEEEEE] px-2 py-1 font-mono text-[11px] text-[#0A0A0A]">
-                Mitigation: Adopt PR #214
+                Mitigation: Adopt PR #167
               </span>
             </div>
             <div className="py-2.5 flex flex-wrap items-center justify-between gap-2">
               <div>
-                <p className="font-semibold text-[#0A0A0A]">Stripe settlement webhook signature invalidation</p>
-                <p className="text-[#6B6B6B]">Secret key scheduled for bi-annual rotation on Dec 1, 2026. Missed rotation will drop settlements.</p>
+                <p className="font-semibold text-[#0A0A0A]">Grafana org admin token expiry mid-incident</p>
+                <p className="text-[#6B6B6B]">Sole-custodian token scheduled for rotation on Dec 5, 2026. A missed rotation breaks dashboards-as-code sync.</p>
               </div>
               <span className="rounded bg-[#EEEEEE] px-2 py-1 font-mono text-[11px] text-[#0A0A0A]">
-                Mitigation: Secrets Manager rotation on Dec 1
+                Mitigation: Vault rotation on Dec 5
               </span>
             </div>
           </div>

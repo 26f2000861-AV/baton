@@ -36,9 +36,9 @@ export default function ContradictionModal({
 
   const isAlreadySettled = item.status === 'settled_by_human'
   const resolutionLabels = {
-    accept_source_a: 'Accepted Source A · AWS SQS FIFO is primary',
-    accept_source_b: 'Accepted Source B · RabbitMQ is the active fallback',
-    accept_dual_scope: 'Scoped both · SQS FIFO primary, RabbitMQ retry fallback',
+    accept_source_a: 'Accepted Source A · VM dual-write is fully live',
+    accept_source_b: 'Accepted Source B · Thanos still serves dashboard reads',
+    accept_dual_scope: 'Scoped both · VM stays dual-write, Thanos serves reads',
     clarification_note: 'Clarification recorded · source precedence remains open',
   }
 
@@ -135,7 +135,7 @@ export default function ContradictionModal({
                 ? 'Contradiction has been settled.'
                 : canResolve
                   ? 'State why this source is canonical, or clarify if both engines are operating in fallback mode...'
-                  : 'Close this window, switch to the lead preview, then reopen the conflict to record a decision.'
+                  : 'Only the lead seat can record a decision here. The lead can sign in and open this conflict to settle it.'
             }
             rows={2}
             className="mt-2 w-full rounded-[6px] border border-[#D4D4D4] bg-white p-3 text-xs text-[#0A0A0A] placeholder-[#767676] outline-none transition focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 focus-visible:border-[var(--accent)]"
@@ -143,7 +143,7 @@ export default function ContradictionModal({
 
           {!isAlreadySettled && !canResolve && (
             <p className="mt-3 text-xs leading-relaxed text-[#6B6B6B]" role="status">
-              Only the engineering lead can record a resolution in this sample flow. Close this window and switch to the lead preview.
+              Only the engineering lead can record a resolution. Decisions persist in the shared history for every member.
             </p>
           )}
 
@@ -155,7 +155,7 @@ export default function ContradictionModal({
                 className="btn-primary min-hit text-xs focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
               >
                 <Check size={14} />
-                <span>Accept Source A (SQS FIFO)</span>
+                <span>Accept Source A (VM dual-write live)</span>
               </button>
 
               <button
@@ -164,7 +164,7 @@ export default function ContradictionModal({
                 className="btn-primary min-hit text-xs focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
               >
                 <Check size={14} />
-                <span>Accept Source B (RabbitMQ Fallback)</span>
+                <span>Accept Source B (Thanos serves reads)</span>
               </button>
 
               <button
@@ -172,7 +172,7 @@ export default function ContradictionModal({
                 onClick={() => onResolve('accept_dual_scope', note)}
                 className="btn-secondary min-hit text-xs focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
               >
-                <span>Resolve: SQS primary, RabbitMQ retry fallback</span>
+                <span>Resolve: VM dual-write stays, Thanos serves reads</span>
               </button>
             </div>
           )}
@@ -180,7 +180,7 @@ export default function ContradictionModal({
           {isAlreadySettled && (
             <div className="mt-3 flex items-center gap-2 text-xs font-semibold text-[#0A0A0A]">
               <Check size={14} />
-              <span>Decision saved in this browser’s sample state. It is not an audit-grade record.</span>
+              <span>Decision saved to the shared handover history. It is visible to every member.</span>
             </div>
           )}
         </div>}
