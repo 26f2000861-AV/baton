@@ -172,6 +172,8 @@ export interface ImportJobDTO {
   commitCount: number
   claimCount: number
   error: string | null
+  /** How the GitHub REST API was reached for this job (auth fallback chain). */
+  authTier: 'user_oauth' | 'server_pat' | 'public' | null
   startedByName: string | null
   startedAt: string
   finishedAt: string | null

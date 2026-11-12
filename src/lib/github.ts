@@ -25,6 +25,9 @@ const REQUEST_TIMEOUT_MS = 8000
 export { GitHubImportError, parseRepoInput }
 export type { MappedSource, MappedClaim } from './githubMappers'
 
+/** How a GitHub REST call was authenticated (Round 3 fallback chain). */
+export type AuthTier = 'user_oauth' | 'server_pat' | 'public'
+
 interface GhRepo {
   id: number
   full_name: string
@@ -34,6 +37,7 @@ interface GhRepo {
 
 interface FetchOptions {
   token?: string | null
+  tier?: AuthTier
 }
 
 async function githubFetch<T>(path: string, options: FetchOptions = {}): Promise<T> {
@@ -62,15 +66,17 @@ async function githubFetch<T>(path: string, options: FetchOptions = {}): Promise
         )
       }
       if (response.status === 403 || response.status === 429) {
+        const tier: AuthTier = options.tier ?? (options.token ? 'user_oauth' : 'public')
         const resetHeader = response.headers.get('x-ratelimit-reset')
-        if (resetHeader) {
-          const resetAt = new Date(Number(resetHeader) * 1000)
-          throw new GitHubImportError(
-            'RATE_LIMITED',
-            `GitHub rate limit reached for this ${options.token ? 'account' : 'IP address'}. Try again after ${resetAt.toLocaleTimeString()}.`
-          )
-        }
-        throw new GitHubImportError('RATE_LIMITED', 'GitHub refused the request (rate limit or scope issue). Try again shortly.')
+        const resetSuffix = resetHeader
+          ? ` Try again after ${new Date(Number(resetHeader) * 1000).toLocaleTimeString()}.`
+          : ''
+        throw new GitHubImportError(
+          'RATE_LIMITED',
+          tier === 'public'
+            ? `GitHub rate limit reached for this IP address — unauthenticated requests are capped at 60 per hour.${resetSuffix}`
+            : `GitHub rate limit reached for this token (5,000 requests per hour).${resetSuffix}`
+        )
       }
       if (response.status >= 500) {
         lastError = new Error(`GitHub responded with ${response.status}`)
@@ -99,6 +105,7 @@ export interface ImportResult {
   claimCount: number
   unfinishedCount: number
   busiestCommitter: string | null
+  authTier: AuthTier
 }
 
 /** Retrieves the signed-in user's GitHub OAuth token from the Account table. */
@@ -108,6 +115,22 @@ export async function getGithubTokenForUser(userId: string): Promise<string | nu
     orderBy: { createdAt: 'desc' },
   })
   return account?.access_token ?? null
+}
+
+/**
+ * GitHub REST authentication fallback chain (Round 3 promise):
+ *   1. the signed-in user's OAuth token — 5,000 req/h, private repos in scope
+ *   2. the server-level GITHUB_PAT env var — 5,000 req/h, shared for members
+ *      who have not connected GitHub
+ *   3. unauthenticated — 60 req/h, public repositories only
+ * The tier used is recorded on the import job so the panel can show it.
+ */
+export async function resolveGithubAuth(userId: string): Promise<{ token: string | null; tier: AuthTier }> {
+  const userToken = await getGithubTokenForUser(userId)
+  if (userToken) return { token: userToken, tier: 'user_oauth' }
+  const serverPat = process.env.GITHUB_PAT?.trim()
+  if (serverPat) return { token: serverPat, tier: 'server_pat' }
+  return { token: null, tier: 'public' }
 }
 
 export async function runImport(params: {
@@ -129,13 +152,14 @@ export async function runImport(params: {
   })
 
   try {
-    const token = await getGithubTokenForUser(params.userId)
-    const repo = await githubFetch<GhRepo>(`/repos/${owner}/${name}`, { token })
+    const { token, tier: authTier } = await resolveGithubAuth(params.userId)
+    await prisma.importJob.update({ where: { id: importJob.id }, data: { authTier } })
+    const repo = await githubFetch<GhRepo>(`/repos/${owner}/${name}`, { token, tier: authTier })
     const pulls = await githubFetch<GhPull[]>(
       `/repos/${owner}/${name}/pulls?state=all&per_page=30&sort=updated&direction=desc`,
-      { token }
+      { token, tier: authTier }
     )
-    const commits = await githubFetch<GhCommit[]>(`/repos/${owner}/${name}/commits?per_page=50`, { token })
+    const commits = await githubFetch<GhCommit[]>(`/repos/${owner}/${name}/commits?per_page=50`, { token, tier: authTier })
 
     let claimCount = 0
     let unfinishedCount = 0
@@ -258,6 +282,7 @@ export async function runImport(params: {
       claimCount,
       unfinishedCount,
       busiestCommitter,
+      authTier,
     }
     await prisma.importJob.update({
       where: { id: importJob.id },

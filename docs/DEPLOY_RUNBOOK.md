@@ -23,16 +23,22 @@ NEXTAUTH_URL     = https://gitlostbaton.xyz
 NEXTAUTH_SECRET  = <openssl rand -base64 32>
 GITHUB_ID        = <OAuth App Client ID>
 GITHUB_SECRET    = <OAuth App Client Secret>
+GITHUB_PAT       = <optional: read-only PAT, shared import fallback>
 ```
 
 Notes:
 - `GITHUB_ID`/`GITHUB_SECRET` enable the **only** production sign-in: GitHub OAuth.
   They must be present or judges cannot sign in at all.
-- The import engine uses each signed-in user's own GitHub token (stored in the
-  `Account` table by the adapter). No extra token variable is needed. To give
-  headless fallback capacity you may optionally add `GITHUB_TOKEN` (read-only
-  PAT) — the code prefers the user's token and falls back to unauthenticated
-  calls for public repos.
+- The import engine authenticates GitHub REST calls through a three-tier
+  fallback chain (resolved per import, recorded on the import job row):
+    1. the signed-in user's own OAuth token (5,000 req/h) — stored in the
+       `Account` table by the NextAuth adapter;
+    2. `GITHUB_PAT`, an optional server-level read-only token (5,000 req/h),
+       shared across members who have not connected GitHub;
+    3. unauthenticated requests (60 req/h, public repositories only).
+  `GITHUB_PAT` may stay empty — the chain then falls straight from the user's
+  token to the public API. The tier actually used is shown in the import
+  history table in the Sources panel.
 
 ## 3. Database migration (first deploy)
 

@@ -161,6 +161,7 @@ export function serializeImportJob(
     commitCount: row.commitCount,
     claimCount: row.claimCount,
     error: row.error,
+    authTier: (row.authTier as ImportJobDTO['authTier']) ?? null,
     startedByName: row.startedBy?.name ?? row.startedBy?.githubLogin ?? null,
     startedAt: row.startedAt.toISOString(),
     finishedAt: row.finishedAt?.toISOString() ?? null,

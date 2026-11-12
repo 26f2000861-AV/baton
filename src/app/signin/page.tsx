@@ -86,7 +86,7 @@ export default function SignInPage() {
           )}
 
           <ul className="signin-points">
-            <li>Creates your private sample handover on first sign-in</li>
+            <li>Pick your starting point after sign-in — sample handover problems or a real repository</li>
             <li>Your role is assigned on the server — no preview switching</li>
             <li>GitHub imports are read-only, using your consented connection</li>
           </ul>

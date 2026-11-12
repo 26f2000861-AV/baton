@@ -23,8 +23,8 @@ server, Prisma + SQLite dev database; production target Neon Postgres per
 | # | Scenario | Expected | Result |
 |---|---|---|---|
 | 2.1 | Visit `/workspace` signed out | Redirect to `/signin` | PASS |
-| 2.2 | Sign in (dev-local in sandbox; GitHub OAuth in prod) | Role picker on first login | PASS |
-| 2.3 | Create handover from role picker | Server-side membership role assigned | PASS |
+| 2.2 | Sign in (dev-local in sandbox; GitHub OAuth in prod) | First login shows the starting point screen (sample vs real repository) | PASS |
+| 2.3 | Create handover from the starting point screen | Server-side membership role assigned | PASS |
 | 2.4 | Unauthenticated `GET /api/handovers/{id}` | 401 | PASS |
 | 2.5 | Unauthenticated `POST /api/handovers/{id}/import` | 401 | PASS |
 | 2.6 | Successor calls settle endpoint | 403 `FORBIDDEN_ROLE` | PASS |
@@ -48,7 +48,9 @@ server, Prisma + SQLite dev database; production target Neon Postgres per
 | 4.3 | Nonexistent repo (`owner/name` that 404s) | `Repository not found or private` | PASS (unit + route mapping) |
 | 4.4 | Bad repo format | 400 `BAD_REPO_FORMAT` | PASS (unit: `parseRepoInput`) |
 | 4.5 | Imported claims deterministic | Open PRs generate "work in progress" claims via fixed mappers, no LLM | PASS (mapper unit tests) |
-| 4.6 | Leaver seat import attempt | UI hides form; route enforces `lead|successor` | PASS |
+| 4.6 | Leaver seat import attempt | UI hides form; route enforces `lead|successor`; starting point screen disables the leaver seat for real-repo starts with an explanatory note | PASS |
+| 4.7 | Auth fallback chain resolution | user token → `GITHUB_PAT` → unauthenticated; tier recorded per job (`ImportJob.authTier`) and shown in import history | PASS (sandbox row shows `public`, 60 req/h label) |
+| 4.8 | Rate-limited import from the starting point screen | Inline error + "Retry import" / "Open workspace anyway" rescue; failed job visible in Sources on continue | PASS |
 
 ## 5. Shared, verifiable work history (Improvement 3)
 

@@ -4,6 +4,13 @@ import { useState } from 'react'
 import { Download, RefreshCw, AlertCircle, CheckCircle2, ExternalLink } from 'lucide-react'
 import type { ImportJobDTO, SourceMeta, ViewerIdentity } from '@/lib/types'
 
+/** How the import reached GitHub — shown per job so the fallback chain is visible. */
+const TIER_COPY: Record<NonNullable<ImportJobDTO['authTier']>, string> = {
+  user_oauth: 'via your GitHub connection · 5,000 req/h',
+  server_pat: 'via server token · 5,000 req/h',
+  public: 'via public API · 60 req/h',
+}
+
 /**
  * GitHub import panel — Improvement 2.
  * Lead and successor can import pull requests and commits from a real
@@ -74,6 +81,7 @@ export default function ImportPanel({
             </div>
             <p className="import-capability-line">
               Supported: GitHub pull requests &amp; commits (public, or private with the repo scope).
+              Authentication falls back automatically: your GitHub connection → a server token → the public API (60 req/h).
               Not yet supported: GitHub issues, Slack, Linear, Jira.
             </p>
           </form>
@@ -114,7 +122,14 @@ export default function ImportPanel({
                     <td>
                       {job.status === 'failed'
                         ? job.error
-                        : `${job.prCount} PRs · ${job.commitCount} commits · ${job.claimCount} claims`}
+                        : (
+                          <>
+                            {job.prCount} PRs · {job.commitCount} commits · {job.claimCount} claims
+                            {job.authTier && (
+                              <small className="import-tier-line">{TIER_COPY[job.authTier]}</small>
+                            )}
+                          </>
+                        )}
                     </td>
                     <td>{new Date(job.startedAt).toLocaleString()}</td>
                   </tr>
