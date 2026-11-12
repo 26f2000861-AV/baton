@@ -12,13 +12,14 @@ import { prisma } from './db'
  * users sign in with their real GitHub identity; that identity is their seat
  * at the handover table and the token used by the GitHub import engine.
  *
- * Sandbox/local development: when GITHUB_ID / GITHUB_SECRET are not set, a
- * clearly-labeled local dev sign-in replaces the GitHub button so the full
- * authenticated flow can be built and tested before the OAuth app exists.
- * It is NEVER enabled when GITHUB_ID is present.
+ * Non-production local development: when GITHUB_ID / GITHUB_SECRET are not
+ * set, a clearly-labeled local dev sign-in replaces the GitHub button so the
+ * full authenticated flow can be built and tested before the OAuth app exists.
+ * Production never enables the local provider.
  */
 
 const hasGitHubApp = Boolean(process.env.GITHUB_ID && process.env.GITHUB_SECRET)
+const allowDevProvider = process.env.NODE_ENV !== 'production'
 
 // Sandbox/preview resilience: the sandbox boot may rewrite .env and drop
 // NEXTAUTH_SECRET. NextAuth v4 then silently falls back to a RANDOM
@@ -44,12 +45,13 @@ export const authOptions: NextAuthOptions = {
         GitHubProvider({
           clientId: process.env.GITHUB_ID as string,
           clientSecret: process.env.GITHUB_SECRET as string,
-          // read:user is the default public scope — enough for public-repo
-          // imports. Private repos would require the user to grant `repo`.
-          authorization: { params: { scope: 'read:user' } },
+          // The import flow supports private repositories, which require the
+          // repo scope in addition to the user's GitHub identity.
+          authorization: { params: { scope: 'read:user repo' } },
         }),
       ]
-    : [
+    : allowDevProvider
+      ? [
         CredentialsProvider({
           id: 'dev-local',
           name: 'Dev Local Sign-in',
@@ -71,7 +73,8 @@ export const authOptions: NextAuthOptions = {
             })
           },
         }),
-      ],
+      ]
+      : [],
   callbacks: {
     async jwt({ token, user, profile }) {
       if (user) {

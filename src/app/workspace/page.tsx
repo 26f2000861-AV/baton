@@ -15,6 +15,7 @@ import PillarUnfinished from '../../components/PillarUnfinished'
 import PillarOwnership from '../../components/PillarOwnership'
 import PillarRisks from '../../components/PillarRisks'
 import BatonMark from '../../components/BatonMark'
+import WorkspaceLoadingScreen from '../../components/WorkspaceLoadingScreen'
 import ContradictionModal from '../../components/ContradictionModal'
 import LeaverInterviewModal from '../../components/LeaverInterviewModal'
 import ExposureDiffModal from '../../components/ExposureDiffModal'
@@ -128,25 +129,11 @@ export default function WorkspacePage() {
   }, [status, router])
 
   if (status === 'loading' || (booting && !handoverId)) {
-    return (
-      <div className="framed-app framed-app-single" aria-busy="true" aria-label="Loading your handover">
-        <div className="workspace-loading">
-          <BatonMark />
-          <p>Loading your handover…</p>
-        </div>
-      </div>
-    )
+    return <WorkspaceLoadingScreen message="Loading your handover…" />
   }
 
   if (status === 'authenticated' && !handoverId) {
-    return (
-      <div className="framed-app framed-app-single">
-        <div className="workspace-loading">
-          <BatonMark />
-          <p>Preparing your workspace…</p>
-        </div>
-      </div>
-    )
+    return <WorkspaceLoadingScreen message="Preparing your workspace…" />
   }
 
   return (
@@ -408,6 +395,23 @@ function WorkspaceInner({
     lead: visibleClaims.filter((claim) => claim.status === 'confirmed_by_lead').length,
     imported: importedClaimCount,
   }
+  const openUnfinishedCount = unfinished.filter((item) => item.status !== 'adopted').length
+  const confirmedOwnershipCount = ownership.filter((item) => item.proposedSuccessor.approvalState === 'confirmed').length
+  const readinessChecks = [
+    { label: 'Claims reviewed', complete: filterCounts.needs_review === 0 },
+    { label: 'Conflicts settled', complete: openConflictCount === 0 },
+    { label: 'Unfinished work adopted', complete: openUnfinishedCount === 0 },
+    { label: 'Owners confirmed', complete: confirmedOwnershipCount === ownership.length },
+    { label: 'Sections signed off', complete: reviewedCount === 4 },
+  ]
+  const readinessScore = readinessChecks.filter((check) => check.complete).length
+  const evidencePercent = visibleClaims.length === 0 ? 0 : Math.round((exactQuoteCount / visibleClaims.length) * 100)
+  const claimStatusSummary = [
+    { label: 'Needs review', count: filterCounts.needs_review, tone: 'review' },
+    { label: 'Quote found', count: filterCounts.verified, tone: 'verified' },
+    { label: 'Inferred', count: filterCounts.inferred, tone: 'inferred' },
+    { label: 'Conflicting', count: filterCounts.conflict, tone: 'critical' },
+  ]
   const detailedFilters = [
     { id: 'inferred', label: 'Inferred', count: filterCounts.inferred },
     { id: 'unverified', label: 'Unverified', count: filterCounts.unverified },
@@ -545,6 +549,27 @@ function WorkspaceInner({
                 <div className="finding-copy"><span className="section-kicker">{conflictSettled ? 'Decision recorded' : openConflictCount > 0 ? `Start here · ${openConflictCount} open ${openConflictCount === 1 ? 'conflict' : 'conflicts'}` : 'All conflicts reviewed'}</span><h2 id="finding-title">{conflictSettled ? 'Conflict decision recorded for handover' : 'Conflicting records need a decision'}</h2><p>{conflictSettled ? conflictResolutionSummary : 'Two project records describe different states. Review the source and timing before the next owner takes over.'}</p></div>
                 <button className="secondary-action" onClick={() => navigate('risks')}>{conflictSettled ? 'Review decision' : 'Review conflict'}</button>
               </section>
+              <section className="overview-command-center" aria-labelledby="command-center-title">
+                <div className="overview-command-heading">
+                  <div>
+                    <p className="section-kicker">Handover health</p>
+                    <h2 id="command-center-title">Know what blocks the next owner</h2>
+                  </div>
+                  <span className={`readiness-badge ${readinessScore === readinessChecks.length ? 'ready' : ''}`}>
+                    {readinessScore === readinessChecks.length ? 'Ready to transfer' : `${readinessScore}/${readinessChecks.length} checks complete`}
+                  </span>
+                </div>
+                <div className="readiness-track" aria-label={`${readinessScore} of ${readinessChecks.length} readiness checks complete`}>
+                  <span style={{ width: `${(readinessScore / readinessChecks.length) * 100}%` }} />
+                </div>
+                <div className="readiness-checks">
+                  {readinessChecks.map((check) => (
+                    <span className={check.complete ? 'complete' : ''} key={check.label}>
+                      <span aria-hidden="true">{check.complete ? '✓' : '○'}</span>{check.label}
+                    </span>
+                  ))}
+                </div>
+              </section>
               <details className="sample-guide">
                 <summary>How to run this sample</summary>
                 <ol>
@@ -556,8 +581,35 @@ function WorkspaceInner({
                 <p>Sample records are synthetic. Everything you change is saved on the server and shared with every member of this handover.</p>
               </details>
               <section className="metric-strip" aria-label="Handover counts">
-                <Metric label="Claims" value={visibleClaims.length} sub={`${exactQuoteCount} exact quotes found · claims still need review`} /><Metric label="Open conflicts" value={openConflictCount} sub={openConflictCount === 0 ? 'No unresolved conflicts' : `${openConflictCount} ${openConflictCount === 1 ? 'needs' : 'need'} review`} /><Metric label="Unfinished work" value={unfinished.length} sub="Items to pick up" /><Metric label="History entries" value={workUpdates.length} sub="Captured by the team" />
+                <Metric label="Total claims" value={visibleClaims.length} sub={`${filterCounts.needs_review} need review`} />
+                <Metric label="Open conflicts" value={openConflictCount} sub={openConflictCount === 0 ? 'No unresolved conflicts' : 'Need a decision'} />
+                <Metric label="Unfinished work" value={openUnfinishedCount} sub={`${unfinished.length} tracked items`} />
+                <Metric label="Verified evidence" value={exactQuoteCount} sub={`${evidencePercent}% of visible claims`} />
+                <Metric label="Sections signed off" value={reviewedCount} sub="of 4 workflow sections" />
+                <Metric label="History entries" value={workUpdates.length} sub="Captured by the team" />
               </section>
+              <div className="overview-insights">
+                <section className="data-card insight-card" aria-labelledby="claims-health-title">
+                  <div className="card-heading"><div><h2 id="claims-health-title">Evidence coverage</h2><p>Claim status from the current reader view</p></div><span className="insight-total">{visibleClaims.length} total</span></div>
+                  <div className="status-bars">
+                    {claimStatusSummary.map((item) => (
+                      <button key={item.label} className="status-bar-row" onClick={() => { setFilter(item.tone === 'review' ? 'needs_review' : item.tone === 'verified' ? 'verified' : item.tone === 'inferred' ? 'inferred' : 'conflicting'); navigate('claims') }}>
+                        <span className="status-bar-label">{item.label}<strong>{item.count}</strong></span>
+                        <span className="status-bar-track"><span className={`status-bar-fill ${item.tone}`} style={{ width: `${visibleClaims.length ? Math.max(item.count / visibleClaims.length * 100, item.count ? 4 : 0) : 0}%` }} /></span>
+                      </button>
+                    ))}
+                  </div>
+                </section>
+                <section className="data-card insight-card" aria-labelledby="attention-title">
+                  <div className="card-heading"><div><h2 id="attention-title">Needs attention</h2><p>Highest-impact work first</p></div></div>
+                  <div className="attention-list">
+                    {openConflictCount > 0 && <button className="attention-item critical" onClick={() => navigate('risks')}><span className="attention-dot" /><span><strong>{openConflictCount} open {openConflictCount === 1 ? 'conflict' : 'conflicts'}</strong><small>Resolve conflicting source records before transfer.</small></span><span aria-hidden="true">→</span></button>}
+                    {filterCounts.needs_review > 0 && <button className="attention-item review" onClick={() => { setFilter('needs_review'); navigate('claims') }}><span className="attention-dot" /><span><strong>{filterCounts.needs_review} claims need review</strong><small>Confirm the evidence or leave the uncertainty visible.</small></span><span aria-hidden="true">→</span></button>}
+                    {openUnfinishedCount > 0 && <button className="attention-item warning" onClick={() => navigate('unfinished')}><span className="attention-dot" /><span><strong>{openUnfinishedCount} unfinished items</strong><small>Pick up the next action and its known blockers.</small></span><span aria-hidden="true">→</span></button>}
+                    {openConflictCount === 0 && filterCounts.needs_review === 0 && openUnfinishedCount === 0 && <p className="attention-empty">Nothing is blocking the current handover review.</p>}
+                  </div>
+                </section>
+              </div>
               {/* Keep the active conflict beside the evidence at narrower desktop widths. */}
               <div className="overview-grid">
                 <Card title="Claim evidence" action="View claims" onAction={() => navigate('claims')}>

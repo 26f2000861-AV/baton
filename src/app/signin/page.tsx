@@ -8,14 +8,15 @@ import BatonMark from '@/components/BatonMark'
 
 /**
  * Sign-in — Improvement 1 entry point.
- * Production: GitHub OAuth only. Local dev (no GITHUB_ID configured on the
- * server): a clearly-labeled dev sign-in replaces the GitHub button so the
- * authenticated flow can be exercised before the OAuth app exists.
+ * Production: GitHub OAuth only. Non-production local dev (without both
+ * GitHub OAuth credentials): a clearly-labeled dev sign-in replaces the GitHub
+ * button so the authenticated flow can be exercised before the OAuth app exists.
  */
 export default function SignInPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [devMode, setDevMode] = useState(false)
+  const [githubConfigured, setGithubConfigured] = useState(false)
   const [devLogin, setDevLogin] = useState('')
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -29,7 +30,9 @@ export default function SignInPage() {
     fetch('/api/auth/providers')
       .then((response) => response.json())
       .then((providers: Record<string, unknown>) => {
-        setDevMode(!('github' in providers))
+        const configured = 'github' in providers
+        setGithubConfigured(configured)
+        setDevMode(!configured && 'dev-local' in providers)
       })
       .catch(() => setDevMode(false))
   }, [])
@@ -74,7 +77,7 @@ export default function SignInPage() {
                 <button type="submit" className="primary-action">Continue</button>
               </div>
             </form>
-          ) : (
+          ) : githubConfigured ? (
             <button
               type="button"
               className="signin-github-button"
@@ -83,6 +86,11 @@ export default function SignInPage() {
               <Github size={18} aria-hidden="true" />
               Continue with GitHub
             </button>
+          ) : (
+            <p className="signin-dev-note">
+              GitHub sign-in is not configured on this server. Ask the administrator to add the GitHub
+              OAuth application credentials.
+            </p>
           )}
 
           <ul className="signin-points">

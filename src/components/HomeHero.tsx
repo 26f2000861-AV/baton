@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import InkOrbitHero from '@/components/ui/ink-orbit-hero'
-import BatonMark from '@/components/BatonMark'
+import Navbar from '@/components/Navbar'
+import GitHubSignInButton from '@/components/GitHubSignInButton'
 import HeroScrollVideoReveal from '@/components/ui/hero-scroll-video-pin-reveal'
 import PushpinTearFooter from '@/components/ui/pushpin-tear-footer'
 import { ArrowRight, ShieldCheck, GitPullRequest, FileText } from 'lucide-react'
@@ -30,26 +31,7 @@ export default function HomeHero() {
   return (
     <div className="flex min-h-screen flex-col bg-[#0b0b0b] text-[#eeeeee]">
       {/* Brand Navigation Header */}
-      <header className="sticky top-0 z-20 border-b border-[#262626] bg-[#0b0b0b]/85 px-4 py-3 backdrop-blur-md sm:px-6">
-        <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4">
-          <Link href="/" aria-label="Baton Home" className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 transition-transform hover:scale-105">
-            <BatonMark size="medium" />
-            <span className="text-sm font-semibold tracking-normal text-[#eeeeee]">Baton</span>
-          </Link>
-          <div className="flex min-w-0 items-center gap-3">
-            <span className="hidden text-xs text-[#a2a2a2] md:inline">Synthetic data · no live sources</span>
-            <Link
-              href={entryHref}
-              className="inline-flex min-h-11 items-center gap-2 border border-[#eeeeee] px-3 text-xs font-semibold text-[#eeeeee] transition-colors hover:bg-[#eeeeee] hover:text-[#0b0b0b] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#c9c9c9] sm:px-4 sm:text-sm"
-              aria-label={signedIn ? 'Open your Baton workspace' : 'Sign in to Baton with GitHub'}
-            >
-              <span className="sm:hidden">{signedIn ? 'Workspace' : 'Sign in'}</span>
-              <span className="hidden sm:inline">{entryLabel}</span>
-              <ArrowRight size={15} aria-hidden="true" />
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       {/* 1. Scroll Reveal with Center Artifact & Workspace Section */}
       <HeroScrollVideoReveal
@@ -186,13 +168,11 @@ export default function HomeHero() {
               Walkthrough uses a synthetic sample case, cloned privately for you when you sign in. Your
               workspace, history and sign-offs are saved on the server — across devices.
             </p>
-            <Link
+            <GitHubSignInButton
               href={entryHref}
-              className="inline-flex min-h-11 items-center gap-2 border border-[#eeeeee] px-4 py-2 text-sm font-medium text-[#eeeeee] transition-colors hover:bg-[#eeeeee] hover:text-[#0b0b0b] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#c9c9c9]"
-            >
-              {entryLabel}
-              <ArrowRight size={15} aria-hidden="true" />
-            </Link>
+              signedIn={signedIn}
+              entryLabel={entryLabel}
+            />
           </div>
         </div>
       </section>
