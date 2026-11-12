@@ -1,14 +1,17 @@
 /**
  * Embedded Postgres daemon for the Baton sandbox.
- * Data dir: /home/z/my-project/.localpg  (persists across sessions)
+ * Data dir: .localpg  (persists across sessions)
  * Port 5433, user/password baton/baton, database baton.
  * Usage: node scripts/pg-daemon.mjs   (long-running; run with nohup)
  */
 import EmbeddedPostgres from 'embedded-postgres';
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const DATA_DIR = '/home/z/my-project/.localpg';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.resolve(__dirname, '..');
+const DATA_DIR = path.join(ROOT, '.localpg');
 const PORT = 5433;
 
 async function main() {

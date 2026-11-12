@@ -1,7 +1,7 @@
 #!/bin/bash
 # Verification v5 — golden path end + persistence across server restart.
 set -u
-cd /home/z/my-project
+cd "$(dirname "$0")/.."
 
 SECRET=$(grep -E '^NEXTAUTH_SECRET=' .env | cut -d= -f2)
 start_server() {

@@ -3,11 +3,11 @@
  * Uses the TypeScript compiler API directly (no project config, no
  * incremental cache) so swallowed syntax errors surface.
  */
-const ts = require('/home/z/my-project/node_modules/typescript');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const ROOT = '/home/z/my-project';
+const ROOT = path.resolve(__dirname, '..');
+const ts = require('typescript');
 const DIRS = ['src', 'prisma', 'tests'];
 
 function walk(dir, out = []) {
