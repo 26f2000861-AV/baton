@@ -35,7 +35,7 @@ export default function SignInPage() {
   }, [])
 
   return (
-    <div className="framed-app" ref={containerRef}>
+    <div className="framed-app framed-app-single" ref={containerRef}>
       <main className="signin-screen">
         <div className="signin-card">
           <div className="signin-head">

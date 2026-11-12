@@ -129,7 +129,7 @@ export default function WorkspacePage() {
 
   if (status === 'loading' || (booting && !handoverId)) {
     return (
-      <div className="framed-app" aria-busy="true" aria-label="Loading your handover">
+      <div className="framed-app framed-app-single" aria-busy="true" aria-label="Loading your handover">
         <div className="workspace-loading">
           <BatonMark />
           <p>Loading your handover…</p>
@@ -140,7 +140,7 @@ export default function WorkspacePage() {
 
   if (status === 'authenticated' && !handoverId) {
     return (
-      <div className="framed-app">
+      <div className="framed-app framed-app-single">
         <div className="workspace-loading">
           <BatonMark />
           <p>Preparing your workspace…</p>

@@ -41,6 +41,14 @@ a:focus-visible {
 }
 
 .framed-app { display: grid; grid-template-columns: var(--sidebar-width) minmax(0, 1fr); min-height: 100vh; min-height: 100dvh; background: transparent; }
+.framed-app.framed-app-single,
+.framed-app:has(.signin-screen),
+.framed-app:has(.workspace-loading) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
 .sidebar { position: sticky; top: 0; display: flex; flex-direction: column; width: var(--sidebar-width); height: 100vh; height: 100dvh; padding: var(--pad) 16px; background: transparent; }
 .brand-lockup { display: flex; min-height: 48px; align-items: center; gap: 12px; color: var(--text); transition: opacity var(--t-hover) var(--ease-out); cursor: pointer; }
 .brand-lockup:hover { opacity: 0.85; }
@@ -760,7 +768,20 @@ h1 { color: var(--text); font-size: var(--fs-title); font-weight: 600; line-heig
 /* --- Sync error banner + loading states --- */
 .sync-error-banner { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0; padding: 10px 16px; border-bottom: 1px solid #5b3a20; background: #2c2010; color: #f8d28a; font-size: var(--fs-small); }
 .sync-error-banner button { border: 0; background: transparent; color: inherit; cursor: pointer; font-size: 13px; }
-.workspace-loading { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; gap: 14px; min-height: 60vh; color: var(--muted); font-size: var(--fs-small); }
+.workspace-loading {
+  grid-column: 1 / -1;
+  display: flex;
+  flex: 1;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: var(--muted);
+  font-size: var(--fs-small);
+}
 
 /* --- Handover switcher entries --- */
 .handover-switch-link { color: var(--muted); }
@@ -768,8 +789,19 @@ h1 { color: var(--text); font-size: var(--fs-title); font-weight: 600; line-heig
 .handover-switch-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* --- Sign-in + role picker screens --- */
-.signin-screen { display: flex; flex: 1; align-items: center; justify-content: center; padding: 24px; }
-.signin-card { width: min(460px, 100%); padding: 28px; border: 1px solid var(--control); border-radius: var(--radius-card); background: var(--surface); }
+.signin-screen {
+  grid-column: 1 / -1;
+  display: flex;
+  flex: 1;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+}
+.signin-card { width: min(460px, 100%); padding: 28px; border: 1px solid var(--control); border-radius: var(--radius-card); background: var(--surface); box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45); }
 .signin-card-wide { width: min(860px, 100%); }
 .signin-card-compact { display: grid; justify-items: center; gap: 12px; text-align: center; color: var(--muted); font-size: var(--fs-small); }
 .signin-head { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 22px; }

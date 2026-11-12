@@ -183,7 +183,7 @@ export default function StartingPointPage() {
 
   if (checking || status !== 'authenticated') {
     return (
-      <div className="framed-app">
+      <div className="framed-app framed-app-single">
         <main className="signin-screen">
           <div className="signin-card signin-card-compact">
             <BatonMark />
@@ -198,7 +198,7 @@ export default function StartingPointPage() {
   const leaverBlocked = startingPoint === 'real'
 
   return (
-    <div className="framed-app" ref={containerRef} tabIndex={-1}>
+    <div className="framed-app framed-app-single" ref={containerRef} tabIndex={-1}>
       <main className="signin-screen">
         <div className="signin-card signin-card-wide">
           <div className="signin-head">
