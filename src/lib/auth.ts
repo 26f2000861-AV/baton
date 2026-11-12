@@ -20,8 +20,21 @@ import { prisma } from './db'
 
 const hasGitHubApp = Boolean(process.env.GITHUB_ID && process.env.GITHUB_SECRET)
 
+// Sandbox/preview resilience: the sandbox boot may rewrite .env and drop
+// NEXTAUTH_SECRET. NextAuth v4 then silently falls back to a RANDOM
+// per-process secret, so the session JWE encrypted by one dev worker cannot
+// be decrypted by another ("decryption operation failed"). A pinned,
+// dev-only fallback keeps local/preview sessions stable. Production always
+// sets NEXTAUTH_SECRET via Vercel env vars, so this fallback never applies
+// there (and NextAuth still refuses to run without a secret in production).
+const DEV_FALLBACK_SECRET =
+  process.env.NODE_ENV === 'production'
+    ? undefined
+    : 'baton-local-dev-secret-6b1f2e8a9c4d47f0b3a2d5e8c1f09a76'
+
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
+  secret: process.env.NEXTAUTH_SECRET || DEV_FALLBACK_SECRET,
   session: {
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60, // 30 days
