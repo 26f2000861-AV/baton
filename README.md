@@ -1,106 +1,192 @@
 # Baton — Accountable Engineering Handover Platform
 
-> **CodersInPune Hackathon (Round 2 — The Build)**  
+> **CodersInPune Hackathon (Round 3 — The Final Product)**  
 > **Team Name:** GIT LOST  
-> **Team Leader:** Aditya Verma  
-> **Team Member:** Manas  
+> **Team Leader:** Aditya Verma (adityaverma200911@gmail.com)  
+> **Team Member:** Manas Kapoor  
+> **Live Deployed Product:** [https://www.gitlostbaton.xyz](https://www.gitlostbaton.xyz)  
+> **Source Repository:** [https://github.com/26f2000861-AV/baton](https://github.com/26f2000861-AV/baton)  
 > **Core Evaluated Workflow:** *"the decisions already taken, what is still unfinished, who owned what, and where the risk sits — without having to chase anyone."*
 
 ---
 
-## Overview
+## 🚀 Judge & Evaluator Quick Start (1-Click Demo Access)
 
-When software engineers leave an organization, tribal knowledge evaporates. Successors are forced to dig through old pull requests, chat logs, and issue trackers to recover the "why" behind decisions.
+To make evaluation seamless without requiring GitHub OAuth authorization or repository permissions, **pre-configured 1-click demo accounts** are available directly on the sign-in page:
 
-**Baton** is a handover workspace demonstrated with a synthetic case. It groups seeded claims, source excerpts, decisions, unfinished work, ownership, and conflicts so an incoming engineer can review what needs attention. Departing engineers can also capture a decision or change as it happens, with its rationale, next action, and an optional source reference. Captured entries are person-reported and saved only in the current browser. Baton is not a shared database or a production access-control system.
-
-### The Five Core Capabilities
-1. **Seeded claim ledger with quote checking:** A reviewer can check whether edited text appears in the app’s synthetic source corpus. A match confirms text presence only; it does not prove the full claim or change the pre-seeded claim status. There is no live source ingestion.
-2. **In-work decision capture:** Record a decision or change, why it happened, the next action, and an optional source reference; the dated entry appears in the handover history. Entries and references are not source-verified or shared across devices.
-3. **Contradiction Settlement Queue:** Disagreement *is* the product discovery. Cross-source contradictions (e.g. PR #204 claiming AWS SQS vs Slack #payment-eng revealing rollback to RabbitMQ) are surfaced side-by-side for human settlement.
-4. **Leaver interview demo:** Five questions are seeded from sample gaps. Submitting an answer updates a related sample claim to `stated_by_leaver` and records a timestamp in this browser’s local storage.
-5. **Reader-Scoped Demo Views:** Filters the sample claim ledger by the selected demo persona. This is a UI demonstration only: personas are selectable and are not authenticated identities or a security boundary. Do not use real confidential data with this zero-login build. A production deployment must authenticate users and enforce authorization on the server before returning claims or sources.
-6. **Successor review and questions:** A successor can mark sections reviewed, undo a review, and submit claim-linked questions. The lead persona can record a reply. Changes are saved only in this browser; nothing is sent to another person or shared across devices, and no certificate is issued.
-
-The public verifier route performs deterministic text-presence checks only. Model-based entailment is not exposed in the demo.
+1. Open **[https://www.gitlostbaton.xyz/signin](https://www.gitlostbaton.xyz/signin)**.
+2. Click any of the pre-configured role buttons:
+   * **`Successor · Priya Sharma`** (`demo_successor`) — **Recommended for Judges**: Review claims, adopt unfinished work, ask questions, and sign off section-by-section.
+   * **`Lead · Vikram Malhotra`** (`demo_lead`): Settle cross-source contradictions with decision notes, review audit exposure diffs, invite members, and import GitHub repositories.
+   * **`Leaver · Alex Chen`** (`demo_leaver`): Complete the gap-driven exit interview and attest knowledge while still at the organization.
+3. *Alternatively*, use **Continue with GitHub** to authenticate with your real GitHub identity and import live repositories.
 
 ---
 
-## Live Demo & Zero-Sign-in Access
+## 🏆 Round 3 Deliverables — The Three Promised Improvements
 
-Open the [deployed workspace](https://gitlostbaton.xyz/workspace#/) to view a **synthetic FinTrack Payment Core Handover** case. The app has no login. All names, records, conversations, and credentials are fabricated for demonstration; do not treat this app as a secure handover system:
-- **Alex Chen** (Staff Platform Engineer — Departing)
-- **Priya Sharma** (Senior Backend Engineer — Successor)
-- **Vikram Malhotra** (Engineering Director — Lead)
+In Round 2, we committed to three specific improvements for Round 3. Here is how each has been fully delivered:
+
+| Promised in Round 2 | Shipped in Round 3 | Architecture & Verification |
+| :--- | :--- | :--- |
+| **Improvement 1: Persistent, authenticated workspace**<br>Add sign-in, server-side role authorization, and persistent storage for handover records. A successor can return later and see the same state; persona-switch no longer grants access. | **Delivered:** NextAuth v4 (GitHub OAuth + Credentials for judges), PostgreSQL (Neon) via Prisma ORM, strict server-side authorization guards (`requireSession` → `requireMembership` → `requireRole`), and cross-device persistence. Multi-tenant handovers with private clones. | Role is determined server-side from the `Membership` database row. Non-members receive `404 Not Found` (preventing ID enumeration). Try `POST /api/handovers/:id/contradictions/:cid/settle` as a successor → returns `403 Forbidden`. |
+| **Improvement 2: Evidence-backed source import**<br>Add scoped GitHub import for pull requests and commits, map imported records to claims with verifiable excerpts and links back to origin. Surfacing clear import errors and unsupported sources. | **Delivered:** Live GitHub REST import engine (`src/lib/github.ts`, `src/lib/githubMappers.ts`). Merged PRs map to claims with deterministic verbatim excerpts; open PRs map to unfinished work items. Three-tier auth fallback chain (`user_oauth` → `server_pat` → `public`). | Import any repository (e.g. `26f2000861-AV/baton`), inspect job cards in the Sources panel, check origin links to GitHub, and verify character-offset quote matching. |
+| **Improvement 3: Shared, verifiable work history**<br>Extend local capture prototype into a shared, dated team history. Persist entries with author identity, link to imported PRs, and render machine verification separately from author explanations. | **Delivered:** Shared Work History (`src/components/HistoryView.tsx`, `src/app/api/handovers/:id/work-updates`). Author identity attached to every update; character-offset quote checking rendered as a distinct machine-check badge. Activity timeline tracks contradiction settlements, imports, and member updates across devices. | Record a work update in one browser; sign in from another device/browser as another member to see the exact update, linked quote, and audit status. |
 
 ---
 
-## Quick Start (Local Run)
+## 📦 Core Product Capabilities (The 4 Pillars)
 
+Baton organizes tribal engineering knowledge into an inspectable ledger covering four core pillars:
+
+1. **Decisions Already Taken:**
+   * Architectural decisions with recorded choices, alternatives considered, and confidence levels.
+   * In-work decision capture: capture rationale, next actions, and source references while working.
+2. **Unfinished Work & Technical Debt:**
+   * Triage roadmap for the successor's first 30 days.
+   * Successor adoption actions: incoming engineers can adopt open work items directly into their queue.
+   * Automatically triages open pull requests imported from GitHub into unfinished work items.
+3. **Ownership Matrix & Contact Routing:**
+   * Clear asset ownership, proposed successors, transfer target dates, and designated escalation contacts.
+   * Prevents "who owns this service" operational freezes during outages.
+4. **Risk Detection & Contradiction Settlement:**
+   * Disagreement *is* the discovery: surfaces contradictory facts across sources (e.g., code says AWS SQS, chat says rolled back to RabbitMQ).
+   * Leads record authoritative human settlement notes and dual-scope resolutions.
+5. **Gap-Driven Leaver Interview:**
+   * Targeted 5-question interview based on undocumented gaps before the engineer leaves.
+   * Responses update claims to `stated_by_leaver` with full audit timestamps.
+6. **Successor Section Review & Sign-Off:**
+   * Section-by-section acceptance with undo capability.
+   * Contextual question drawer to ask the departing engineer or lead questions before sign-off.
+7. **Deterministic Character-Offset Verifier:**
+   * Standalone verification route (`/api/verify`) that performs exact quote substring extraction with character offsets (`charStart`, `charEnd`). No non-deterministic LLM hallucination in the evidence chain.
+
+---
+
+## 🛠️ Technology Architecture
+
+* **Framework:** Next.js 14 App Router (`src/app`) with React 18 & TypeScript
+* **Database:** PostgreSQL (Neon Serverless Postgres in production)
+* **ORM:** Prisma Client v6 with declarative schema ([prisma/schema.prisma](file:///C:/Users/adity/Downloads/baton/prisma/schema.prisma))
+* **Authentication:** NextAuth.js v4 (GitHub OAuth + JWT session strategy + Demo Credentials)
+* **Styling & UI:** Tailwind CSS, Lucide React icons, Framer Motion
+* **External APIs:** GitHub REST API v3 (octokit-compatible rate limiting, pagination, and multi-tier auth)
+* **Deployment:** Vercel (Edge routing, serverless lambdas in `bom1` region)
+
+```
+┌────────────────────────────────────────────────────────┐
+│                   Next.js 14 Web UI                   │
+│   (Overview · Claims · Decisions · Ownership · Risks)   │
+└───────────────┬────────────────────────┬───────────────┘
+                │                        │
+       NextAuth v4 (JWT)         REST API Routes
+       GitHub OAuth / Demo       (/api/handovers/*)
+                │                        │
+                ▼                        ▼
+┌───────────────────────┐       ┌────────────────────────┐
+│  GitHub REST API v3   │       │   Server Authz Layer   │
+│  (PRs, Commits, Repo) │       │ (Session→Member→Role)  │
+└───────────────────────┘       └───────────┬────────────┘
+                                            │
+                                  Prisma Client v6
+                                            │
+                                            ▼
+                                ┌────────────────────────┐
+                                │   Neon PostgreSQL DB   │
+                                │ (Handovers, Claims,    │
+                                │  Updates, Activity)    │
+                                └────────────────────────┘
+```
+
+---
+
+## 💻 Quick Start (Running Locally)
+
+### Prerequisites
+* Node.js 18.17+ or 20+
+* Git
+* npm or pnpm
+
+### 1. Clone & Install
 ```bash
-# Clone the repository
 git clone https://github.com/26f2000861-AV/baton.git
 cd baton
-
-# Install dependencies
 npm install
+```
 
-# Run the development server
+### 2. Environment Configuration
+Copy `.env.example` to `.env`:
+```bash
+cp .env.example .env
+```
+Fill in the variables in `.env`:
+```ini
+# PostgreSQL connection string (or Neon serverless postgres)
+DATABASE_URL="postgresql://user:password@localhost:5432/baton?sslmode=require"
+
+# NextAuth configuration
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-32-character-secret-here"
+
+# GitHub OAuth App credentials (optional for local demo signin)
+GITHUB_ID=""
+GITHUB_SECRET=""
+
+# Optional GitHub PAT for higher import rate limits (5,000 req/h)
+GITHUB_PAT=""
+```
+
+### 3. Initialize the Database
+```bash
+# Push schema to database and generate Prisma Client
+npx prisma db push
+npx prisma generate
+```
+
+### 4. Run Development Server
+```bash
 npm run dev
 ```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
----
-
-## Project Structure
-
-```
-baton/
-├── src/
-│   ├── app/
-│   │   ├── layout.tsx                # Root layout with Tailwind CSS & typography
-│   │   ├── page.tsx                  # Landing page & interactive ink ledger hero
-│   │   ├── workspace/
-│   │   │   ├── layout.tsx            # Workspace layout wrapper
-│   │   │   └── page.tsx              # Main Handover Dashboard (The 4 Pillars & Persona Switcher)
-│   │   └── api/verify/route.ts       # Deterministic quote check over synthetic sources
-│   ├── components/
-│   │   ├── HomeHero.tsx              # Landing page hero component
-│   │   ├── PillarDecisions.tsx       # Decisions Already Taken timeline
-│   │   ├── PillarUnfinished.tsx      # First 30 Days triage roadmap
-│   │   ├── PillarOwnership.tsx       # Ownership matrix & "Who to Ask" cards
-│   │   ├── PillarRisks.tsx           # Contradiction queue & active hazards
-│   │   ├── SourceInspectorDrawer.tsx # Slide-over raw source viewer
-│   │   ├── LeaverInterviewModal.tsx  # Focused 5-question interview drawer
-│   │   ├── ContradictionModal.tsx    # Side-by-side source diff resolution
-│   │   ├── ExposureDiffModal.tsx     # Lead compliance audit modal
-│   ├── lib/
-│   │   ├── types.ts                  # Shared TypeScript domain models
-│   │   ├── verifier.ts               # Deterministic exact substring matching engine
-│   │   ├── personaCompiler.ts        # Reader-clearance filter & exposure diff
-│   │   └── store.tsx                 # Reactive state store with mutation handlers
-│   └── data/
-│       ├── rawSources.ts             # Raw synthetic GitHub PRs, Slack threads, Linear tickets
-│       └── seedCase.ts               # FinTrack Payment Core pre-seeded claim ledger
-└── docs/                             # Functional specifications & submission deliverables
-```
+Open **[http://localhost:3000](http://localhost:3000)** in your browser. You can immediately click **Judge & Demo Access** on the sign-in page to start evaluating.
 
 ---
 
-## Submission & Documentation
+## 🧪 Testing Suite
 
-The current, factual Round 2 response draft is [`docs/ROUND_2_FORM_RESPONSE_DRAFT.md`](./docs/ROUND_2_FORM_RESPONSE_DRAFT.md). The numbered specifications below are historical planning notes: they describe parts of the original target design, not a complete inventory of shipped features. Some early assumptions and research comparisons in them have not been validated; use the README and running source code for current product behavior.
+Baton includes automated tests for deterministic quote verification, GitHub payload mapping, TypeScript static analysis, and security authorization guards:
 
-Historical planning notes:
-- `docs/00_overview_and_workflow_architecture.md`
-- `docs/01_claim_ledger_and_provenance_engine.md`
-- `docs/02_decisions_and_architecture_rationale.md`
-- `docs/03_unfinished_work_and_technical_debt.md`
-- `docs/04_ownership_matrix_and_contact_routing.md`
-- `docs/05_risk_detection_and_contradiction_queue.md`
-- `docs/06_reader_scoped_compilation_and_privacy.md`
-- `docs/07_gap_driven_leaver_interview.md`
-- `docs/08_successor_acceptance_and_verification.md`
-- `docs/09_why_baton_stands_out_and_differentiation.md`
-- `docs/SUBMISSION_DRAFT.md`
+```bash
+# Run unit test suite (Node test runner)
+npm test
+
+# Run TypeScript compilation check
+npm run typecheck
+
+# Run ESLint check
+npm run lint
+```
+
+Test coverage includes:
+* `tests/verifier.test.mts`: Exact quote substring matching, CRLF normalization, whitespace degradation, and boundary checks.
+* `tests/github-mappers.test.mts`: Pull request & commit DTO mapping, deleted author handling, claim extraction, and open PR triage into work items.
+* Server-side route authorization: `authz.ts` regression checks for 401 unauthenticated, 403 forbidden, and 404 obscure-id responses.
+
+---
+
+## 🗺️ Product Roadmap (Next 12 Months)
+
+* **Phase 1 (Q1): Automated Connectors:** Linear and Jira sync for active work; Slack connector for ephemeral architecture discussions.
+* **Phase 2 (Q2): Knowledge Graphs & Attestation:** Signed cryptographic handover certificates upon full successor acceptance.
+* **Phase 3 (Q3): Identity Provider SCIM:** Automatic handover triggering when offboarding begins in Okta / Google Workspace.
+* **Phase 4 (Q4): Enterprise Compliance:** SOC 2 Type II audit trail export and retention policies.
+
+---
+
+## 📄 Team & Final Submission Details
+
+* **Hackathon:** CodersInPune 2026 (Final Round 3)
+* **Team Name:** GIT LOST
+* **Team Members:**
+  * **Aditya Verma** (Team Leader) — Architecture, full-stack Next.js development, PostgreSQL schema, NextAuth & GitHub integrations.
+  * **Manas Kapoor** — Documentation, testing protocols, and submission proposal.
+* **AI Tool Disclosure:** AI coding assistants (Gemini, Antigravity CLI) were used for boilerplate acceleration, test drafting, and refactoring under full human review.

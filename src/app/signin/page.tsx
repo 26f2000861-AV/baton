@@ -4,16 +4,15 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession, signIn, signOut } from 'next-auth/react'
 import Link from 'next/link'
-import { ArrowRight, ArrowLeft } from 'lucide-react'
+import { ArrowRight, ArrowLeft, Shield, UserCheck, BookOpen, Sparkles } from 'lucide-react'
 
 export default function SignInPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
-  const [devMode, setDevMode] = useState(false)
-  const [githubConfigured, setGithubConfigured] = useState(false)
   const [devLogin, setDevLogin] = useState('')
   const [isHovered, setIsHovered] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -23,9 +22,9 @@ export default function SignInPage() {
         if (err === 'Configuration') {
           setErrorMessage('Server configuration error: check NEXTAUTH_SECRET, GITHUB_ID, and GITHUB_SECRET in Vercel environment variables.')
         } else if (err === 'OAuthCallback') {
-          setErrorMessage('OAuth callback failed: verify that your GitHub authorization callback URL matches your domain, and that the database is reachable.')
+          setErrorMessage('OAuth callback failed: verify that your GitHub authorization callback URL matches your domain, and that the database is reachable. You can also sign in with a demo account below.')
         } else if (err === 'OAuthSignin' || err === 'OAuthCreateAccount') {
-          setErrorMessage('OAuth sign-in failed. Please verify your GitHub OAuth app credentials and try again.')
+          setErrorMessage('OAuth sign-in failed. Please verify your GitHub OAuth app credentials or continue with a demo account below.')
         } else {
           setErrorMessage(`Sign-in error: ${err}`)
         }
@@ -39,16 +38,10 @@ export default function SignInPage() {
     }
   }, [status, router])
 
-  useEffect(() => {
-    fetch('/api/auth/providers')
-      .then((response) => response.json())
-      .then((providers: Record<string, unknown>) => {
-        const configured = 'github' in providers
-        setGithubConfigured(configured)
-        setDevMode(!configured && 'dev-local' in providers)
-      })
-      .catch(() => setDevMode(false))
-  }, [])
+  const handleQuickDemo = (login: string) => {
+    setIsSubmitting(true)
+    signIn('dev-local', { callbackUrl: '/workspace', login })
+  }
 
   return (
     <div className="relative flex min-h-screen min-h-dvh items-center justify-center overflow-hidden bg-[#0a0a0a] px-5 py-8">
@@ -63,14 +56,14 @@ export default function SignInPage() {
       />
 
       {/* Sign-in Card */}
-      <div className="relative z-10 w-full max-w-[480px]">
+      <div className="relative z-10 w-full max-w-[500px]">
         <div className="rounded-[22px] border border-[#2a2a2a] bg-[#141414] px-8 py-10 shadow-[0_16px_48px_rgba(0,0,0,0.55)] sm:px-10 sm:py-12">
           {/* GitHub Octocat Logo */}
-          <div className="mb-8 flex justify-center">
+          <div className="mb-6 flex justify-center">
             <svg
               viewBox="0 0 98 96"
-              width="48"
-              height="48"
+              width="44"
+              height="44"
               xmlns="http://www.w3.org/2000/svg"
               fill="white"
               aria-label="GitHub"
@@ -84,13 +77,13 @@ export default function SignInPage() {
           </div>
 
           {/* Heading */}
-          <h1 className="mb-3 text-center text-[26px] font-bold tracking-tight text-white sm:text-[28px]">
-            Sign in to GitHub
+          <h1 className="mb-2 text-center text-[26px] font-bold tracking-tight text-white sm:text-[28px]">
+            Sign in to Baton
           </h1>
 
           {/* Description */}
-          <p className="mx-auto mb-9 max-w-[340px] text-center text-[13.5px] leading-[1.65] text-zinc-400">
-            GitHub verifies your identity and helps you access your repositories, issues, and more.
+          <p className="mx-auto mb-7 max-w-[360px] text-center text-[13px] leading-[1.6] text-zinc-400">
+            Sign in with GitHub for live repository imports, or choose a 1-click demo account below.
           </p>
 
           {/* Error Banner */}
@@ -100,81 +93,140 @@ export default function SignInPage() {
             </div>
           )}
 
-          {/* Auth section */}
-          {devMode ? (
+          {/* Primary Option: Continue with GitHub */}
+          <button
+            type="button"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            onClick={() => signIn('github', { callbackUrl: '/workspace' })}
+            className="group relative flex w-full items-center justify-center gap-3 rounded-[14px] border border-[#3a3a3a] bg-transparent px-5 py-3.5 text-[15px] font-semibold text-white transition-all duration-[250ms] ease-out hover:scale-[1.01] hover:border-white hover:bg-white hover:text-black hover:shadow-[0_4px_16px_rgba(255,255,255,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#141414] active:scale-[0.99]"
+            aria-label="Continue with GitHub"
+          >
+            <svg
+              viewBox="0 0 98 96"
+              width="20"
+              height="20"
+              xmlns="http://www.w3.org/2000/svg"
+              className="transition-[fill] duration-[250ms]"
+              style={{ fill: isHovered ? '#000' : '#fff' }}
+              aria-hidden="true"
+            >
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z"
+              />
+            </svg>
+
+            <span>Continue with GitHub</span>
+
+            <ArrowRight
+              size={16}
+              className="absolute right-5 text-[#666] transition-all duration-[250ms] ease-out group-hover:translate-x-0.5 group-hover:text-black"
+              aria-hidden="true"
+            />
+          </button>
+
+          {/* Divider with "or demo account" */}
+          <div className="my-6 flex items-center gap-3">
+            <div className="h-px flex-1 bg-[#252525]" />
+            <span className="select-none text-[11px] font-medium uppercase tracking-wider text-zinc-500">
+              or evaluate with demo account
+            </span>
+            <div className="h-px flex-1 bg-[#252525]" />
+          </div>
+
+          {/* Judge & Evaluator 1-Click Access Card */}
+          <div className="rounded-xl border border-zinc-800 bg-[#0d0d0d] p-4 text-left">
+            <div className="mb-3 flex items-center justify-between">
+              <span className="flex items-center gap-1.5 text-xs font-semibold text-zinc-200">
+                <Sparkles size={13} className="text-amber-400" />
+                Hackathon Judge & Demo Access
+              </span>
+              <span className="rounded-full bg-emerald-950/80 px-2 py-0.5 text-[10px] font-medium text-emerald-400 border border-emerald-800/40">
+                1-Click Sign-in
+              </span>
+            </div>
+            <p className="mb-3 text-[11px] leading-relaxed text-zinc-400">
+              Instant access without GitHub authorization. Full authenticated database session with pre-seeded claims:
+            </p>
+
+            <div className="grid gap-2">
+              <button
+                type="button"
+                disabled={isSubmitting}
+                onClick={() => handleQuickDemo('demo_successor')}
+                className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-900/80 px-3 py-2 text-left text-xs font-medium text-zinc-100 transition-colors hover:border-zinc-700 hover:bg-zinc-800 focus:outline-none"
+              >
+                <div className="flex items-center gap-2">
+                  <UserCheck size={14} className="text-emerald-400" />
+                  <div>
+                    <div className="font-semibold text-zinc-100">Successor · Priya Sharma</div>
+                    <div className="text-[10px] text-zinc-400">Review claims, adopt work & section sign-off (Recommended)</div>
+                  </div>
+                </div>
+                <ArrowRight size={13} className="text-zinc-500" />
+              </button>
+
+              <button
+                type="button"
+                disabled={isSubmitting}
+                onClick={() => handleQuickDemo('demo_lead')}
+                className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-900/80 px-3 py-2 text-left text-xs font-medium text-zinc-100 transition-colors hover:border-zinc-700 hover:bg-zinc-800 focus:outline-none"
+              >
+                <div className="flex items-center gap-2">
+                  <Shield size={14} className="text-sky-400" />
+                  <div>
+                    <div className="font-semibold text-zinc-100">Lead · Vikram Malhotra</div>
+                    <div className="text-[10px] text-zinc-400">Settle contradictions, review audit exposure & manage team</div>
+                  </div>
+                </div>
+                <ArrowRight size={13} className="text-zinc-500" />
+              </button>
+
+              <button
+                type="button"
+                disabled={isSubmitting}
+                onClick={() => handleQuickDemo('demo_leaver')}
+                className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-900/80 px-3 py-2 text-left text-xs font-medium text-zinc-100 transition-colors hover:border-zinc-700 hover:bg-zinc-800 focus:outline-none"
+              >
+                <div className="flex items-center gap-2">
+                  <BookOpen size={14} className="text-amber-400" />
+                  <div>
+                    <div className="font-semibold text-zinc-100">Leaver · Alex Chen</div>
+                    <div className="text-[10px] text-zinc-400">Answer gap-driven exit interview & attest knowledge</div>
+                  </div>
+                </div>
+                <ArrowRight size={13} className="text-zinc-500" />
+              </button>
+            </div>
+
+            {/* Custom Demo Username Input */}
             <form
-              className="grid gap-3"
+              className="mt-3.5 flex gap-2 border-t border-zinc-800/80 pt-3"
               onSubmit={(event) => {
                 event.preventDefault()
-                signIn('dev-local', { callbackUrl: '/workspace', login: devLogin || 'dev_user' })
+                handleQuickDemo(devLogin || 'judge')
               }}
             >
-              <label htmlFor="dev-login" className="text-xs font-semibold text-[#e0e0e0]">
-                Local development sign-in
-              </label>
-              <p className="m-0 text-[11px] leading-relaxed text-zinc-400">
-                GitHub OAuth is not configured on this server yet, so a local dev identity is offered
-                instead. This is never shown when the GitHub app is configured.
-              </p>
-              <div className="flex gap-2">
-                <input
-                  id="dev-login"
-                  value={devLogin}
-                  onChange={(event) => setDevLogin(event.target.value)}
-                  placeholder="e.g. dev_lead"
-                  maxLength={39}
-                  autoComplete="off"
-                  className="min-h-[44px] flex-1 rounded-xl border border-[#2a2a2a] bg-[#0a0a0a] px-3 text-sm text-white placeholder:text-zinc-500 focus:border-[#555] focus:outline-none"
-                />
-                <button
-                  type="submit"
-                  className="min-h-[44px] rounded-xl bg-white px-5 text-sm font-semibold text-black transition-opacity hover:opacity-90"
-                >
-                  Continue
-                </button>
-              </div>
-            </form>
-          ) : githubConfigured ? (
-            <button
-              type="button"
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-              onClick={() => signIn('github', { callbackUrl: '/workspace' })}
-              className="group relative flex w-full items-center justify-center gap-3 rounded-[14px] border border-[#3a3a3a] bg-transparent px-5 py-3.5 text-[15px] font-semibold text-white transition-all duration-[250ms] ease-out hover:scale-[1.01] hover:border-white hover:bg-white hover:text-black hover:shadow-[0_4px_16px_rgba(255,255,255,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#141414] active:scale-[0.99]"
-              aria-label="Continue with GitHub"
-            >
-              {/* GitHub icon — transitions to black on hover */}
-              <svg
-                viewBox="0 0 98 96"
-                width="20"
-                height="20"
-                xmlns="http://www.w3.org/2000/svg"
-                className="transition-[fill] duration-[250ms]"
-                style={{ fill: isHovered ? '#000' : '#fff' }}
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z"
-                />
-              </svg>
-
-              <span>Continue with GitHub</span>
-
-              {/* Arrow — slides right on hover */}
-              <ArrowRight
-                size={16}
-                className="absolute right-5 text-[#666] transition-all duration-[250ms] ease-out group-hover:translate-x-0.5 group-hover:text-black"
-                aria-hidden="true"
+              <input
+                id="dev-login"
+                value={devLogin}
+                onChange={(event) => setDevLogin(event.target.value)}
+                placeholder="or custom login: e.g. judge"
+                maxLength={39}
+                autoComplete="off"
+                className="h-8 flex-1 rounded-lg border border-zinc-800 bg-black/60 px-2.5 text-xs text-white placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none"
               />
-            </button>
-          ) : (
-            <p className="m-0 rounded-xl border border-[#2a2a2a] bg-[#0f0f0f] p-4 text-center text-[12px] leading-relaxed text-zinc-400">
-              GitHub sign-in is not configured on this server. Ask the administrator to add the
-              GitHub OAuth application credentials.
-            </p>
-          )}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="h-8 rounded-lg bg-zinc-800 px-3 text-xs font-medium text-zinc-200 transition-colors hover:bg-zinc-700"
+              >
+                Sign in
+              </button>
+            </form>
+          </div>
 
           {/* Signed-in user: sign out first */}
           {session && (
@@ -187,25 +239,16 @@ export default function SignInPage() {
             </button>
           )}
 
-          {/* Divider with "or" */}
-          <div className="my-7 flex items-center gap-4">
-            <div className="h-px flex-1 bg-[#2a2a2a]" />
-            <span className="select-none text-[12px] font-medium text-zinc-400">or</span>
-            <div className="h-px flex-1 bg-[#2a2a2a]" />
-          </div>
-
           {/* Back to landing page */}
-          <Link
-            href="/"
-            className="group flex items-center justify-center gap-2 text-[13px] text-zinc-400 transition-colors duration-200 hover:text-white"
-          >
-            <ArrowLeft
-              size={14}
-              className="transition-transform duration-200 group-hover:-translate-x-0.5"
-              aria-hidden="true"
-            />
-            <span>Back to the landing page</span>
-          </Link>
+          <div className="mt-6 text-center">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1.5 text-xs text-zinc-500 transition-colors duration-200 hover:text-zinc-300"
+            >
+              <ArrowLeft size={13} />
+              <span>Back to the landing page</span>
+            </Link>
+          </div>
         </div>
       </div>
     </div>

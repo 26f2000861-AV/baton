@@ -59,7 +59,7 @@ const STARTING_POINTS: { id: StartingPoint; title: string; description: string; 
  * fallback chain (your GitHub connection → a server token → the public API).
  */
 export default function StartingPointPage() {
-  const { status } = useSession()
+  const { data: session, status } = useSession()
   const router = useRouter()
   const [startingPoint, setStartingPoint] = useState<StartingPoint>('sample')
   const [role, setRole] = useState<PersonaRole>('successor')
@@ -84,11 +84,19 @@ export default function StartingPointPage() {
         if (payload.handovers && payload.handovers.length > 0) {
           router.replace(`/workspace?h=${payload.handovers[0].id}`)
         } else {
+          const login = session?.user?.githubLogin || ''
+          if (login.includes('lead')) {
+            setRole('lead')
+          } else if (login.includes('leaver')) {
+            setRole('leaver')
+          } else {
+            setRole('successor')
+          }
           setChecking(false)
         }
       })
       .catch(() => setChecking(false))
-  }, [status, router])
+  }, [status, session, router])
 
   const selectStartingPoint = (point: StartingPoint) => {
     setStartingPoint(point)

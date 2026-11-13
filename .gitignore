@@ -38,6 +38,7 @@ next-env.d.ts
 .impeccable/
 .taste-skill/
 tmp/
+scripts/run-sql.mjs
 
 
 # round 3 working docs (temp, stripped before submission)

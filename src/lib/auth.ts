@@ -61,41 +61,55 @@ export const authOptions: NextAuthOptions = {
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
-  providers: hasGitHubApp
-    ? [
-        GitHubProvider({
-          clientId: githubId as string,
-          clientSecret: githubSecret as string,
-          // The import flow supports private repositories, which require the
-          // repo scope in addition to the user's GitHub identity.
-          authorization: { params: { scope: 'read:user repo' } },
-        }),
-      ]
-    : allowDevProvider
+  providers: [
+    ...(hasGitHubApp
       ? [
-        CredentialsProvider({
-          id: 'dev-local',
-          name: 'Dev Local Sign-in',
-          credentials: {
-            login: { label: 'Dev username', type: 'text', placeholder: 'e.g. dev_lead' },
+          GitHubProvider({
+            clientId: githubId as string,
+            clientSecret: githubSecret as string,
+            // The import flow supports private repositories, which require the
+            // repo scope in addition to the user's GitHub identity and email.
+            authorization: { params: { scope: 'read:user user:email repo' } },
+          }),
+        ]
+      : []),
+    CredentialsProvider({
+      id: 'dev-local',
+      name: 'Demo & Judge Sign-in',
+      credentials: {
+        login: { label: 'Demo username', type: 'text', placeholder: 'e.g. demo_successor' },
+      },
+      async authorize(credentials) {
+        const raw = (credentials?.login ?? '').trim().toLowerCase()
+        const login = /^[-_a-z0-9]{1,39}$/.test(raw) ? raw : 'demo_successor'
+
+        const DEMO_PROFILES: Record<string, { name: string; email: string }> = {
+          demo_successor: { name: 'Priya Sharma (Successor)', email: 'priya.successor@gitlostbaton.xyz' },
+          demo_lead: { name: 'Vikram Malhotra (Lead)', email: 'vikram.lead@gitlostbaton.xyz' },
+          demo_leaver: { name: 'Alex Chen (Leaver)', email: 'alex.leaver@gitlostbaton.xyz' },
+          judge: { name: 'Hackathon Judge', email: 'judge@gitlostbaton.xyz' },
+          dev_user: { name: 'Dev User', email: 'dev_user@gitlostbaton.xyz' },
+          dev_lead: { name: 'Dev Lead', email: 'dev_lead@gitlostbaton.xyz' },
+        }
+
+        const profile = DEMO_PROFILES[login] || {
+          name: `Judge ${login.replace(/^demo_/, '')}`,
+          email: `${login}@gitlostbaton.xyz`,
+        }
+
+        // Reuse (or create) a local demo user so repeat sign-ins keep state.
+        const existing = await prisma.user.findUnique({ where: { githubLogin: login } })
+        if (existing) return existing
+        return prisma.user.create({
+          data: {
+            name: profile.name,
+            githubLogin: login,
+            email: profile.email,
           },
-          async authorize(credentials) {
-            const raw = (credentials?.login ?? '').trim().toLowerCase()
-            const login = /^[-_a-z0-9]{1,39}$/.test(raw) ? raw : 'dev_user'
-            // Reuse (or create) a local dev user so repeat sign-ins keep state.
-            const existing = await prisma.user.findUnique({ where: { githubLogin: login } })
-            if (existing) return existing
-            return prisma.user.create({
-              data: {
-                name: `Dev ${login.replace(/^dev_/, '')}`,
-                githubLogin: login,
-                email: `${login}@dev.local`,
-              },
-            })
-          },
-        }),
-      ]
-      : [],
+        })
+      },
+    }),
+  ],
   callbacks: {
     async jwt({ token, user, profile }) {
       if (user) {
