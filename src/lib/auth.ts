@@ -55,6 +55,7 @@ const DEV_FALLBACK_SECRET =
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
+  debug: true,
   secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET || DEV_FALLBACK_SECRET,
   session: {
     strategy: 'jwt',
