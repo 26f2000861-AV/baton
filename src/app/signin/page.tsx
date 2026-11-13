@@ -43,7 +43,7 @@ export default function SignInPage() {
 
   const handleQuickDemo = (login: string) => {
     setIsSubmitting(true)
-    signIn('dev-local', { callbackUrl: '/workspace', login })
+    signIn('dev-local', { callbackUrl: '/workspace?h=cmwfhxecd000wic08eyrzbv5d', login })
   }
 
   return (

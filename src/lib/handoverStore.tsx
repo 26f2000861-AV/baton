@@ -130,8 +130,16 @@ export function HandoverProvider({
   const [loading, setLoading] = useState<boolean>(Boolean(handoverId))
   const [pending, setPending] = useState<string | null>(null)
   const [syncError, setSyncError] = useState<string | null>(null)
+  const [trackedId, setTrackedId] = useState<string | null>(handoverId)
   const handoverIdRef = useRef(handoverId)
   handoverIdRef.current = handoverId
+
+  if (handoverId !== trackedId) {
+    setTrackedId(handoverId)
+    if (handoverId) {
+      setLoading(true)
+    }
+  }
 
   const hydrate = useCallback(async (id: string) => {
     setLoading(true)

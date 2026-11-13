@@ -164,7 +164,7 @@ function WorkspaceLoader({
 }) {
   const { state, loading, syncError } = useHandover()
 
-  if (status === 'loading' || booting || !activeHandoverId || (loading && !state)) {
+  if (status === 'loading' || booting || (!state && !syncError)) {
     return <WorkspaceLoadingScreen message="Loading your handover…" />
   }
 
