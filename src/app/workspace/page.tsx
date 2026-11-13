@@ -27,7 +27,7 @@ import MembersPanel from '../../components/MembersPanel'
 import NewHandoverModal from '../../components/NewHandoverModal'
 import { HandoverProvider, useHandover } from '../../lib/handoverStore'
 import { CLAIM_STATUS_COPY } from '../../lib/claimStatus'
-import type { PersonaRole, SuccessorQuery } from '../../lib/types'
+import type { HandoverState, PersonaRole, SuccessorQuery } from '../../lib/types'
 
 const routes = [
   { id: 'overview', label: 'Overview', hash: '#/', icon: LayoutDashboard },
@@ -70,7 +70,12 @@ interface HandoverSummary {
 export default function WorkspacePage() {
   const { data: session, status } = useSession()
   const router = useRouter()
-  const [handoverId, setHandoverId] = useState<string | null>(null)
+  const [handoverId, setHandoverId] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      return new URLSearchParams(window.location.search).get('h')
+    }
+    return null
+  })
   const [handovers, setHandovers] = useState<HandoverSummary[]>([])
   const [booting, setBooting] = useState(true)
 
@@ -128,13 +133,11 @@ export default function WorkspacePage() {
     }
   }, [status, router])
 
-  if (status === 'loading' || booting || !handoverId) {
-    return <WorkspaceLoadingScreen message="Loading your handover…" />
-  }
-
   return (
     <HandoverProvider handoverId={handoverId}>
-      <WorkspaceInner
+      <WorkspaceLoader
+        status={status}
+        booting={booting}
         handovers={handovers}
         activeHandoverId={handoverId}
         onSwitchHandover={switchHandover}
@@ -144,19 +147,85 @@ export default function WorkspacePage() {
   )
 }
 
-function WorkspaceInner({
+function WorkspaceLoader({
+  status,
+  booting,
   handovers,
   activeHandoverId,
   onSwitchHandover,
   sessionName,
 }: {
+  status: 'loading' | 'authenticated' | 'unauthenticated'
+  booting: boolean
+  handovers: HandoverSummary[]
+  activeHandoverId: string | null
+  onSwitchHandover: (id: string) => void
+  sessionName: string | null
+}) {
+  const { state, loading, syncError } = useHandover()
+
+  if (status === 'loading' || booting || !activeHandoverId || (loading && !state)) {
+    return <WorkspaceLoadingScreen message="Loading your handover…" />
+  }
+
+  if (!state) {
+    return (
+      <div className="framed-app framed-app-single workspace-loading-shell" role="status">
+        <div className="workspace-loading" style={{ minHeight: 'auto', gap: 18 }}>
+          <div className="workspace-loading-logo">
+            <BatonMark size="medium" />
+          </div>
+          <div className="workspace-loading-copy">
+            <p style={{ fontSize: 18, color: 'var(--text)' }}>Handover Not Found</p>
+            <span className="workspace-loading-subtitle">
+              {syncError || 'This handover could not be loaded or may have been removed.'}
+            </span>
+          </div>
+          <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+            <button
+              type="button"
+              className="primary-action"
+              onClick={() => {
+                window.location.href = '/workspace'
+              }}
+            >
+              Go to my handovers
+            </button>
+            <Link href="/" className="secondary-action">
+              Landing page
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <WorkspaceInner
+      state={state}
+      handovers={handovers}
+      activeHandoverId={activeHandoverId}
+      onSwitchHandover={onSwitchHandover}
+      sessionName={sessionName}
+    />
+  )
+}
+
+function WorkspaceInner({
+  state,
+  handovers,
+  activeHandoverId,
+  onSwitchHandover,
+  sessionName,
+}: {
+  state: HandoverState
   handovers: HandoverSummary[]
   activeHandoverId: string | null
   onSwitchHandover: (id: string) => void
   sessionName: string | null
 }) {
   const {
-    state, loading, pending, syncError, clearSyncError, viewer, visibleClaims, withheldCount, withheldDetails,
+    loading, pending, syncError, clearSyncError, viewer, visibleClaims, withheldCount, withheldDetails,
     decisions, workUpdates, unfinished, ownership, contradictions, questions, queries, sectionStates,
     answerInterviewQuestion, resolveContradiction, adoptUnfinishedItem, acceptSection, undoSectionAcceptance,
     submitSuccessorQuery, resolveSuccessorQuery, captureWorkUpdate, resetHandover, runImport, inviteMember,
@@ -488,42 +557,6 @@ function WorkspaceInner({
       </div>
     </>
   )
-
-  if (loading && !state) {
-    return <WorkspaceLoadingScreen message="Loading your handover…" />
-  }
-
-  if (!state) {
-    return (
-      <div className="framed-app framed-app-single workspace-loading-shell" role="status">
-        <div className="workspace-loading" style={{ minHeight: 'auto', gap: 18 }}>
-          <div className="workspace-loading-logo">
-            <BatonMark size="medium" />
-          </div>
-          <div className="workspace-loading-copy">
-            <p style={{ fontSize: 18, color: 'var(--text)' }}>Handover Not Found</p>
-            <span className="workspace-loading-subtitle">
-              {syncError || 'This handover could not be loaded or may have been removed.'}
-            </span>
-          </div>
-          <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
-            <button
-              type="button"
-              className="primary-action"
-              onClick={() => {
-                window.location.href = '/workspace'
-              }}
-            >
-              Go to my handovers
-            </button>
-            <Link href="/" className="secondary-action">
-              Landing page
-            </Link>
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="framed-app">
