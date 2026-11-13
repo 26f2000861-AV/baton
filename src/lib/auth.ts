@@ -146,6 +146,7 @@ export const authOptions: NextAuthOptions = {
           GitHubProvider({
             clientId: githubId as string,
             clientSecret: githubSecret as string,
+            issuer: 'https://github.com/login/oauth',
             // The import flow supports private repositories, which require the
             // repo scope in addition to the user's GitHub identity and email.
             authorization: { params: { scope: 'read:user user:email repo' } },
