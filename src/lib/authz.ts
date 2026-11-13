@@ -94,6 +94,15 @@ export function authzErrorResponse(error: unknown): NextResponse {
       { status: error.status }
     )
   }
+  // Allow Next.js internal control-flow exceptions (e.g. dynamic bail-out during static prerendering) to bubble up
+  if (
+    error &&
+    typeof error === 'object' &&
+    'digest' in error &&
+    (error as { digest?: string }).digest === 'DYNAMIC_SERVER_USAGE'
+  ) {
+    throw error
+  }
   console.error('[api] unexpected error', error)
   return NextResponse.json(
     { error: { code: 'INTERNAL', message: 'Something went wrong. Please try again.' } },

@@ -4,6 +4,8 @@ import { createHandover, listHandoversForUser, logActivity } from '@/lib/handove
 import { ACTIVITY_ACTIONS } from '@/lib/activity'
 import type { PersonaRole } from '@/lib/types'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     const session = await requireSession()
