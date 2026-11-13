@@ -42,8 +42,7 @@ a:focus-visible {
 
 .framed-app { display: grid; grid-template-columns: var(--sidebar-width) minmax(0, 1fr); min-height: 100vh; min-height: 100dvh; background: transparent; }
 .framed-app.framed-app-single,
-.framed-app:has(.signin-screen),
-.framed-app:has(.workspace-loading) {
+.framed-app:has(.signin-screen) {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -91,7 +90,10 @@ a:focus-visible {
 .icon-action, .mobile-menu-button { display: inline-flex; width: 44px; height: 44px; align-items: center; justify-content: center; border: 1px solid transparent; border-radius: var(--radius-control); background: transparent; color: var(--muted); transition: background-color var(--t-ui) var(--ease-out), color var(--t-ui) var(--ease-out); }
 .icon-action:hover, .mobile-menu-button:hover { border-color: var(--control); background: var(--surface); color: var(--text); }
 .mobile-menu-button, .mobile-action, .mobile-menu { display: none; }
-.sheet { min-height: calc(100vh - 48px - var(--sheet-inset)); margin: 0 0 var(--sheet-inset); overflow: hidden; overflow: clip; border: 1px solid var(--border); border-radius: var(--radius-sheet); background: var(--surface); }
+.sheet { position: relative; min-height: calc(100vh - 48px - var(--sheet-inset)); margin: 0 0 var(--sheet-inset); overflow: hidden; overflow: clip; border: 1px solid var(--border); border-radius: var(--radius-sheet); background: var(--surface); }
+.workspace-sheet-loading-bar { position: absolute; top: 0; left: 0; right: 0; height: 3px; overflow: hidden; background: rgba(255, 255, 255, 0.06); z-index: 20; }
+.workspace-sheet-loading-bar span { display: block; width: 45%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, transparent, var(--accent), transparent); box-shadow: 0 0 12px rgba(245, 158, 11, 0.6); animation: loading-bar-slide 1.2s infinite ease-in-out; }
+@keyframes loading-bar-slide { 0% { transform: translateX(-100%); } 100% { transform: translateX(350%); } }
 .sheet-content { width: min(100%, 1200px); margin: 0 auto; padding: 28px var(--pad) 40px; }
 .sample-workspace-note { display: flex; min-height: 22px; align-items: center; gap: 8px; margin-bottom: 10px; color: var(--muted); font-size: 9px; font-weight: 650; letter-spacing: .06em; }
 .sample-indicator { width: 6px; height: 6px; flex: none; border-radius: 50%; background: var(--accent); }

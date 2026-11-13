@@ -128,12 +128,8 @@ export default function WorkspacePage() {
     }
   }, [status, router])
 
-  if (status === 'loading' || (booting && !handoverId)) {
+  if (status === 'loading' || booting || !handoverId) {
     return <WorkspaceLoadingScreen message="Loading your handover…" />
-  }
-
-  if (status === 'authenticated' && !handoverId) {
-    return <WorkspaceLoadingScreen message="Preparing your workspace…" />
   }
 
   return (
@@ -493,6 +489,42 @@ function WorkspaceInner({
     </>
   )
 
+  if (loading && !state) {
+    return <WorkspaceLoadingScreen message="Loading your handover…" />
+  }
+
+  if (!state) {
+    return (
+      <div className="framed-app framed-app-single workspace-loading-shell" role="status">
+        <div className="workspace-loading" style={{ minHeight: 'auto', gap: 18 }}>
+          <div className="workspace-loading-logo">
+            <BatonMark size="medium" />
+          </div>
+          <div className="workspace-loading-copy">
+            <p style={{ fontSize: 18, color: 'var(--text)' }}>Handover Not Found</p>
+            <span className="workspace-loading-subtitle">
+              {syncError || 'This handover could not be loaded or may have been removed.'}
+            </span>
+          </div>
+          <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+            <button
+              type="button"
+              className="primary-action"
+              onClick={() => {
+                window.location.href = '/workspace'
+              }}
+            >
+              Go to my handovers
+            </button>
+            <Link href="/" className="secondary-action">
+              Landing page
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="framed-app">
       <aside className="sidebar" aria-label="Baton workspace">
@@ -519,13 +551,12 @@ function WorkspaceInner({
           </div>
         )}
         <main className="sheet">
+          {loading && (
+            <div className="workspace-sheet-loading-bar" aria-hidden="true">
+              <span />
+            </div>
+          )}
           <div className="sheet-content">
-            {loading ? (
-              <div className="workspace-loading" aria-busy="true"><p>Loading handover…</p></div>
-            ) : !state ? (
-              <div className="workspace-loading"><p>This handover could not be loaded. It may have been removed.</p></div>
-            ) : (
-            <>
             <div className="sample-workspace-note"><span className="sample-indicator" />{state.handover.isTemplate ? 'TEMPLATE' : 'SHARED HANDOVER'}<span className="sample-note-copy" role="status" aria-live="polite">Saved on the server · visible to every member across devices · your role ({viewer?.role ?? 'member'}) comes from your membership, not a switch.</span></div>
             <div className="page-heading">
             <div><p className="breadcrumb">Engineering <span aria-hidden="true">/</span> {state.handover.name}</p><h1>{title}</h1></div>
@@ -681,8 +712,6 @@ function WorkspaceInner({
             {route === 'interview' && <div className="view-stack"><div className="view-intro"><p>{pendingQuestions.length} questions awaiting an answer</p><button className="primary-action" onClick={() => { rememberFocus(); setInterviewOpen(true) }} disabled={role !== 'leaver'}>{role === 'leaver' ? 'Answer questions' : 'View questions'}</button></div><section className="data-card"><div className="card-heading"><div><h2>Pending questions</h2><p>Context from the departing engineer · only the leaver seat can record answers</p></div></div>{questions.map((question) => <button key={question.id} className="question-row" onClick={() => { rememberFocus(); setInterviewOpen(true) }}><span className="question-priority">{question.priorityRank}</span><span><strong>{question.promptText}</strong><small>Claim {question.associatedClaimId} · {statusLabels[visibleClaims.find((claim) => claim.id === question.associatedClaimId)?.status ?? '']?.label ?? 'Pending'}</small></span><span className="state-label">{question.status === 'pending_answer' ? 'Pending' : question.status === 'answered' ? 'Answered' : 'Escalated'}</span></button>)}</section></div>}
 
             {route === 'exposure' && <div className="view-stack"><div className="view-intro"><p>Reviewer: {viewer?.name ?? 'you'} · clearance from your membership role</p><button className="secondary-action" onClick={() => { rememberFocus(); setExposureOpen(true) }}>Open visibility details</button></div><section className="data-card"><div className="card-heading"><div><h2>Visible claims</h2><p>{visibleClaims.length} claims available in this view</p></div></div><div className="claim-list">{renderClaimRows(visibleClaims.slice(0, 5), true)}</div></section><section className="data-card"><div className="card-heading"><div><h2>Withheld claims</h2><p>{withheldCount} claims hidden from this view</p></div></div>{withheldDetails.length ? withheldDetails.map((item) => <div className="withheld-row" key={item.claimId}><strong>{item.claimId}</strong><span>{item.reason}</span><small>Visible to: {({ public_open: 'Open to the team', team_internal: 'Team members', confidential_lead: 'Team leads', restricted_hr_legal: 'Restricted HR or legal roles' } as Record<string, string>)[item.requiredClearance] ?? item.requiredClearance.replaceAll('_', ' ')}</small></div>) : <p className="empty-state">No claims are withheld for this reviewer.</p>}</section></div>}
-            </>
-            )}
           </div>
         </main>
       </div>
