@@ -60,7 +60,7 @@ export default function HomeHero() {
         tags={[
           { text: 'Evidence-backed claims', background: '#1c1c1c', color: '#eeeeee' },
           { text: 'Decisions & open work', background: '#242424', color: '#ffffff' },
-          { text: 'Ownership transfer', background: '#20241e', color: '#d5dfca' },
+          { text: 'Ownership transfer', background: '#20241e', color: '#ffffff' },
           { text: 'Human-reviewed risks', background: '#222222', color: '#eeeeee' },
         ]}
         subText="Compare source excerpts, keep conflicting records visible until a lead explains the decision, then pass that context and the next action to its owner."
@@ -134,7 +134,7 @@ export default function HomeHero() {
                 <FileText size={17} aria-hidden="true" />
                 <span className="font-mono text-[11px] uppercase tracking-[0.14em]">01 · Capture</span>
               </div>
-                <h3 className="text-lg font-medium text-[#eeeeee]">Record the choice and why</h3>
+              <h3 className="text-lg font-medium text-[#eeeeee]">Record the choice and why</h3>
               <p className="mt-2 max-w-sm text-sm leading-6 text-[#a2a2a2]">
                 Add a decision, rationale, next action, and optional source reference while the work is fresh.
               </p>
@@ -145,7 +145,7 @@ export default function HomeHero() {
                 <GitPullRequest size={17} aria-hidden="true" />
                 <span className="font-mono text-[11px] uppercase tracking-[0.14em]">02 · Review</span>
               </div>
-                <h3 className="text-lg font-medium text-[#eeeeee]">Compare conflicting sources</h3>
+              <h3 className="text-lg font-medium text-[#eeeeee]">Compare conflicting sources</h3>
               <p className="mt-2 max-w-sm text-sm leading-6 text-[#a2a2a2]">
                 Compare the PR and chat excerpts; keep the disagreement open until a lead records why.
               </p>
@@ -156,7 +156,7 @@ export default function HomeHero() {
                 <ShieldCheck size={17} aria-hidden="true" />
                 <span className="font-mono text-[11px] uppercase tracking-[0.14em]">03 · Handover</span>
               </div>
-                <h3 className="text-lg font-medium text-[#eeeeee]">Pass context to the next owner</h3>
+              <h3 className="text-lg font-medium text-[#eeeeee]">Pass context to the next owner</h3>
               <p className="mt-2 max-w-sm text-sm leading-6 text-[#a2a2a2]">
                 Carry the decision, open work, owner, and remaining question into the successor’s next step.
               </p>

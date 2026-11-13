@@ -36,7 +36,7 @@ Section-by-section successor review with undo, plus claim-linked questions and l
 
 Before pasting, make sure each sentence describes a path you personally opened in the current deployed version. Remove anything that does not work there.
 
-## Technology and implementation details
+## Technology and implementation detailspt_live_6f0adfe0ff1fe4b9b6ee10360671c12e8aec0bc2
 
 ```text
 Built with Next.js 14 App Router, React 18, TypeScript, and Tailwind CSS. The workspace uses a client-side React state store seeded with synthetic handover records and saves demo changes in browser local storage; it has no server database or shared persistent backend. Engineers can record a decision or change, rationale, next action, and optional source reference during work; entries are person-reported and references are not verified. A server route checks whether a submitted quote appears in the fixed synthetic source corpus. It does not establish that a claim is true, update the seeded status, or call an LLM. The UI includes claim/source inspection, ownership and unfinished-work views, contradiction settlement, leaver interview, persona-filtered demo views, successor review, and sample question replies.
