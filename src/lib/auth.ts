@@ -53,6 +53,16 @@ const DEV_FALLBACK_SECRET =
     ? undefined
     : 'baton-local-dev-secret-6b1f2e8a9c4d47f0b3a2d5e8c1f09a76'
 
+let latestAuthError: string | null = null
+
+export function getLatestAuthError(): string | null {
+  return latestAuthError
+}
+
+export function setLatestAuthError(msg: string) {
+  latestAuthError = msg
+}
+
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   debug: true,
@@ -60,6 +70,75 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  logger: {
+    error(code, metadata: any) {
+      const err = metadata?.error
+      const message = err?.message || err?.error_description || String(err || '')
+      const cause = err?.cause ? ` (${err.cause?.message || err.cause})` : ''
+      latestAuthError = `${code}: ${message}${cause}`
+      console.error('[NextAuth Error]', code, metadata)
+    },
+    warn(code) {
+      console.warn('[NextAuth Warn]', code)
+    },
+    debug(code, metadata) {
+      console.log('[NextAuth Debug]', code, metadata)
+    },
+  },
+  cookies: {
+    sessionToken: {
+      name: `__Secure-next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: true,
+        domain: process.env.NODE_ENV === 'production' ? '.gitlostbaton.xyz' : undefined,
+      },
+    },
+    callbackUrl: {
+      name: `__Secure-next-auth.callback-url`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: true,
+        domain: process.env.NODE_ENV === 'production' ? '.gitlostbaton.xyz' : undefined,
+      },
+    },
+    csrfToken: {
+      name: `next-auth.csrf-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: true,
+        domain: process.env.NODE_ENV === 'production' ? '.gitlostbaton.xyz' : undefined,
+      },
+    },
+    pkceCodeVerifier: {
+      name: `__Secure-next-auth.pkce.code_verifier`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: true,
+        domain: process.env.NODE_ENV === 'production' ? '.gitlostbaton.xyz' : undefined,
+        maxAge: 900,
+      },
+    },
+    state: {
+      name: `__Secure-next-auth.state`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: true,
+        domain: process.env.NODE_ENV === 'production' ? '.gitlostbaton.xyz' : undefined,
+        maxAge: 900,
+      },
+    },
   },
   providers: [
     ...(hasGitHubApp

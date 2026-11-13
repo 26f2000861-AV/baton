@@ -18,11 +18,14 @@ export default function SignInPage() {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search)
       const err = params.get('error')
+      const errDetail = params.get('error_detail')
       if (err) {
-        if (err === 'Configuration') {
+        if (errDetail) {
+          setErrorMessage(`OAuth callback failed: ${errDetail}. Check that your GitHub OAuth App Authorization Callback URL matches https://www.gitlostbaton.xyz/api/auth/callback/github.`)
+        } else if (err === 'Configuration') {
           setErrorMessage('Server configuration error: check NEXTAUTH_SECRET, GITHUB_ID, and GITHUB_SECRET in Vercel environment variables.')
         } else if (err === 'OAuthCallback') {
-          setErrorMessage('OAuth callback failed: verify that your GitHub authorization callback URL matches your domain, and that the database is reachable. You can also sign in with a demo account below.')
+          setErrorMessage('OAuth callback failed: In your GitHub Developer Settings (github.com/settings/developers), verify that the Authorization Callback URL is EXACTLY: https://www.gitlostbaton.xyz/api/auth/callback/github (must include https://, www, and /api/auth/callback/github). Or sign in with a demo account below.')
         } else if (err === 'OAuthSignin' || err === 'OAuthCreateAccount') {
           setErrorMessage('OAuth sign-in failed. Please verify your GitHub OAuth app credentials or continue with a demo account below.')
         } else {
