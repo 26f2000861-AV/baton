@@ -18,7 +18,27 @@ import { prisma } from './db'
  * Production never enables the local provider.
  */
 
-const hasGitHubApp = Boolean(process.env.GITHUB_ID && process.env.GITHUB_SECRET)
+const githubId =
+  process.env.GITHUB_ID ||
+  process.env.GITHUB_CLIENT_ID ||
+  process.env.AUTH_GITHUB_ID
+
+const githubSecret =
+  process.env.GITHUB_SECRET ||
+  process.env.GITHUB_CLIENT_SECRET ||
+  process.env.AUTH_GITHUB_SECRET
+
+// Ensure NEXTAUTH_SECRET is set even if provided as AUTH_SECRET
+if (!process.env.NEXTAUTH_SECRET && process.env.AUTH_SECRET) {
+  process.env.NEXTAUTH_SECRET = process.env.AUTH_SECRET
+}
+
+// Fallback NEXTAUTH_URL to Vercel deployment URL if unset
+if (!process.env.NEXTAUTH_URL && process.env.VERCEL_URL) {
+  process.env.NEXTAUTH_URL = `https://${process.env.VERCEL_URL}`
+}
+
+const hasGitHubApp = Boolean(githubId && githubSecret)
 const allowDevProvider = process.env.NODE_ENV !== 'production'
 
 // Sandbox/preview resilience: the sandbox boot may rewrite .env and drop
@@ -35,7 +55,7 @@ const DEV_FALLBACK_SECRET =
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
-  secret: process.env.NEXTAUTH_SECRET || DEV_FALLBACK_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET || DEV_FALLBACK_SECRET,
   session: {
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60, // 30 days
@@ -43,8 +63,8 @@ export const authOptions: NextAuthOptions = {
   providers: hasGitHubApp
     ? [
         GitHubProvider({
-          clientId: process.env.GITHUB_ID as string,
-          clientSecret: process.env.GITHUB_SECRET as string,
+          clientId: githubId as string,
+          clientSecret: githubSecret as string,
           // The import flow supports private repositories, which require the
           // repo scope in addition to the user's GitHub identity.
           authorization: { params: { scope: 'read:user repo' } },

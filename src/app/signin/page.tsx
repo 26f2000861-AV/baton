@@ -13,6 +13,25 @@ export default function SignInPage() {
   const [githubConfigured, setGithubConfigured] = useState(false)
   const [devLogin, setDevLogin] = useState('')
   const [isHovered, setIsHovered] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      const err = params.get('error')
+      if (err) {
+        if (err === 'Configuration') {
+          setErrorMessage('Server configuration error: check NEXTAUTH_SECRET, GITHUB_ID, and GITHUB_SECRET in Vercel environment variables.')
+        } else if (err === 'OAuthCallback') {
+          setErrorMessage('OAuth callback failed: verify that your GitHub authorization callback URL matches your domain, and that the database is reachable.')
+        } else if (err === 'OAuthSignin' || err === 'OAuthCreateAccount') {
+          setErrorMessage('OAuth sign-in failed. Please verify your GitHub OAuth app credentials and try again.')
+        } else {
+          setErrorMessage(`Sign-in error: ${err}`)
+        }
+      }
+    }
+  }, [])
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -73,6 +92,13 @@ export default function SignInPage() {
           <p className="mx-auto mb-9 max-w-[340px] text-center text-[13.5px] leading-[1.65] text-[#8b8b8b]">
             GitHub verifies your identity and helps you access your repositories, issues, and more.
           </p>
+
+          {/* Error Banner */}
+          {errorMessage && (
+            <div className="mb-6 rounded-xl border border-red-500/30 bg-red-950/40 p-3.5 text-center text-xs leading-relaxed text-red-200">
+              {errorMessage}
+            </div>
+          )}
 
           {/* Auth section */}
           {devMode ? (
