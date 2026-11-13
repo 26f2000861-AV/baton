@@ -1,13 +1,12 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { authzErrorResponse, requireMembership, requireSession } from '@/lib/authz'
+import { authzErrorResponse, clearanceForRole, requireMembership, requireSession } from '@/lib/authz'
 import { serializeSourceMeta } from '@/lib/serializers'
 
 /**
  * Full source record content for the inspector drawer (on-demand, so the
- * state payload stays lean). Members only; restricted sources are blocked —
- * the clearance compile already hides their claims, this closes the direct
- * read path.
+ * state payload stays lean). Members only; restricted and confidential
+ * sources require sufficient role clearance.
  */
 export async function GET(
   _req: Request,
@@ -15,7 +14,7 @@ export async function GET(
 ) {
   try {
     const session = await requireSession()
-    const { handover } = await requireMembership(params.id, session.userId)
+    const { handover, membership } = await requireMembership(params.id, session.userId)
 
     const row = await prisma.sourceRecord.findUnique({
       where: { handoverId_legacyId: { handoverId: handover.id, legacyId: params.legacyId } },
@@ -26,12 +25,30 @@ export async function GET(
         { status: 404 }
       )
     }
+
+    const memberClearance = clearanceForRole(membership.role)
+
     if (row.requiredClearanceLevel === 'restricted_hr_legal') {
       return NextResponse.json(
         {
           error: {
             code: 'SOURCE_RESTRICTED',
             message: 'This source contains restricted records and cannot be inspected.',
+          },
+        },
+        { status: 403 }
+      )
+    }
+
+    if (
+      row.requiredClearanceLevel === 'confidential_lead' &&
+      memberClearance !== 'confidential_lead'
+    ) {
+      return NextResponse.json(
+        {
+          error: {
+            code: 'SOURCE_RESTRICTED',
+            message: 'This source requires team lead clearance.',
           },
         },
         { status: 403 }

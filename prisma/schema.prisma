@@ -76,7 +76,7 @@ model Handover {
   name         String
   description  String   @default("")
   isTemplate   Boolean  @default(false)
-  templateKey  String?
+  templateKey  String?  @unique
   createdById  String
   createdAt    DateTime @default(now())
 

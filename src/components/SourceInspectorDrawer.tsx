@@ -117,7 +117,7 @@ export default function SourceInspectorDrawer({
             <button
               ref={closeButtonRef}
               onClick={onClose}
-              className="min-hit flex h-11 w-11 items-center justify-center rounded-[6px] border border-[#D4D4D4] bg-white text-[#6B6B6B] hover:border-[#0A0A0A] hover:text-[#0A0A0A] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+              className="min-hit flex h-10 w-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-[8px] border border-white/[0.1] bg-white/[0.04] text-zinc-400 hover:border-white/[0.2] hover:bg-white/[0.08] hover:text-white focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
               aria-label="Close source inspector drawer"
             >
               <X size={18} />
@@ -125,37 +125,37 @@ export default function SourceInspectorDrawer({
           </div>
 
           {/* Verification Status Pill */}
-          <div className="mt-4 flex items-center justify-between rounded-[6px] border border-[#E6E6E6] bg-[#F2F4F7] p-3 text-xs">
+          <div className="mt-4 flex items-center justify-between rounded-[8px] border border-[#26262a] bg-[#18181c] p-3 text-xs">
             <div className="flex items-center gap-2">
-              <ShieldCheck size={16} className={isExactVerified ? 'text-[#1D5FBF]' : 'text-[#6B6B6B]'} />
-              <span className="font-semibold text-[#0A0A0A]">
+              <ShieldCheck size={16} className={isExactVerified ? 'text-emerald-400' : 'text-zinc-400'} />
+              <span className="font-semibold text-white">
                 {status.label}
               </span>
             </div>
-            <span className="font-mono text-[11px] text-[#b8b8b8]">
+            <span className="font-mono text-[11px] text-zinc-400">
               {verificationMethodLabel}
             </span>
           </div>
-          <p className="mt-2 text-xs leading-relaxed text-[#b8b8b8]">{status.description}</p>
+          <p className="mt-2 text-xs leading-relaxed text-zinc-400">{status.description}</p>
 
           {/* Handover Claim Statement */}
-          <div className="mt-4 rounded-[6px] border border-[#E6E6E6] bg-white p-4">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#6B6B6B]">
+          <div className="mt-4 rounded-[8px] border border-[#26262a] bg-[#18181c] p-4">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
               Handover Claim Statement ({claim.id})
             </span>
-            <p className="mt-1.5 text-sm leading-relaxed text-[#0A0A0A]">
+            <p className="mt-1.5 text-sm leading-relaxed text-zinc-100">
               {claim.statement}
             </p>
           </div>
 
           {claim.history && claim.history.length > 0 && (
-            <section className="mt-4 rounded-[6px] border border-[#E6E6E6] bg-white p-4" aria-label="Claim history">
-              <h3 className="text-[11px] font-semibold uppercase tracking-wider text-[#6B6B6B]">Claim history</h3>
+            <section className="mt-4 rounded-[8px] border border-[#26262a] bg-[#18181c] p-4" aria-label="Claim history">
+              <h3 className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Claim history</h3>
               <ol className="mt-3 space-y-3">
                 {claim.history.map((entry, index) => (
-                  <li key={`${entry.timestamp}-${index}`} className="border-l-2 border-[#1D5FBF] pl-3 text-xs">
-                    <p className="text-[#0A0A0A]">{entry.action}</p>
-                    <p className="mt-1 text-[#6B6B6B]">{entry.actor} · {new Date(entry.timestamp).toLocaleString()}</p>
+                  <li key={`${entry.timestamp}-${index}`} className="border-l-2 border-emerald-500/70 pl-3 text-xs">
+                    <p className="text-zinc-100">{entry.action}</p>
+                    <p className="mt-1 text-zinc-400">{entry.actor} · {new Date(entry.timestamp).toLocaleString()}</p>
                   </li>
                 ))}
               </ol>
@@ -164,16 +164,16 @@ export default function SourceInspectorDrawer({
 
           {/* Verbatim Source Evidence Snippet */}
           {source && (
-            <div className="mt-4 rounded-[6px] border border-[#E6E6E6] bg-[#F2F4F7]/60 p-4">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#6B6B6B]">
+            <div className="mt-4 rounded-[8px] border border-[#26262a] bg-[#18181c] p-4">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
                 Verbatim Source Snippet ({source.sourceId})
               </span>
-              <div className="mt-2 rounded-[4px] border border-[#262626] bg-[#181818] p-3 font-mono text-xs leading-relaxed text-[#eeeeee]">
-                <mark className="rounded bg-[#1D5FBF] px-1 py-0.5 font-bold text-white">
+              <div className="mt-2 rounded-[6px] border border-white/[0.08] bg-[#0c0c0e] p-3 font-mono text-xs leading-relaxed text-zinc-200">
+                <mark className="rounded bg-emerald-500/20 text-emerald-300 px-1 py-0.5 font-bold">
                   {source.exactSnippet}
                 </mark>
               </div>
-              <label htmlFor="quote-check-input" className="mt-4 block text-[11px] font-semibold uppercase tracking-wider text-[#6B6B6B]">
+              <label htmlFor="quote-check-input" className="mt-4 block text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
                 Check whether this quote appears in this handover’s source record
               </label>
               <textarea
@@ -182,7 +182,7 @@ export default function SourceInspectorDrawer({
                 onChange={(event) => { setQuoteToCheck(event.target.value); setQuoteCheck(null); setQuoteCheckError('') }}
                 rows={3}
                 maxLength={8000}
-                className="mt-2 min-h-20 w-full rounded-[4px] border border-[#363636] bg-[#121212] p-3 font-mono text-xs leading-relaxed text-[#eeeeee] focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
+                className="mt-2 min-h-20 w-full rounded-[6px] border border-white/[0.1] bg-[#0c0c0e] p-3 font-mono text-xs leading-relaxed text-zinc-200 placeholder-zinc-500 focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
               />
               <button
                 type="button"

@@ -89,7 +89,7 @@ export default function SignInPage() {
           </h1>
 
           {/* Description */}
-          <p className="mx-auto mb-9 max-w-[340px] text-center text-[13.5px] leading-[1.65] text-[#8b8b8b]">
+          <p className="mx-auto mb-9 max-w-[340px] text-center text-[13.5px] leading-[1.65] text-zinc-400">
             GitHub verifies your identity and helps you access your repositories, issues, and more.
           </p>
 
@@ -112,7 +112,7 @@ export default function SignInPage() {
               <label htmlFor="dev-login" className="text-xs font-semibold text-[#e0e0e0]">
                 Local development sign-in
               </label>
-              <p className="m-0 text-[11px] leading-relaxed text-[#6b6b6b]">
+              <p className="m-0 text-[11px] leading-relaxed text-zinc-400">
                 GitHub OAuth is not configured on this server yet, so a local dev identity is offered
                 instead. This is never shown when the GitHub app is configured.
               </p>
@@ -124,7 +124,7 @@ export default function SignInPage() {
                   placeholder="e.g. dev_lead"
                   maxLength={39}
                   autoComplete="off"
-                  className="min-h-[44px] flex-1 rounded-xl border border-[#2a2a2a] bg-[#0a0a0a] px-3 text-sm text-white placeholder:text-[#555] focus:border-[#555] focus:outline-none"
+                  className="min-h-[44px] flex-1 rounded-xl border border-[#2a2a2a] bg-[#0a0a0a] px-3 text-sm text-white placeholder:text-zinc-500 focus:border-[#555] focus:outline-none"
                 />
                 <button
                   type="submit"
@@ -170,7 +170,7 @@ export default function SignInPage() {
               />
             </button>
           ) : (
-            <p className="m-0 rounded-xl border border-[#2a2a2a] bg-[#0f0f0f] p-4 text-center text-[12px] leading-relaxed text-[#6b6b6b]">
+            <p className="m-0 rounded-xl border border-[#2a2a2a] bg-[#0f0f0f] p-4 text-center text-[12px] leading-relaxed text-zinc-400">
               GitHub sign-in is not configured on this server. Ask the administrator to add the
               GitHub OAuth application credentials.
             </p>
@@ -180,7 +180,7 @@ export default function SignInPage() {
           {session && (
             <button
               type="button"
-              className="mt-4 w-full border-0 bg-transparent text-center text-xs text-[#6b6b6b] underline underline-offset-2 transition-colors hover:text-white"
+              className="mt-4 w-full border-0 bg-transparent text-center text-xs text-zinc-400 underline underline-offset-2 transition-colors hover:text-white"
               onClick={() => signOut({ callbackUrl: '/' })}
             >
               Sign out first
@@ -190,14 +190,14 @@ export default function SignInPage() {
           {/* Divider with "or" */}
           <div className="my-7 flex items-center gap-4">
             <div className="h-px flex-1 bg-[#2a2a2a]" />
-            <span className="select-none text-[12px] font-medium text-[#4a4a4a]">or</span>
+            <span className="select-none text-[12px] font-medium text-zinc-400">or</span>
             <div className="h-px flex-1 bg-[#2a2a2a]" />
           </div>
 
           {/* Back to landing page */}
           <Link
             href="/"
-            className="group flex items-center justify-center gap-2 text-[13px] text-[#6b6b6b] transition-colors duration-200 hover:text-[#cccccc]"
+            className="group flex items-center justify-center gap-2 text-[13px] text-zinc-400 transition-colors duration-200 hover:text-white"
           >
             <ArrowLeft
               size={14}

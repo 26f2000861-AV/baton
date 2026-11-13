@@ -775,11 +775,13 @@ h1 { color: var(--text); font-size: var(--fs-title); font-weight: 600; line-heig
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
   .drawer-panel, .view-stack, .native-component, .certificate-seal, .sheet.clearance-pulse {
     transform: none !important;
+    transition: opacity 0.15s ease !important;
   }
 }
 

@@ -40,7 +40,7 @@ export default function ExposureDiffModal({
     <div
       ref={containerRef}
       tabIndex={-1}
-      className={`fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 backdrop-blur-[2px]${isClosing ? ' is-closing' : ''}`}
+      className={`fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-[4px]${isClosing ? ' is-closing' : ''}`}
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -48,56 +48,56 @@ export default function ExposureDiffModal({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="my-auto w-full max-w-2xl rounded-[8px] border border-[#E6E6E6] bg-[#FFFFFF] p-6 shadow-2xl"
+        className="my-auto w-full max-w-2xl rounded-[12px] border border-[#2a2a2e] bg-[#141416] p-6 text-[#f4f4f5] shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
       >
-        <div className="flex items-start justify-between border-b border-[#F0F0F0] pb-4">
+        <div className="flex items-start justify-between border-b border-white/[0.08] pb-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-[#6B6B6B]">
+              <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
                 Who can view each claim
               </span>
               <span className="monochrome-pill">Preview · {personaName}</span>
             </div>
-            <h2 id="exposure-diff-title" className="mt-1 text-base font-semibold text-[#0A0A0A]">
+            <h2 id="exposure-diff-title" className="mt-1 text-base font-semibold text-white">
               Claims hidden in this view
             </h2>
           </div>
           <button
             ref={closeButtonRef}
             onClick={onClose}
-            className="min-hit flex h-11 w-11 items-center justify-center rounded-[6px] border border-[#D4D4D4] bg-white text-[#6B6B6B] hover:border-[#0A0A0A] hover:text-[#0A0A0A] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+            className="min-hit flex h-10 w-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-[8px] border border-white/[0.1] bg-white/[0.04] text-zinc-400 hover:border-white/[0.2] hover:bg-white/[0.08] hover:text-white focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
             aria-label="Close exposure diff dialog"
           >
             <X size={18} />
           </button>
         </div>
 
-        <p className="mt-4 text-xs text-[#6B6B6B]">
+        <p className="mt-4 text-xs text-zinc-400">
           This synthetic preview shows what {personaName} can see in the sample case. Persona switching is not authentication or access control; no data is actually protected. Use sample data only.
         </p>
 
         <div className="mt-4 space-y-3">
           {details.length === 0 ? (
-            <div className="rounded-[6px] border border-[#E6E6E6] bg-[#F2F4F7] p-6 text-center text-xs text-[#6B6B6B]">
+            <div className="rounded-[8px] border border-[#26262a] bg-[#18181c] p-6 text-center text-xs text-zinc-400">
               No claims are hidden from this view.
             </div>
           ) : (
             details.map((d) => (
               <div
                 key={d.claimId}
-                className="rounded-[6px] border border-[#E6E6E6] bg-[#F2F4F7]/40 p-4 text-xs"
+                className="rounded-[8px] border border-[#26262a] bg-[#18181c] p-4 text-xs"
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-mono font-bold text-[#0A0A0A]">{d.claimId}</span>
-                  <span className="rounded bg-[#EEEEEE] px-2 py-0.5 font-mono text-[11px] font-semibold text-[#0A0A0A]">
+                  <span className="font-mono font-bold text-white">{d.claimId}</span>
+                  <span className="rounded border border-white/[0.1] bg-white/[0.06] px-2 py-0.5 font-mono text-[11px] font-semibold text-zinc-200">
                     Visible to: {clearanceLabel(d.requiredClearance)}
                   </span>
                 </div>
-                <p className="mt-2 text-xs font-medium leading-relaxed text-[#0A0A0A]">
+                <p className="mt-2 text-xs font-medium leading-relaxed text-[#eeeeee]">
                   {d.statement}
                 </p>
-                <div className="mt-2.5 rounded-[4px] border border-[#363636] bg-[#181818] p-2.5 text-[11px] text-[#8d8d8d]">
-                  <strong className="text-[#eeeeee]">Why it is hidden: </strong>
+                <div className="mt-2.5 rounded-[6px] border border-white/[0.08] bg-[#0c0c0e] p-2.5 text-[11px] text-zinc-400">
+                  <strong className="text-white">Why it is hidden: </strong>
                   {d.reason}
                 </div>
               </div>
@@ -105,10 +105,10 @@ export default function ExposureDiffModal({
           )}
         </div>
 
-        <div className="mt-6 flex justify-end pt-3 border-t border-[#F0F0F0]">
+        <div className="mt-6 flex justify-end border-t border-white/[0.08] pt-3">
           <button
             onClick={onClose}
-            className="btn-secondary min-hit text-xs px-5 focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+            className="btn-secondary min-hit px-5 text-xs focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
           >
             Close
           </button>

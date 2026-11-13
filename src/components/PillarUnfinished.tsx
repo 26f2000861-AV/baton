@@ -28,10 +28,10 @@ export default function PillarUnfinished({
     <section id="unfinished" className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="mt-0.5 text-xl font-semibold tracking-tight text-[#0A0A0A]">
+          <h2 className="mt-0.5 text-xl font-semibold tracking-tight text-white">
             Unfinished work roadmap
           </h2>
-          <p className="mt-1 text-xs text-[#6B6B6B]">
+          <p className="mt-1 text-xs text-zinc-400">
             What incomplete branches, PRs, and migrations must the successor triage in the first 30 days?
           </p>
         </div>
@@ -39,8 +39,8 @@ export default function PillarUnfinished({
           onClick={isAccepted ? onUndo : onAccept}
           className={`min-hit flex items-center gap-1.5 rounded-[6px] px-3 py-2 text-xs font-semibold transition ${
             isAccepted
-              ? 'border border-[#E6E6E6] bg-[#EEEEEE] text-[#0A0A0A]'
-              : 'border border-[#0A0A0A] bg-[#141414] text-white hover:bg-[#2a2a2a]'
+              ? 'border border-white/20 bg-white/10 text-white'
+              : 'border border-white/10 bg-[#18181c] text-white hover:bg-[#242428]'
           }`}
           aria-pressed={isAccepted}
           aria-label={isAccepted ? 'Undo unfinished work review' : 'Mark unfinished work reviewed'}

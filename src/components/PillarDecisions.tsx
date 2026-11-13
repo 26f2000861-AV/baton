@@ -79,10 +79,10 @@ export default function PillarDecisions({
     <section id="decisions" className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="mt-0.5 text-xl font-semibold tracking-tight text-[#0A0A0A]">
+          <h2 className="mt-0.5 text-xl font-semibold tracking-tight text-[#eeeeee]">
             Architecture decisions
           </h2>
-          <p className="mt-1 text-xs text-[#6B6B6B]">
+          <p className="mt-1 text-xs text-[#a3a3a3]">
             Which major design choices were made, why, and which carry residual risk?
           </p>
         </div>
@@ -90,8 +90,8 @@ export default function PillarDecisions({
           onClick={isAccepted ? onUndo : onAccept}
           className={`min-hit flex items-center gap-1.5 rounded-[6px] px-3 py-2 text-xs font-semibold transition ${
             isAccepted
-              ? 'border border-[#E6E6E6] bg-[#EEEEEE] text-[#0A0A0A]'
-              : 'border border-[#0A0A0A] bg-[#141414] text-white hover:bg-[#2a2a2a]'
+              ? 'border border-white/20 bg-white/10 text-white'
+              : 'border border-white/10 bg-[#18181c] text-white hover:bg-[#242428]'
           }`}
           aria-pressed={isAccepted}
           aria-label={isAccepted ? 'Undo architecture decisions review' : 'Mark architecture decisions reviewed'}
@@ -112,11 +112,11 @@ export default function PillarDecisions({
           return (
             <article
               key={d.id}
-              className="ledger-panel flex flex-col justify-between transition hover:border-[#0A0A0A]"
+              className="ledger-panel flex flex-col justify-between transition hover:border-zinc-500"
             >
               <div>
                 <div className="flex items-start justify-between gap-3">
-                  <span className="rounded bg-[#EEEEEE] px-2 py-0.5 font-mono text-[11px] font-semibold text-[#0A0A0A]">
+                  <span className="rounded bg-white/10 px-2 py-0.5 font-mono text-[11px] font-semibold text-[#eeeeee]">
                     {d.id === 'dec_01' ? 'ADR-011' : 'COMMIT 77e2d'}
                   </span>
                   <span className="monochrome-pill">
@@ -124,37 +124,37 @@ export default function PillarDecisions({
                   </span>
                 </div>
 
-                <h3 className="mt-2 text-base font-semibold leading-snug text-[#0A0A0A]">
+                <h3 className="mt-2 text-base font-semibold leading-snug text-[#eeeeee]">
                   {d.title}
                 </h3>
-                <p className="mt-2 text-xs leading-relaxed text-[#6B6B6B]">
+                <p className="mt-2 text-xs leading-relaxed text-[#a3a3a3]">
                   {d.context}
                 </p>
 
                 <div className="mt-4 rounded-[6px] border border-[#363636] bg-[#181818] p-3 text-xs text-[#eeeeee]">
-                  <span className="block text-[11px] font-semibold text-[#6B6B6B]">Decision taken</span>
+                  <span className="block text-[11px] font-semibold text-[#a3a3a3]">Decision taken</span>
                   <p className="mt-0.5 font-medium">{d.decisionTaken}</p>
                 </div>
 
                 {d.tradeOffsAccepted && d.tradeOffsAccepted.length > 0 && (
-                  <div className="mt-3 text-xs text-[#6B6B6B]">
-                    <span className="font-semibold text-[#0A0A0A]">Trade-offs accepted: </span>
+                  <div className="mt-3 text-xs text-[#a3a3a3]">
+                    <span className="font-semibold text-[#eeeeee]">Trade-offs accepted: </span>
                     {d.tradeOffsAccepted.join(' • ')}
                   </div>
                 )}
               </div>
 
               {/* Signature Baton pass line connecting claim to source key */}
-              <div className="mt-5 pt-3 border-t border-[#F0F0F0]">
+              <div className="mt-5 pt-3 border-t border-white/[0.08]">
                 <div className="baton-pass-line">
-                  <span className="text-xs text-[#6B6B6B]">
+                  <span className="text-xs text-[#a3a3a3]">
                     {isInferred ? (
-                      <span className="flex items-center gap-1 font-medium text-[#0A0A0A]">
-                        <AlertCircle size={13} className="text-[#6B6B6B]" />
+                      <span className="flex items-center gap-1 font-medium text-[#eeeeee]">
+                        <AlertCircle size={13} className="text-[#a3a3a3]" />
                         Rationale inferred from sample context ({d.provenance.exactQuote})
                       </span>
                     ) : (
-                      <span className="evidence-signal font-medium text-[#1D5FBF]">
+                      <span className="evidence-signal font-medium text-emerald-400">
                         Rationale documented; claim support still needs review
                       </span>
                     )}
@@ -162,12 +162,12 @@ export default function PillarDecisions({
                   <div className="pass-rule" />
                   <button
                     onClick={() => onInspect(d.associatedClaimId)}
-                    className="min-hit flex items-center gap-1 font-mono text-xs text-[#0A0A0A] underline-offset-2 hover:underline"
+                    className="min-hit flex items-center gap-1 font-mono text-xs text-[#eeeeee] underline-offset-2 hover:underline"
                     title={`Inspect source evidence: ${d.provenance.sourceId}`}
                     aria-label={`Inspect source for ${d.provenance.sourceId}`}
                   >
                     <span>{d.provenance.sourceId}</span>
-                    <ExternalLink size={12} className="text-[#6B6B6B]" />
+                    <ExternalLink size={12} className="text-[#a3a3a3]" />
                   </button>
                 </div>
               </div>
@@ -176,25 +176,25 @@ export default function PillarDecisions({
         })}
 
         {/* 1.8M active-series Benchmark Fact Card - explicitly labeled 'unverified' */}
-        <article className="ledger-panel lg:col-span-2 flex flex-col justify-between transition hover:border-[#0A0A0A]">
+        <article className="ledger-panel lg:col-span-2 flex flex-col justify-between transition hover:border-zinc-500">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <div className="flex items-center gap-2">
-                <span className="rounded bg-[#EEEEEE] px-2 py-0.5 font-mono text-[11px] font-semibold text-[#0A0A0A]">
+                <span className="rounded bg-white/10 px-2 py-0.5 font-mono text-[11px] font-semibold text-[#eeeeee]">
                   BENCHMARK
                 </span>
                 <span className="monochrome-pill">Unverified</span>
               </div>
-              <h3 className="mt-2 text-base font-semibold leading-snug text-[#0A0A0A]">
+              <h3 className="mt-2 text-base font-semibold leading-snug text-[#eeeeee]">
                 Ingest benchmark sustained 1.8M active series with headroom to 2.4M under simulated load
               </h3>
-              <p className="mt-1 text-xs text-[#6B6B6B]">
+              <p className="mt-1 text-xs text-[#a3a3a3]">
                 Sample data: Cited in the PR #142 summary discussion, but the synthetic stress-test run logs were uncommitted. Labeled unverified per review rules.
               </p>
             </div>
             <button
               onClick={() => onInspect('claim_04')}
-              className="min-hit flex items-center gap-1.5 rounded-[6px] border border-[#D4D4D4] bg-white px-3 py-2 text-xs font-medium text-[#0A0A0A] hover:bg-[#EEEEEE]"
+              className="min-hit flex items-center gap-1.5 rounded-[6px] border border-white/10 bg-[#18181c] px-3 py-2 text-xs font-medium text-[#eeeeee] hover:bg-[#242428]"
               aria-label="Inspect benchmark evidence"
             >
               <FileText size={14} />
