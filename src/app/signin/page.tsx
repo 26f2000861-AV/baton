@@ -1,15 +1,14 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession, signIn, signOut } from 'next-auth/react'
 import Link from 'next/link'
-import { ArrowRight, ArrowLeft, Shield, UserCheck, BookOpen, Sparkles } from 'lucide-react'
+import { ArrowRight, ArrowLeft } from 'lucide-react'
 
 export default function SignInPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
-  const [devLogin, setDevLogin] = useState('')
   const [isHovered, setIsHovered] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -86,7 +85,7 @@ export default function SignInPage() {
 
           {/* Description */}
           <p className="mx-auto mb-7 max-w-[360px] text-center text-[13px] leading-[1.6] text-zinc-400">
-            Sign in with GitHub for live repository imports, or choose a 1-click demo account below.
+            Sign in with GitHub for live repository imports, or explore a pre-configured seat below.
           </p>
 
           {/* Error Banner */}
@@ -130,105 +129,93 @@ export default function SignInPage() {
             />
           </button>
 
-          {/* Divider with "or demo account" */}
+          {/* Divider */}
           <div className="my-6 flex items-center gap-3">
             <div className="h-px flex-1 bg-[#252525]" />
             <span className="select-none text-[11px] font-medium uppercase tracking-wider text-zinc-500">
-              or evaluate with demo account
+              or explore a sample seat
             </span>
             <div className="h-px flex-1 bg-[#252525]" />
           </div>
 
-          {/* Judge & Evaluator 1-Click Access Card */}
-          <div className="rounded-xl border border-zinc-800 bg-[#0d0d0d] p-4 text-left">
-            <div className="mb-3 flex items-center justify-between">
-              <span className="flex items-center gap-1.5 text-xs font-semibold text-zinc-200">
-                <Sparkles size={13} className="text-amber-400" />
-                Hackathon Judge & Demo Access
+          {/* Sample Review Seats */}
+          <div className="space-y-2 text-left">
+            <div className="flex items-center justify-between px-0.5">
+              <span className="text-[12px] font-medium text-zinc-400">
+                Pre-configured review seats
               </span>
-              <span className="rounded-full bg-emerald-950/80 px-2 py-0.5 text-[10px] font-medium text-emerald-400 border border-emerald-800/40">
-                1-Click Sign-in
+              <span className="text-[11px] text-zinc-600">
+                No setup required
               </span>
             </div>
-            <p className="mb-3 text-[11px] leading-relaxed text-zinc-400">
-              Instant access without GitHub authorization. Full authenticated database session with pre-seeded claims:
-            </p>
 
             <div className="grid gap-2">
               <button
                 type="button"
                 disabled={isSubmitting}
                 onClick={() => handleQuickDemo('demo_successor')}
-                className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-900/80 px-3 py-2 text-left text-xs font-medium text-zinc-100 transition-colors hover:border-zinc-700 hover:bg-zinc-800 focus:outline-none"
+                className="group flex items-center justify-between rounded-xl border border-[#262626] bg-[#0f0f11] px-4 py-3 text-left transition-all duration-150 hover:border-zinc-700 hover:bg-[#161619] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400"
               >
-                <div className="flex items-center gap-2">
-                  <UserCheck size={14} className="text-emerald-400" />
-                  <div>
-                    <div className="font-semibold text-zinc-100">Successor · Priya Sharma</div>
-                    <div className="text-[10px] text-zinc-400">Review claims, adopt work & section sign-off (Recommended)</div>
+                <div className="min-w-0 pr-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-zinc-100 group-hover:text-white">
+                      Priya Sharma
+                    </span>
+                    <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] font-medium text-zinc-400">
+                      Successor
+                    </span>
                   </div>
+                  <p className="mt-1 text-[11px] text-zinc-400">
+                    Review claims, adopt open items, and complete sign-off
+                  </p>
                 </div>
-                <ArrowRight size={13} className="text-zinc-500" />
+                <ArrowRight size={14} className="flex-none text-zinc-600 transition-transform duration-150 group-hover:translate-x-0.5 group-hover:text-zinc-200" />
               </button>
 
               <button
                 type="button"
                 disabled={isSubmitting}
                 onClick={() => handleQuickDemo('demo_lead')}
-                className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-900/80 px-3 py-2 text-left text-xs font-medium text-zinc-100 transition-colors hover:border-zinc-700 hover:bg-zinc-800 focus:outline-none"
+                className="group flex items-center justify-between rounded-xl border border-[#262626] bg-[#0f0f11] px-4 py-3 text-left transition-all duration-150 hover:border-zinc-700 hover:bg-[#161619] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400"
               >
-                <div className="flex items-center gap-2">
-                  <Shield size={14} className="text-sky-400" />
-                  <div>
-                    <div className="font-semibold text-zinc-100">Lead · Vikram Malhotra</div>
-                    <div className="text-[10px] text-zinc-400">Settle contradictions, review audit exposure & manage team</div>
+                <div className="min-w-0 pr-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-zinc-100 group-hover:text-white">
+                      Vikram Malhotra
+                    </span>
+                    <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] font-medium text-zinc-400">
+                      Engineering Lead
+                    </span>
                   </div>
+                  <p className="mt-1 text-[11px] text-zinc-400">
+                    Settle contradictions, review access visibility, and manage team
+                  </p>
                 </div>
-                <ArrowRight size={13} className="text-zinc-500" />
+                <ArrowRight size={14} className="flex-none text-zinc-600 transition-transform duration-150 group-hover:translate-x-0.5 group-hover:text-zinc-200" />
               </button>
 
               <button
                 type="button"
                 disabled={isSubmitting}
                 onClick={() => handleQuickDemo('demo_leaver')}
-                className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-900/80 px-3 py-2 text-left text-xs font-medium text-zinc-100 transition-colors hover:border-zinc-700 hover:bg-zinc-800 focus:outline-none"
+                className="group flex items-center justify-between rounded-xl border border-[#262626] bg-[#0f0f11] px-4 py-3 text-left transition-all duration-150 hover:border-zinc-700 hover:bg-[#161619] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400"
               >
-                <div className="flex items-center gap-2">
-                  <BookOpen size={14} className="text-amber-400" />
-                  <div>
-                    <div className="font-semibold text-zinc-100">Leaver · Alex Chen</div>
-                    <div className="text-[10px] text-zinc-400">Answer gap-driven exit interview & attest knowledge</div>
+                <div className="min-w-0 pr-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-zinc-100 group-hover:text-white">
+                      Alex Chen
+                    </span>
+                    <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] font-medium text-zinc-400">
+                      Departing Engineer
+                    </span>
                   </div>
+                  <p className="mt-1 text-[11px] text-zinc-400">
+                    Answer structured exit interview and attest repository context
+                  </p>
                 </div>
-                <ArrowRight size={13} className="text-zinc-500" />
+                <ArrowRight size={14} className="flex-none text-zinc-600 transition-transform duration-150 group-hover:translate-x-0.5 group-hover:text-zinc-200" />
               </button>
             </div>
-
-            {/* Custom Demo Username Input */}
-            <form
-              className="mt-3.5 flex gap-2 border-t border-zinc-800/80 pt-3"
-              onSubmit={(event) => {
-                event.preventDefault()
-                handleQuickDemo(devLogin || 'judge')
-              }}
-            >
-              <input
-                id="dev-login"
-                value={devLogin}
-                onChange={(event) => setDevLogin(event.target.value)}
-                placeholder="or custom login: e.g. judge"
-                maxLength={39}
-                autoComplete="off"
-                className="h-8 flex-1 rounded-lg border border-zinc-800 bg-black/60 px-2.5 text-xs text-white placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none"
-              />
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="h-8 rounded-lg bg-zinc-800 px-3 text-xs font-medium text-zinc-200 transition-colors hover:bg-zinc-700"
-              >
-                Sign in
-              </button>
-            </form>
           </div>
 
           {/* Signed-in user: sign out first */}
