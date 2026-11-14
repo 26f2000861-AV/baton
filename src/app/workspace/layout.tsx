@@ -1,19 +1,12 @@
-import type { Metadata } from 'next'
-import type { ReactNode } from 'react'
-import Providers from '@/app/providers'
+'use client'
 
-export const metadata: Metadata = {
-  title: 'Workspace',
-  robots: { index: false, follow: false },
-  alternates: {},
-}
+import type { ReactNode } from 'react'
 
 /**
  * The workspace route renders inside the root layout; the page itself owns
- * the session gate and the HandoverProvider (Round 3). This wrapper mounts
- * the SessionProvider at the route boundary and keeps the route out of
- * search indexes — workspace state is private, per-seat data.
+ * the session gate and the HandoverProvider (Round 3). This wrapper only
+ * keeps the route boundary stable.
  */
 export default function WorkspaceLayout({ children }: { children: ReactNode }) {
-  return <Providers>{children}</Providers>
+  return <>{children}</>
 }

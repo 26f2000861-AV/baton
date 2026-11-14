@@ -9,6 +9,7 @@ import { ArrowRight, ArrowLeft } from 'lucide-react'
 export default function SignInPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const [isHovered, setIsHovered] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -87,7 +88,14 @@ export default function SignInPage() {
   return (
     <div className="relative flex min-h-screen min-h-dvh items-center justify-center overflow-hidden bg-[#0a0a0a] px-5 py-8">
       {/* Subtle diagonal stripe background pattern */}
-      <div className="diag-stripes pointer-events-none absolute inset-0" aria-hidden="true" />
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage:
+            'repeating-linear-gradient(135deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 10px)',
+        }}
+        aria-hidden="true"
+      />
 
       {/* Sign-in Card */}
       <div className="relative z-10 w-full max-w-[500px]">
@@ -130,6 +138,8 @@ export default function SignInPage() {
           {/* Primary Option: Continue with GitHub */}
           <button
             type="button"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
             onClick={() => signIn('github', { callbackUrl: '/workspace' })}
             className="group relative flex w-full items-center justify-center gap-3 rounded-[14px] border border-[#3a3a3a] bg-transparent px-5 py-3.5 text-[15px] font-semibold text-white transition-all duration-[250ms] ease-out hover:scale-[1.01] hover:border-white hover:bg-white hover:text-black hover:shadow-[0_4px_16px_rgba(255,255,255,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#141414] active:scale-[0.99]"
             aria-label="Continue with GitHub"
@@ -139,7 +149,8 @@ export default function SignInPage() {
               width="20"
               height="20"
               xmlns="http://www.w3.org/2000/svg"
-              className="fill-white transition-[fill] duration-[250ms] group-hover:fill-black"
+              className="transition-[fill] duration-[250ms]"
+              style={{ fill: isHovered ? '#000' : '#fff' }}
               aria-hidden="true"
             >
               <path
