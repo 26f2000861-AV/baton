@@ -22,6 +22,9 @@ body {
 button, input, select, textarea { font-family: var(--font); }
 button { cursor: pointer; }
 button:disabled { cursor: not-allowed; }
+/* Decorative diagonal stripes for the sign-in screen — a CSS class keeps
+   inline style attributes out of the production HTML. */
+.diag-stripes { background-image: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0px, rgba(255, 255, 255, 0.03) 1px, transparent 1px, transparent 10px); }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
 
 /* Visible High-Contrast Focus Appearance (WCAG 2.2 SC 2.4.11) */

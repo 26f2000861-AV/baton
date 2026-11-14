@@ -1,14 +1,41 @@
+# Baton — public content is open to standard and AI crawlers.
+# Private, per-seat workspace state lives behind sign-in and is never listed here.
+
 User-agent: Googlebot
 Allow: /
+Disallow: /api/
 
 User-agent: Bingbot
 Allow: /
+Disallow: /api/
 
 User-agent: Twitterbot
 Allow: /
+Disallow: /api/
 
 User-agent: facebookexternalhit
 Allow: /
+Disallow: /api/
+
+# AI crawlers are welcome on public content (GEO).
+User-agent: GPTBot
+Allow: /
+Disallow: /api/
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /api/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /api/
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /api/
 
 User-agent: *
 Allow: /
+Disallow: /api/
+
+Sitemap: https://www.gitlostbaton.xyz/sitemap.xml
