@@ -1,11 +1,14 @@
 # Audit Change Log — Round 3 Hardening (Audit-Fix Loop, Round 1 → Round 2)
 
-Two commits on top of `e08da3c` (main):
+Four commits on top of `e08da3c` (main):
 
+- `801c8ed` docs: correct cumulative diff stats in audit changelog
+- `e93ead1` docs: audit change log
+- `6f307a0` style(ui): consistent disclosure chevrons on claims help panels
 - `4204a30` fix(audit): harden demo auth, de-hardcode judge flow, resolve audit findings C1-C2, H1-H2, M1-M6, L1-L6
 - `6f307a0` style(ui): consistent disclosure chevrons on claims help panels
 
-Net diff: 37 files changed, +388 / -864 lines.
+Net diff across the four commits: 38 files changed, +451 / -865 lines.
 
 ## Critical
 
