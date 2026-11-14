@@ -88,10 +88,12 @@ Improvement 3: Shared, Verifiable Work History
 ```text
 Testing encompasses unit testing, TypeScript strict typechecking, security regression checks, and manual end-to-end journey tests:
 
-1. Automated Unit Tests (tests/verifier.test.mts & tests/github-mappers.test.mts):
-• 13 passing unit tests executed via Node's native test runner (node --experimental-strip-types --test).
+1. Automated Unit Tests (tests/verifier.test.mts, tests/github-mappers.test.mts, tests/authz.test.mts, tests/crypto.test.mts, tests/ratelimit.test.mts, tests/tenant.test.mts & tests/utils.test.mts):
+• 33 passing unit tests executed via Node's native test runner (node --experimental-strip-types --test).
 • Verifier tests: Exact substring extraction, CRLF normalization, whitespace mismatch degradation, and empty/absent quote rejections.
 • GitHub mapper tests: Repository input parsing (handles owner/name, full URLs, and .git extensions), PR and commit mapping to SourceRecord, deleted author resilience, claim excerpt building, and open PR triage into work items.
+• Authorization regression tests: Role gates (403), CUID handover-id shape behind the 404 non-enumeration behavior, role-to-clearance mapping, founder-governance escape hatch for lead-less handovers, and creator protection against demotion or removal.
+• Security & cryptographic tests: AES-256-GCM token encryption at rest with authentication tags, sliding-window rate limiting with quota isolation across client identifiers, multi-tenant Prisma database scoping, and WHATWG URL validation preventing XSS injection.
 
 2. Static Analysis & Type Safety:
 • Full TypeScript compilation check (tsc --noEmit) passes with zero errors across the entire codebase.

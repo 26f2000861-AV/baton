@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { authzErrorResponse, requireGovernance, requireMembership, requireSession } from '@/lib/authz'
+import { authzErrorResponse, canMutateMember, requireGovernance, requireMembership, requireSession } from '@/lib/authz'
 import { logActivity } from '@/lib/handoverService'
 import { ACTIVITY_ACTIONS } from '@/lib/activity'
 import type { PersonaRole } from '@/lib/types'
@@ -34,6 +34,14 @@ export async function PATCH(
           },
         },
         { status: 409 }
+      )
+    }
+
+    const mutationCheck = canMutateMember(handover, session.userId, params.userId, 'modify_role')
+    if (!mutationCheck.allowed) {
+      return NextResponse.json(
+        { error: { code: mutationCheck.code, message: mutationCheck.message } },
+        { status: 403 }
       )
     }
 
@@ -81,6 +89,14 @@ export async function DELETE(
           },
         },
         { status: 409 }
+      )
+    }
+
+    const mutationCheck = canMutateMember(handover, session.userId, params.userId, 'remove')
+    if (!mutationCheck.allowed) {
+      return NextResponse.json(
+        { error: { code: mutationCheck.code, message: mutationCheck.message } },
+        { status: 403 }
       )
     }
     const target = await prisma.membership.findUnique({

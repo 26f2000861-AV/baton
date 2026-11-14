@@ -4,10 +4,12 @@ import assert from 'node:assert/strict'
 import {
   AuthzError,
   canFounderGovern,
+  canMutateMember,
   clearanceForRole,
   isHandoverId,
   requireRole,
 } from '../src/lib/authzRules.ts'
+import { compileVisibleClaims } from '../src/lib/serializers.ts'
 
 /**
  * Authorization rules regression suite.
@@ -88,4 +90,64 @@ test('canFounderGovern: creator may govern only while no lead exists', () => {
     canFounderGovern(handover, { userId: 'user-3', role: 'successor' }, false),
     false
   )
+})
+
+test('compileVisibleClaims: redacts statements for withheld claims', () => {
+  const confidentialClaim = {
+    id: 'c1',
+    handoverId: 'h1',
+    legacyId: 'claim_10',
+    sectionId: 'risks',
+    statement: 'Alex Chen severance clauses and executive retention package terms',
+    status: 'quoted_verified',
+    category: 'fact',
+    verificationMethod: 'exact_substring_match',
+    sourceQuotes: JSON.stringify([
+      {
+        sourceId: 'slack_hr',
+        requiredClearanceLevel: 'restricted_hr_legal',
+      },
+    ]),
+    history: null,
+    origin: 'seed',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  }
+
+  // Successor only has team_internal clearance:
+  const result = compileVisibleClaims([confidentialClaim as any], 'team_internal')
+  assert.equal(result.visibleClaims.length, 0)
+  assert.equal(result.withheldCount, 1)
+  assert.equal(result.withheldDetails.length, 1)
+  assert.equal(result.withheldDetails[0].claimId, 'claim_10')
+  // CRUCIAL: Confidential text must NOT be present in withheldDetails statement:
+  assert.ok(!result.withheldDetails[0].statement.includes('severance'))
+  assert.ok(!result.withheldDetails[0].statement.includes('Alex Chen'))
+  assert.equal(
+    result.withheldDetails[0].statement,
+    '[Redacted — requires restricted hr legal clearance]'
+  )
+})
+
+test('canMutateMember protects handover creator from removal or demotion by other leads', () => {
+  const handover = { createdById: 'creator-1' }
+  const otherLead = 'invited-lead-2'
+  const regularMember = 'member-3'
+
+  // Other lead cannot remove the creator:
+  const removeCreator = canMutateMember(handover, otherLead, 'creator-1', 'remove')
+  assert.equal(removeCreator.allowed, false)
+  assert.equal(removeCreator.code, 'FORBIDDEN_CREATOR_REMOVAL')
+
+  // Other lead cannot modify/demote the creator's role:
+  const modifyCreator = canMutateMember(handover, otherLead, 'creator-1', 'modify_role')
+  assert.equal(modifyCreator.allowed, false)
+  assert.equal(modifyCreator.code, 'FORBIDDEN_CREATOR_MODIFICATION')
+
+  // Modifying regular members is permitted for leads:
+  const modifyRegular = canMutateMember(handover, otherLead, regularMember, 'modify_role')
+  assert.equal(modifyRegular.allowed, true)
+
+  const removeRegular = canMutateMember(handover, otherLead, regularMember, 'remove')
+  assert.equal(removeRegular.allowed, true)
 })

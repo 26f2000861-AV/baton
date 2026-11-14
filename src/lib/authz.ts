@@ -7,6 +7,7 @@ import type { ClearanceLevel } from './types'
 import {
   AuthzError,
   canFounderGovern,
+  canMutateMember,
   clearanceForRole,
   isHandoverId,
   requireRole,
@@ -26,7 +27,7 @@ import {
  * live in authzRules.ts and are unit-tested in tests/authz.test.mts.
  */
 
-export { AuthzError, canFounderGovern, clearanceForRole, isHandoverId, requireRole }
+export { AuthzError, canFounderGovern, canMutateMember, clearanceForRole, isHandoverId, requireRole }
 export type { Role }
 
 export interface SessionUser {
@@ -55,13 +56,15 @@ export async function requireMembership(
   handoverId: string,
   userId: string
 ): Promise<{ handover: Handover; membership: Membership }> {
+  // Reject malformed or invalid IDs before querying the database
+  if (!isHandoverId(handoverId)) {
+    throw new AuthzError(404, 'HANDOVER_NOT_FOUND', 'Handover not found.')
+  }
   const membership = await prisma.membership.findUnique({
     where: { handoverId_userId: { handoverId, userId } },
     include: { handover: true },
   })
-  if (!membership || !isHandoverId(handoverId)) {
-    // Also verify the handover actually exists — membership presence implies it,
-    // but a forged membership row is impossible via the API; keep the check cheap.
+  if (!membership) {
     throw new AuthzError(404, 'HANDOVER_NOT_FOUND', 'Handover not found.')
   }
   return { handover: membership.handover, membership }

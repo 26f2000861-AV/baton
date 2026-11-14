@@ -99,9 +99,9 @@ To ensure hackathon judges can immediately test the fully authenticated product 
 ## 6. Testing & Quality Assurance
 
 Baton has undergone rigorous automated and manual validation:
-* **Automated Unit Tests:** 13 unit tests running on Node's native test runner covering quote verification edge cases, GitHub DTO mapping, deleted author handling, and open PR triage.
+* **Automated Unit Tests:** 33 unit tests running on Node's native test runner across 7 targeted test suites: quote verification edge cases, GitHub DTO mapping, deleted author handling, open PR triage, authorization regression rules (role gates, id-shape non-enumeration, founder governance, lead-mutation protection), AES-256-GCM token encryption at rest, sliding-window rate limiting, multi-tenant Prisma client scoping, and WHATWG URL sanitization.
 * **Type Safety:** Full TypeScript strict compilation (`tsc --noEmit`) passes with zero errors.
-* **Security & Authz Regression:** Verified 401 unauthenticated, 403 forbidden, and 404 obscure-id behaviors.
+* **Security & Authz Regression:** Verified 401 unauthenticated, 403 forbidden, and 404 obscure-id behaviors; demo-seat takeover attempt rejected with 401.
 * **Cross-Browser Verification:** Tested across Chrome, Safari, and Firefox.
 
 ---

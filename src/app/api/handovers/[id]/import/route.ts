@@ -3,6 +3,7 @@ import { authzErrorResponse, requireMembership, requireRole, requireSession } fr
 import { getHandoverState, logActivity } from '@/lib/handoverService'
 import { runImport, GitHubImportError } from '@/lib/github'
 import { ACTIVITY_ACTIONS } from '@/lib/activity'
+import { checkRateLimit, rateLimitResponse } from '@/lib/rateLimit'
 
 /**
  * Start a GitHub import for this handover (Improvement 2).
@@ -17,6 +18,11 @@ export async function POST(
     const session = await requireSession()
     const { handover, membership } = await requireMembership(params.id, session.userId)
     requireRole(membership, ['lead', 'successor'])
+
+    const rl = checkRateLimit(`import:${handover.id}`, 5, 60_000)
+    if (!rl.success) {
+      return rateLimitResponse(rl.retryAfterSeconds, 5, rl.reset)
+    }
 
     const body: unknown = await req.json().catch(() => null)
     const { repo } = (body ?? {}) as Record<string, unknown>

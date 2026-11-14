@@ -4,6 +4,7 @@ import { FormEvent, useState } from 'react'
 import { FileText, Check, AlertCircle, ExternalLink, ChevronDown, ShieldCheck, ShieldAlert } from 'lucide-react'
 import type { ArchitecturalDecision, SourceMeta, WorkUpdate } from '@/lib/types'
 import type { CaptureWorkUpdateInput } from '@/lib/handoverStore'
+import { sanitizeSafeUrl } from '@/lib/utils'
 
 /**
  * Decisions pillar + the shared work-history capture form (Improvement 3).
@@ -315,8 +316,8 @@ export default function PillarDecisions({
                   {update.linkedSource && (
                     <p className="work-update-linked-source">
                       Evidence: <code>{update.linkedSource.legacyId}</code>
-                      {update.linkedSource.sourceType.startsWith('github') && update.linkedSource.uri.startsWith('http') && (
-                        <a href={update.linkedSource.uri} target="_blank" rel="noopener noreferrer"> Open on GitHub <ExternalLink size={11} className="inline" aria-hidden="true" /></a>
+                      {update.linkedSource.sourceType.startsWith('github') && sanitizeSafeUrl(update.linkedSource.uri) && (
+                        <a href={sanitizeSafeUrl(update.linkedSource.uri)!} target="_blank" rel="noopener noreferrer"> Open on GitHub <ExternalLink size={11} className="inline" aria-hidden="true" /></a>
                       )}
                     </p>
                   )}

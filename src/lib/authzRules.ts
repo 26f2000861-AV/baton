@@ -57,3 +57,32 @@ export function canFounderGovern(
   if (membership.role === 'lead') return true
   return !handoverHasLead && handover.createdById === membership.userId
 }
+
+/**
+ * Governance protection (Remediation for SEC-06):
+ * The creator of a handover cannot be removed or demoted by other leads.
+ */
+export function canMutateMember(
+  handover: { createdById: string },
+  actorUserId: string,
+  targetUserId: string,
+  action: 'modify_role' | 'remove'
+): { allowed: boolean; code?: string; message?: string } {
+  if (action === 'remove' && targetUserId === handover.createdById) {
+    return {
+      allowed: false,
+      code: 'FORBIDDEN_CREATOR_REMOVAL',
+      message: 'The creator of this handover cannot be removed from their own handover.',
+    }
+  }
+
+  if (action === 'modify_role' && targetUserId === handover.createdById && actorUserId !== handover.createdById) {
+    return {
+      allowed: false,
+      code: 'FORBIDDEN_CREATOR_MODIFICATION',
+      message: 'The creator of this handover cannot be demoted or modified by other members.',
+    }
+  }
+
+  return { allowed: true }
+}

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { ShieldCheck, ShieldAlert, ExternalLink, GitCommit, MessageSquare, CheckSquare, GitPullRequest, Users, Download, RotateCcw, FileText, HelpCircle, ArrowDownUp } from 'lucide-react'
 import type { ActivityEntry, WorkUpdate } from '@/lib/types'
 import { ACTION_LABELS } from '@/lib/activity'
+import { sanitizeSafeUrl } from '@/lib/utils'
 
 /**
  * Shared, dated team history — Improvement 3.
@@ -82,8 +83,8 @@ export default function HistoryView({
                     {item.update.linkedSource && (
                       <p className="history-linked">
                         Evidence: <code>{item.update.linkedSource.legacyId}</code>
-                        {item.update.linkedSource.uri.startsWith('http') && (
-                          <a href={item.update.linkedSource.uri} target="_blank" rel="noopener noreferrer">
+                        {sanitizeSafeUrl(item.update.linkedSource.uri) && (
+                          <a href={sanitizeSafeUrl(item.update.linkedSource.uri)!} target="_blank" rel="noopener noreferrer">
                             {' '}Open origin <ExternalLink size={11} aria-hidden="true" />
                           </a>
                         )}

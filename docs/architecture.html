@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1d1c1a;
+    --muted: #6b685f;
+    --fill-1: #f7f7f6;
+    --fill-2: #eeedeb;
+    --border: #d3cdba;
+    --accent: #8e7324;
+    --accent-soft: #f3edda;
+  }
+  html, body { margin: 0; padding: 0; background: #ffffff; }
+  .canvas {
+    position: relative; width: 1000px; height: 700px;
+    font-family: 'Inter', sans-serif; background: #ffffff;
+    box-sizing: border-box;
+  }
+  .node {
+    position: absolute; box-sizing: border-box; border-radius: 10px;
+    border: 1.5px solid var(--border); background: var(--fill-1);
+    padding: 16px 18px 14px 18px; text-align: center;
+  }
+  .node .t { font-size: 21px; font-weight: 600; color: var(--ink); line-height: 1.25; }
+  .node .d { font-size: 16px; color: var(--muted); margin-top: 7px; line-height: 1.35; }
+  .node.guard {
+    background: var(--accent-soft); border: 2px solid var(--accent);
+  }
+  .node.ext { background: var(--fill-2); border-style: dashed; }
+  .tier-label {
+    position: absolute; font-family: 'IBM Plex Mono', monospace; font-size: 16px;
+    letter-spacing: 2px; color: var(--muted); text-transform: uppercase;
+  }
+  svg.wires { position: absolute; inset: 0; width: 1000px; height: 700px; }
+  .wire { stroke: #a89f88; stroke-width: 2; fill: none; }
+  .arrowhead { fill: #a89f88; }
+  .wire-label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 15px; fill: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <!-- tier labels (left rail, vertically centered per band) -->
+  <div class="tier-label" style="left: 14px; top: 52px;">Client</div>
+  <div class="tier-label" style="left: 14px; top: 225px;">Edge</div>
+  <div class="tier-label" style="left: 14px; top: 380px;">Core</div>
+  <div class="tier-label" style="left: 14px; top: 560px;">Data</div>
+
+  <!-- Row 1: client -->
+  <div class="node" style="left: 210px; top: 24px; width: 560px;">
+    <div class="t">Next.js 14 App Router UI</div>
+    <div class="d">Overview &middot; Claims &middot; Decisions &middot; Ownership &middot; Risks &middot; History</div>
+  </div>
+
+  <!-- Row 2: edge -->
+  <div class="node" style="left: 60px; top: 186px; width: 420px;">
+    <div class="t">NextAuth v4 (JWT)</div>
+    <div class="d">GitHub OAuth &middot; allowlisted demo seats<br>@gitlostbaton.xyz namespace</div>
+  </div>
+  <div class="node" style="left: 520px; top: 186px; width: 420px;">
+    <div class="t">REST API /api/*</div>
+    <div class="d">20 route files &middot; workspace, members,<br>imports, work updates, verify</div>
+  </div>
+
+  <!-- Row 3: server core -->
+  <div class="node guard" style="left: 170px; top: 348px; width: 660px;">
+    <div class="t">Authorization Guard &mdash; src/lib/authz.ts</div>
+    <div class="d">requireSession &rarr; requireMembership &rarr; requireRole<br>
+    401 unauthenticated &middot; 404 non-member (no id enumeration) &middot; 403 wrong role</div>
+  </div>
+
+  <!-- Row 4: data / external -->
+  <div class="node" style="left: 60px; top: 520px; width: 420px;">
+    <div class="t">Prisma ORM v6</div>
+    <div class="d">Typed data layer &middot; transactional cloning<br>SQLite locally &middot; Neon Postgres in production</div>
+  </div>
+  <div class="node ext" style="left: 520px; top: 520px; width: 420px;">
+    <div class="t">GitHub REST API v3</div>
+    <div class="d">Read-only import &middot; 3-tier auth:<br>user OAuth &rarr; server PAT &rarr; public</div>
+  </div>
+
+  <!-- wires -->
+  <svg class="wires">
+    <defs>
+      <marker id="arr" markerWidth="9" markerHeight="8" refX="7.5" refY="4" orient="auto">
+        <path d="M0,0 L8,4 L0,8 Z" class="arrowhead"/>
+      </marker>
+    </defs>
+    <!-- UI -> NextAuth -->
+    <path class="wire" d="M 380 106 L 290 186" marker-end="url(#arr)"/>
+    <!-- UI -> API routes -->
+    <path class="wire" d="M 600 106 L 710 186" marker-end="url(#arr)"/>
+    <!-- NextAuth -> Guard -->
+    <path class="wire" d="M 300 296 L 380 348" marker-end="url(#arr)"/>
+    <text class="wire-label" x="238" y="330">JWT session</text>
+    <!-- API -> Guard -->
+    <path class="wire" d="M 700 296 L 620 348" marker-end="url(#arr)"/>
+    <!-- Guard -> Prisma -->
+    <path class="wire" d="M 380 452 L 290 520" marker-end="url(#arr)"/>
+    <!-- API -> GitHub -->
+    <path class="wire" d="M 780 296 C 930 360, 940 440, 800 520" marker-end="url(#arr)"/>
+    <text class="wire-label" x="880" y="400">import jobs</text>
+  </svg>
+</div>
+</body>
+</html>

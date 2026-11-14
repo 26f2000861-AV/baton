@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { authzErrorResponse, requireSession } from '@/lib/authz'
 import { createHandover, listHandoversForUser, logActivity } from '@/lib/handoverService'
 import { ACTIVITY_ACTIONS } from '@/lib/activity'
+import { checkRateLimit, rateLimitResponse } from '@/lib/rateLimit'
 import type { PersonaRole } from '@/lib/types'
 
 export const dynamic = 'force-dynamic'
@@ -20,6 +21,11 @@ const ROLES: PersonaRole[] = ['lead', 'successor', 'leaver']
 export async function POST(req: Request) {
   try {
     const session = await requireSession()
+    const rl = checkRateLimit(`handover-create:${session.userId}`, 10, 60_000)
+    if (!rl.success) {
+      return rateLimitResponse(rl.retryAfterSeconds, 10, rl.reset)
+    }
+
     const body: unknown = await req.json().catch(() => null)
     if (!body || typeof body !== 'object') {
       return NextResponse.json(

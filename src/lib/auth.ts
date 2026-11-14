@@ -4,6 +4,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import type { Profile } from 'next-auth'
 import { prisma } from './db'
+import { encryptToken } from './crypto'
 
 /**
  * Baton auth — Improvement 1.
@@ -59,8 +60,21 @@ export function setLatestAuthError(msg: string) {
   latestAuthError = msg
 }
 
+const basePrismaAdapter = PrismaAdapter(prisma)
+const securePrismaAdapter = {
+  ...basePrismaAdapter,
+  async linkAccount(account: any) {
+    const secureAccount = {
+      ...account,
+      access_token: account.access_token ? encryptToken(account.access_token) : account.access_token,
+      refresh_token: account.refresh_token ? encryptToken(account.refresh_token) : account.refresh_token,
+    }
+    return basePrismaAdapter.linkAccount(secureAccount)
+  },
+}
+
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  adapter: securePrismaAdapter as any,
   // Verbose OAuth logging is a dev aid; never enable it in production logs.
   debug: process.env.NODE_ENV !== 'production',
   secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET || DEV_FALLBACK_SECRET,

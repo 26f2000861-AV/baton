@@ -6,6 +6,7 @@ import type { Claim, ClearanceLevel } from '@/lib/types'
 import { CLAIM_STATUS_COPY } from '@/lib/claimStatus'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
 import { useHandover } from '@/lib/handoverStore'
+import { sanitizeSafeUrl } from '@/lib/utils'
 
 interface QuoteCheck {
   isExactMatch: boolean
@@ -220,9 +221,9 @@ export default function SourceInspectorDrawer({
               <div className="pt-2">
                 <span className="block font-medium text-[#0A0A0A]">{isImported ? 'Imported source · link back to origin' : 'Illustrative source reference · synthetic, not connected'}</span>
                 <code className="mt-1 block break-all text-[11px]">{source.uri}</code>
-                {source.uri.startsWith('http') && (
+                {sanitizeSafeUrl(source.uri) && (
                   <a
-                    href={source.uri}
+                    href={sanitizeSafeUrl(source.uri)!}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-[#1D5FBF] underline-offset-2 hover:underline"

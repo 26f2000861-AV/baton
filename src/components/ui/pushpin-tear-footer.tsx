@@ -503,12 +503,14 @@ const DEFAULT_COLUMNS: FooterColumn[] = [
 const DEFAULT_SIDES: IconLink[] = []
 
 function A({ href, className, label, children, style }: { href?: string; className?: string; label?: string; children: React.ReactNode; style?: React.CSSProperties }) {
+  const isSafe = !href || href === '#' || href.startsWith('/') || href.startsWith('#') || /^https?:\/\//i.test(href) || href.startsWith('mailto:')
+  const safeHref = isSafe ? href : '#'
   const onClick = (e: React.MouseEvent) => {
-    if (!href || href === "#") e.preventDefault()
+    if (!safeHref || safeHref === "#") e.preventDefault()
   }
-  const out = !!href && /^https?:/.test(href)
+  const out = !!safeHref && /^https?:\/\//i.test(safeHref)
   return (
-    <a href={href || "#"} className={className} aria-label={label} title={label} onClick={onClick} style={style} {...(out ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
+    <a href={safeHref || "#"} className={className} aria-label={label} title={label} onClick={onClick} style={style} {...(out ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
       {children}
     </a>
   )

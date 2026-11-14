@@ -1,4 +1,5 @@
 import { prisma } from './db'
+import { decryptToken } from './crypto'
 import {
   GitHubImportError,
   mapPullToSource,
@@ -108,13 +109,13 @@ export interface ImportResult {
   authTier: AuthTier
 }
 
-/** Retrieves the signed-in user's GitHub OAuth token from the Account table. */
+/** Retrieves and decrypts the signed-in user's GitHub OAuth token from the Account table. */
 export async function getGithubTokenForUser(userId: string): Promise<string | null> {
   const account = await prisma.account.findFirst({
     where: { userId, provider: 'github' },
     orderBy: { createdAt: 'desc' },
   })
-  return account?.access_token ?? null
+  return decryptToken(account?.access_token)
 }
 
 /**

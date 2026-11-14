@@ -31,7 +31,7 @@ import type {
   WorkUpdate,
   WorkUpdateVerification,
 } from './types'
-import { clearanceForRole } from './authz'
+import { clearanceForRole } from './authzRules.ts'
 import type { PersonaRole } from './types'
 
 /**
@@ -233,7 +233,7 @@ export function compileVisibleClaims(claims: ClaimRow[], clearance: string) {
       )
       withheld.push({
         claimId: row.legacyId,
-        statement: row.statement,
+        statement: `[Redacted — requires ${highest.replaceAll('_', ' ')} clearance]`,
         requiredClearance: highest,
         reason:
           highest === 'restricted_hr_legal'

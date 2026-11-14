@@ -6,6 +6,7 @@
 > **Team Member:** Manas Kapoor  
 > **Live Deployed Product:** [https://www.gitlostbaton.xyz](https://www.gitlostbaton.xyz)  
 > **Source Repository:** [https://github.com/26f2000861-AV/baton](https://github.com/26f2000861-AV/baton)  
+> **Product Dossier:** [Baton Round 3 Final Product Dossier (PDF)](./docs/Baton_Round_3_Final_Product_Dossier.pdf)  
 > **Core Evaluated Workflow:** *"the decisions already taken, what is still unfinished, who owned what, and where the risk sits — without having to chase anyone."*
 
 ---
@@ -67,7 +68,7 @@ Baton organizes tribal engineering knowledge into an inspectable ledger covering
 
 * **Framework:** Next.js 14 App Router (`src/app`) with React 18 & TypeScript
 * **Database:** PostgreSQL (Neon Serverless Postgres in production)
-* **ORM:** Prisma Client v6 with declarative schema ([prisma/schema.prisma](file:///C:/Users/adity/Downloads/baton/prisma/schema.prisma))
+* **ORM:** Prisma Client v6 with declarative schema ([prisma/schema.prisma](./prisma/schema.prisma))
 * **Authentication:** NextAuth.js v4 (GitHub OAuth + JWT session strategy + Demo Credentials)
 * **Styling & UI:** Tailwind CSS, Lucide React icons, Framer Motion
 * **External APIs:** GitHub REST API v3 (octokit-compatible rate limiting, pagination, and multi-tier auth)
@@ -167,10 +168,14 @@ npm run typecheck
 npm run lint
 ```
 
-Test coverage includes:
+Test coverage includes 33 passing automated tests across 7 suites:
 * `tests/verifier.test.mts`: Exact quote substring matching, CRLF normalization, whitespace degradation, and boundary checks.
 * `tests/github-mappers.test.mts`: Pull request & commit DTO mapping, deleted author handling, claim extraction, and open PR triage into work items.
-* `tests/authz.test.mts`: Authorization rules regression — role gates (403), CUID handover-id shape behind the 404 non-enumeration behavior, role-to-clearance mapping, and the founder-governance escape hatch for lead-less handovers. Route-level 401/403/404 responses are additionally verified live against the running server.
+* `tests/authz.test.mts`: Authorization rules regression — role gates (403), CUID handover-id shape behind the 404 non-enumeration behavior, role-to-clearance mapping, founder-governance escape hatch for lead-less handovers, and creator protection against demotion or removal.
+* `tests/crypto.test.mts`: AES-256-GCM token encryption at rest, authenticated encryption tags, idempotency, and tamper detection.
+* `tests/ratelimit.test.mts`: In-memory sliding-window rate limiting per client IP with quota isolation.
+* `tests/tenant.test.mts`: Multi-tenant Prisma client scoping ensuring tenant database isolation.
+* `tests/utils.test.mts`: WHATWG URL parsing, allowed protocols (HTTPS/HTTP), and XSS scheme neutralization.
 
 ---
 

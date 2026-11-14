@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { authzErrorResponse, requireMembership, requireSession } from '@/lib/authz'
 import { resetHandoverToTemplate, logActivity, getHandoverState } from '@/lib/handoverService'
 import { ACTIVITY_ACTIONS } from '@/lib/activity'
+import { checkRateLimit, rateLimitResponse } from '@/lib/rateLimit'
 
 /**
  * Reset a handover to the sample baseline. Creator only. Wipes all mutable
@@ -26,6 +27,12 @@ export async function POST(
         { status: 403 }
       )
     }
+
+    const rl = checkRateLimit(`reset:${handover.id}`, 3, 60_000)
+    if (!rl.success) {
+      return rateLimitResponse(rl.retryAfterSeconds, 3, rl.reset)
+    }
+
     await resetHandoverToTemplate(handover.id)
     await logActivity({
       handoverId: handover.id,
