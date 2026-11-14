@@ -1,11 +1,11 @@
-import {
+import type {
   ArchitecturalDecision,
   Claim,
   ContradictionItem,
   LeaverInterviewQuestion,
   OwnershipAsset,
   UnfinishedWorkItem,
-} from '../lib/types'
+} from '../lib/types.ts'
 
 /**
  * Helios Observability Platform — Round 3 sample handover case.
