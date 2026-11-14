@@ -47,6 +47,7 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
+  refresh_token_expires_in Int?
   createdAt         DateTime @default(now())
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -76,7 +77,7 @@ model Handover {
   name         String
   description  String   @default("")
   isTemplate   Boolean  @default(false)
-  templateKey  String?
+  templateKey  String?  @unique
   createdById  String
   createdAt    DateTime @default(now())
 

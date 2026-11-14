@@ -1,21 +1,21 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { authzErrorResponse, requireMembership, requireRole, requireSession } from '@/lib/authz'
+import { authzErrorResponse, requireGovernance, requireMembership, requireSession } from '@/lib/authz'
 import { logActivity } from '@/lib/handoverService'
 import { ACTIVITY_ACTIONS } from '@/lib/activity'
 import type { PersonaRole } from '@/lib/types'
 
 const ROLES: PersonaRole[] = ['lead', 'successor', 'leaver']
 
-/** Change a member's role. Lead only; the lead cannot demote themself. */
+/** Change a member's role. Lead only (or the creator while no lead exists); the lead cannot demote themself. */
 export async function PATCH(
   req: Request,
   { params }: { params: { id: string; userId: string } }
 ) {
   try {
     const session = await requireSession()
-    const { membership } = await requireMembership(params.id, session.userId)
-    requireRole(membership, ['lead'])
+    const { handover, membership } = await requireMembership(params.id, session.userId)
+    await requireGovernance(handover, membership)
 
     const body: unknown = await req.json().catch(() => null)
     const { role } = (body ?? {}) as Record<string, unknown>
@@ -62,15 +62,15 @@ export async function PATCH(
   }
 }
 
-/** Remove a member. Lead only; the lead cannot remove themself. */
+/** Remove a member. Lead only (or the creator while no lead exists); the lead cannot remove themself. */
 export async function DELETE(
   _req: Request,
   { params }: { params: { id: string; userId: string } }
 ) {
   try {
     const session = await requireSession()
-    const { membership } = await requireMembership(params.id, session.userId)
-    requireRole(membership, ['lead'])
+    const { handover, membership } = await requireMembership(params.id, session.userId)
+    await requireGovernance(handover, membership)
 
     if (params.userId === session.userId) {
       return NextResponse.json(

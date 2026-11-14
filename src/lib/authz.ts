@@ -3,34 +3,37 @@ import { NextResponse } from 'next/server'
 import type { Membership, Handover } from '@prisma/client'
 import { authOptions } from './auth'
 import { prisma } from './db'
-import type { ClearanceLevel, PersonaRole } from './types'
+import type { ClearanceLevel } from './types'
+import {
+  AuthzError,
+  canFounderGovern,
+  clearanceForRole,
+  isHandoverId,
+  requireRole,
+  type Role,
+} from './authzRules'
 
 /**
  * Server-side authorization for Baton — Improvement 1.
  * THE CLIENT IS UNTRUSTED. Every route handler must pass through these guards
- * in order: requireSession → requireMembership → requireRole, before any DB
- * read or write. Client-side role gating is a UX affordance only.
+ * in order: requireSession → requireMembership → requireRole (or
+ * requireGovernance), before any DB read or write. Client-side role gating is
+ * a UX affordance only.
  *
  * Non-members receive 404 (not 403) so handover ids are not enumerable.
+ *
+ * The pure decision rules (roles, clearance, id shape, founder governance)
+ * live in authzRules.ts and are unit-tested in tests/authz.test.mts.
  */
 
-export type Role = PersonaRole // 'lead' | 'successor' | 'leaver'
+export { AuthzError, canFounderGovern, clearanceForRole, isHandoverId, requireRole }
+export type { Role }
 
 export interface SessionUser {
   userId: string
   githubLogin: string | null
   name: string | null
   image: string | null
-}
-
-export class AuthzError extends Error {
-  constructor(
-    public status: number,
-    public code: string,
-    message: string
-  ) {
-    super(message)
-  }
 }
 
 /** Returns the signed-in user or throws 401. */
@@ -64,26 +67,27 @@ export async function requireMembership(
   return { handover: membership.handover, membership }
 }
 
-/** Throws 403 unless the member holds one of the allowed roles. */
-export function requireRole(membership: Membership, roles: Role[]): void {
-  if (!roles.includes(membership.role as Role)) {
+/**
+ * Governance gate: the lead role governs invites, role changes and
+ * settlements. One escape hatch exists so a handover can never deadlock:
+ * when the handover has NO lead at all, the member who created it may
+ * exercise governance (in practice: invite members, or claim the lead seat).
+ */
+export async function requireGovernance(
+  handover: Handover,
+  membership: Membership
+): Promise<void> {
+  const hasLead = await prisma.membership.findFirst({
+    where: { handoverId: handover.id, role: 'lead' },
+    select: { id: true },
+  })
+  if (!canFounderGovern(handover, membership, Boolean(hasLead))) {
     throw new AuthzError(
       403,
       'FORBIDDEN_ROLE',
-      `This action requires the ${roles.join(' or ')} role on this handover.`
+      'This action requires the lead role on this handover.'
     )
   }
-}
-
-/** Maps a membership role to its clearance — mirrors the Round 2 persona model. */
-export function clearanceForRole(role: string): ClearanceLevel {
-  if (role === 'lead') return 'confidential_lead'
-  return 'team_internal' // successor + leaver
-}
-
-function isHandoverId(id: string): boolean {
-  // CUID-shaped ids only; rejects legacy/seed ids and junk early.
-  return /^c[a-z0-9]{20,}$/i.test(id)
 }
 
 /** Maps any thrown AuthzError to a clean JSON response. Used by every route. */

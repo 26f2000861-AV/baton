@@ -69,8 +69,8 @@ export default function HomeHero() {
         <div id="handover-core" className="flex flex-1 flex-col justify-center border-t border-[#262626]">
           <InkOrbitHero
             theme="dark"
-            titleTop="A practical handover for"
-            titleAccent={["the work that matters"]}
+            titleTop="A practical handover"
+            titleAccent={["for the work that matters"]}
             description="Review the sample PR and Slack records side by side. Keep the source, conflict, lead rationale, and next owner in one handover."
             primaryCta={entryLabel}
             onPrimary={() => router.push(entryHref)}

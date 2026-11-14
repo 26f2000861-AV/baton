@@ -8,14 +8,11 @@ import { prisma } from './db'
 /**
  * Baton auth — Improvement 1.
  *
- * Production: GitHub OAuth is the ONLY provider (team decision). Judges and
- * users sign in with their real GitHub identity; that identity is their seat
- * at the handover table and the token used by the GitHub import engine.
- *
- * Non-production local development: when GITHUB_ID / GITHUB_SECRET are not
- * set, a clearly-labeled local dev sign-in replaces the GitHub button so the
- * full authenticated flow can be built and tested before the OAuth app exists.
- * Production never enables the local provider.
+ * Production: GitHub OAuth is the identity provider. The demo credentials
+ * provider (dev-local) stays available in every environment for judge
+ * evaluation, but is hardened: it accepts only fixed, whitelisted demo
+ * logins and resolves accounts by the reserved @gitlostbaton.xyz e-mail
+ * namespace — it can never match, create, or impersonate a real account.
  */
 
 const githubId =
@@ -39,7 +36,6 @@ if (!process.env.NEXTAUTH_URL && process.env.VERCEL_URL) {
 }
 
 const hasGitHubApp = Boolean(githubId && githubSecret)
-const allowDevProvider = process.env.NODE_ENV !== 'production'
 
 // Sandbox/preview resilience: the sandbox boot may rewrite .env and drop
 // NEXTAUTH_SECRET. NextAuth v4 then silently falls back to a RANDOM
@@ -65,7 +61,8 @@ export function setLatestAuthError(msg: string) {
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
-  debug: true,
+  // Verbose OAuth logging is a dev aid; never enable it in production logs.
+  debug: process.env.NODE_ENV !== 'production',
   secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET || DEV_FALLBACK_SECRET,
   session: {
     strategy: 'jwt',
@@ -159,9 +156,18 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         login: { label: 'Demo username', type: 'text', placeholder: 'e.g. demo_successor' },
       },
+      /**
+       * Security model (hardened for Round 3):
+       * 1. Only the fixed demo logins below are accepted — anything else
+       *    returns null and NextAuth rejects the sign-in.
+       * 2. Demo accounts are resolved by their reserved
+       *    @gitlostbaton.xyz e-mail address, NEVER by githubLogin, so this
+       *    provider can only ever return rows it created itself. A real
+       *    GitHub user (however their account was created) can never be
+       *    matched or impersonated through this form.
+       */
       async authorize(credentials) {
         const raw = (credentials?.login ?? '').trim().toLowerCase()
-        const login = /^[-_a-z0-9]{1,39}$/.test(raw) ? raw : 'demo_successor'
 
         const DEMO_PROFILES: Record<string, { name: string; email: string }> = {
           demo_successor: { name: 'Priya Sharma (Successor)', email: 'priya.successor@gitlostbaton.xyz' },
@@ -172,18 +178,21 @@ export const authOptions: NextAuthOptions = {
           dev_lead: { name: 'Dev Lead', email: 'dev_lead@gitlostbaton.xyz' },
         }
 
-        const profile = DEMO_PROFILES[login] || {
-          name: `Judge ${login.replace(/^demo_/, '')}`,
-          email: `${login}@gitlostbaton.xyz`,
+        const profile = DEMO_PROFILES[raw]
+        if (!profile) {
+          // Unknown login: reject. No arbitrary account creation, no
+          // user lookup by username — the pre-hardening behavior allowed
+          // signing in as any existing user by typing their GitHub login.
+          return null
         }
 
-        // Reuse (or create) a local demo user so repeat sign-ins keep state.
-        const existing = await prisma.user.findUnique({ where: { githubLogin: login } })
+        // Reuse (or create) the demo-owned user so repeat sign-ins keep state.
+        const existing = await prisma.user.findUnique({ where: { email: profile.email } })
         if (existing) return existing
         return prisma.user.create({
           data: {
             name: profile.name,
-            githubLogin: login,
+            githubLogin: raw,
             email: profile.email,
           },
         })

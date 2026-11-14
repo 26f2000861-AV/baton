@@ -4,10 +4,20 @@
 # This script derives prisma/schema.sqlite.prisma (one-word provider swap — the schema
 # is deliberately provider-agnostic: no native types, no enums, no Json columns)
 # and runs generate/push against whichever provider DATABASE_URL indicates.
+# Works with npm-only machines (npx) and falls back to nothing else — bun is
+# optional and used when present.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 COMMAND="${1:-push}"
+
+# Prefer bunx when available (faster, runs TS natively); npx otherwise so the
+# README's npm-only prerequisites are sufficient.
+if command -v bunx >/dev/null 2>&1; then
+  RUNNER="bunx"
+else
+  RUNNER="npx"
+fi
 
 url="${DATABASE_URL:-$(grep -E '^DATABASE_URL=' .env 2>/dev/null | cut -d= -f2- | tr -d '"' || true)}"
 
@@ -22,17 +32,21 @@ fi
 
 case "$COMMAND" in
   push)
-    bunx prisma db push --schema "$SCHEMA" --skip-generate
-    bunx prisma generate --schema "$SCHEMA"
+    "$RUNNER" prisma db push --schema "$SCHEMA" --skip-generate
+    "$RUNNER" prisma generate --schema "$SCHEMA"
     ;;
   generate)
-    bunx prisma generate --schema "$SCHEMA"
+    "$RUNNER" prisma generate --schema "$SCHEMA"
     ;;
   studio)
-    bunx prisma studio --schema "$SCHEMA"
+    "$RUNNER" prisma studio --schema "$SCHEMA"
     ;;
   seed)
-    bunx tsx prisma/seed-template.ts 2>/dev/null || bun run prisma/seed-template.ts
+    if command -v bun >/dev/null 2>&1; then
+      bun run prisma/seed-template.ts
+    else
+      npx tsx prisma/seed-template.ts
+    fi
     ;;
   *)
     echo "Usage: scripts/dev-db.sh [push|generate|studio|seed]"

@@ -67,13 +67,19 @@ export async function POST(
     })
 
     if (item.associatedClaimId) {
+      // Derive the history text from THIS contradiction's payload — the
+      // values come from the two disagreeing sources, so the audit trail is
+      // correct for seeded and imported contradictions alike (a previous
+      // version hardcoded the Helios sample narrative into every settlement).
+      const valueA = item.sourceA?.extractedValue ?? 'Source A'
+      const valueB = item.sourceB?.extractedValue ?? 'Source B'
       const settledSource =
         resolution === 'accept_source_b'
-          ? 'Accepted Source B: Thanos still serves dashboard reads; VM ingest remains dual-write.'
+          ? `Accepted Source B: ${valueB}.`
           : resolution === 'accept_source_a'
-            ? 'Accepted Source A: the VictoriaMetrics dual-write is fully live for dashboards.'
+            ? `Accepted Source A: ${valueA}.`
             : resolution === 'accept_dual_scope'
-              ? 'Resolved scope: VM stays dual-write for ingest; Thanos keeps serving dashboard reads until the cutover completes.'
+              ? `Resolved dual scope: "${valueA}" and "${valueB}" each hold within their own scope.`
               : 'Lead clarification recorded; source precedence remains explicitly unresolved.'
       const claimRow = await prisma.claim.findUnique({
         where: { handoverId_legacyId: { handoverId: handover.id, legacyId: item.associatedClaimId } },

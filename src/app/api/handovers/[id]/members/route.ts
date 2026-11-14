@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { authzErrorResponse, requireMembership, requireRole, requireSession } from '@/lib/authz'
+import { authzErrorResponse, requireGovernance, requireMembership, requireSession } from '@/lib/authz'
 import { inviteMemberByLogin, logActivity } from '@/lib/handoverService'
 import { ACTIVITY_ACTIONS } from '@/lib/activity'
 import type { PersonaRole } from '@/lib/types'
@@ -8,9 +8,10 @@ const ROLES: PersonaRole[] = ['lead', 'successor', 'leaver']
 
 /**
  * Invite an existing Baton user to this handover by GitHub username.
- * Lead only. The invited user must have signed in to Baton at least once
- * (the app does not search GitHub user accounts — honest limitation, stated
- * in the UI).
+ * Lead only (or the creator while the handover has no lead at all — the
+ * deadlock escape hatch). The invited user must have signed in to Baton at
+ * least once (the app does not search GitHub user accounts — honest
+ * limitation, stated in the UI).
  */
 export async function POST(
   req: Request,
@@ -18,8 +19,8 @@ export async function POST(
 ) {
   try {
     const session = await requireSession()
-    const { membership } = await requireMembership(params.id, session.userId)
-    requireRole(membership, ['lead'])
+    const { handover, membership } = await requireMembership(params.id, session.userId)
+    await requireGovernance(handover, membership)
 
     const body: unknown = await req.json().catch(() => null)
     const { githubLogin, role } = (body ?? {}) as Record<string, unknown>

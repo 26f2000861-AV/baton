@@ -40,9 +40,49 @@ export default function SignInPage() {
     }
   }, [status, router])
 
-  const handleQuickDemo = (login: string) => {
+  const handleQuickDemo = async (login: string) => {
     setIsSubmitting(true)
-    signIn('dev-local', { callbackUrl: '/workspace?h=cmwfhxecd000wic08eyrzbv5d', login })
+    try {
+      // redirect:false keeps control here so the demo seat can be provisioned
+      // before entering the workspace — no hardcoded handover ids (a previous
+      // version baked in a production database id, which broke the demo flow
+      // on every fresh environment).
+      const result = await signIn('dev-local', { redirect: false, login })
+      if (result?.error) {
+        setErrorMessage('That demo seat is not available. Check the sign-in name and try again.')
+        return
+      }
+
+      // Ensure the seat actually has a handover to open: on a fresh database
+      // (or a judge's first visit) provision the private sample clone with
+      // this seat's role before routing into the workspace.
+      let target: string | null = null
+      try {
+        const me = await fetch('/api/me', { cache: 'no-store' })
+        if (me.ok) {
+          const payload = await me.json()
+          target = payload?.handovers?.[0]?.id ?? null
+        }
+        if (!target) {
+          const role = login === 'demo_lead' ? 'lead' : login === 'demo_leaver' ? 'leaver' : 'successor'
+          const created = await fetch('/api/handovers', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fromTemplate: true, role }),
+          })
+          if (created.ok) {
+            const payload = await created.json()
+            target = payload?.handover?.id ?? null
+          }
+        }
+      } catch {
+        // Network hiccup: fall through to /workspace, which has its own
+        // first-login handling (starting-point picker).
+      }
+      router.replace(target ? `/workspace?h=${target}` : '/workspace')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (

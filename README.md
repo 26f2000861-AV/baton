@@ -119,6 +119,7 @@ Copy `.env.example` to `.env`:
 ```bash
 cp .env.example .env
 ```
+No PostgreSQL available? Local development works on SQLite — set `DATABASE_URL="file:./db/baton-dev.db"` in `.env` and use `npm run db:push` (the helper script works with plain npm; bun is optional but used when present).
 Fill in the variables in `.env`:
 ```ini
 # PostgreSQL connection string (or Neon serverless postgres)
@@ -169,7 +170,7 @@ npm run lint
 Test coverage includes:
 * `tests/verifier.test.mts`: Exact quote substring matching, CRLF normalization, whitespace degradation, and boundary checks.
 * `tests/github-mappers.test.mts`: Pull request & commit DTO mapping, deleted author handling, claim extraction, and open PR triage into work items.
-* Server-side route authorization: `authz.ts` regression checks for 401 unauthenticated, 403 forbidden, and 404 obscure-id responses.
+* `tests/authz.test.mts`: Authorization rules regression — role gates (403), CUID handover-id shape behind the 404 non-enumeration behavior, role-to-clearance mapping, and the founder-governance escape hatch for lead-less handovers. Route-level 401/403/404 responses are additionally verified live against the running server.
 
 ---
 

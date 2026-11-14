@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "node --experimental-strip-types --test tests/verifier.test.mts tests/github-mappers.test.mts",
+    "test": "node --experimental-strip-types --test tests/verifier.test.mts tests/github-mappers.test.mts tests/authz.test.mts",
     "typecheck": "tsc --noEmit",
     "db:push": "bash scripts/dev-db.sh push",
     "db:generate": "bash scripts/dev-db.sh generate",

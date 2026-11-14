@@ -62,3 +62,6 @@ scripts/run-sql.mjs
 # sandbox-only local postgres runtime
 /.localpg/
 /.localpg-runtime/
+
+# local dev database (recreated by scripts/dev-db.sh)
+prisma/db/*.db
