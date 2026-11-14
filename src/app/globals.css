@@ -422,12 +422,6 @@ h1 { color: var(--text); font-size: var(--fs-title); font-weight: 600; line-heig
   border-color: var(--border-strong) !important;
 }
 
-.native-component [class~="text-white"],
-[role="dialog"] [class~="text-white"],
-.drawer-overlay [class~="text-white"] {
-  color: var(--primary-ink) !important;
-}
-
 .native-component .ledger-panel {
   border-color: var(--border);
   border-radius: var(--radius-card);
