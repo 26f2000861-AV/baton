@@ -77,31 +77,7 @@ export default function HomeHero() {
             secondaryCta="See how it works"
             onSecondary={scrollToWorkflow}
             proof={null}
-            preview={
-              <div className="grid gap-3 border border-[#3b3b3b] bg-[#111111]/95 p-4 text-left shadow-[0_12px_36px_rgba(0,0,0,0.38)] sm:p-5">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-[#b8b8b8]">Sample conflict</span>
-                  <span className="border border-[#5b4725] bg-[#2c2010] px-2 py-1 text-[10px] font-medium text-[#fbbf24]">Needs human review</span>
-                </div>
-                <div>
-                  <h2 className="text-sm font-semibold text-[#eeeeee]">Metrics read path</h2>
-                  <p className="mt-1 text-xs leading-5 text-[#b8b8b8]">Two project records describe different states.</p>
-                </div>
-                <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-stretch gap-2">
-                  <div className="min-w-0 border border-[#303030] bg-[#171717] p-2.5">
-                    <span className="block text-[10px] text-[#a2a2a2]">GitHub PR #155</span>
-                    <strong className="mt-1 block text-xs leading-5 text-[#eeeeee]">VM dual-write live</strong>
-                  </div>
-                  <span className="self-center font-mono text-[10px] text-[#a2a2a2]" aria-hidden="true">vs</span>
-                  <div className="min-w-0 border border-[#303030] bg-[#171717] p-2.5">
-                    <span className="block text-[10px] text-[#a2a2a2]">Slack #helios-eng</span>
-                    <strong className="mt-1 block text-xs leading-5 text-[#eeeeee]">Thanos reads restored</strong>
-                  </div>
-                </div>
-                <p className="text-[11px] leading-4 text-[#a2a2a2]">Synthetic records · no connected source systems</p>
-                <p className="text-[11px] leading-4 text-[#b8b8b8]">Lead records why · successor reviews the handover</p>
-              </div>
-            }
+            preview={null}
             sculptureLabel=""
             sculptureHint=""
             hud={false}
