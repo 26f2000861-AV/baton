@@ -48,7 +48,49 @@ a:focus-visible {
   justify-content: center;
   width: 100%;
 }
-.sidebar { position: sticky; top: 0; display: flex; flex-direction: column; width: var(--sidebar-width); height: 100vh; height: 100dvh; padding: var(--pad) 16px; background: transparent; }
+.sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  width: var(--sidebar-width);
+  height: 100vh;
+  height: 100dvh;
+  padding: var(--pad) 16px;
+  background: transparent;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+  animation: sidebar-slide-down 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+}
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.32);
+}
+
+@keyframes sidebar-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 .brand-lockup { display: flex; min-height: 48px; align-items: center; gap: 12px; color: var(--text); transition: opacity var(--t-hover) var(--ease-out); cursor: pointer; }
 .brand-lockup:hover { opacity: 0.85; }
 .brand-mark { display: inline-flex; align-items: center; justify-content: center; flex: none; border: 0; background: transparent; color: var(--text); }
@@ -471,6 +513,18 @@ h1 { color: var(--text); font-size: var(--fs-title); font-weight: 600; line-heig
   -webkit-overflow-scrolling: touch;
   padding: var(--pad);
   background: var(--surface);
+  animation: mobile-menu-slide-down 240ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes mobile-menu-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .mobile-menu a,
 .mobile-menu button {
