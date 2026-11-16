@@ -13,9 +13,10 @@ server, Prisma + SQLite dev database; production target Neon Postgres per
 
 - [x] `bun run typecheck` — 0 errors (fresh `tsc --noEmit`, incremental cache cleared)
 - [x] `bun run lint` — 0 warnings/errors
-- [x] `npm test` — 33/33 pass (deterministic verifier suite + GitHub mapper suite
+- [x] `npm test` — 46/46 pass (deterministic verifier suite + GitHub mapper suite
       + authorization regression suite + AES-256-GCM token encryption suite
-      + sliding-window rate limit suite + multi-tenant isolation suite + WHATWG URL sanitization suite)
+      + sliding-window rate limit suite + multi-tenant isolation suite + WHATWG URL sanitization suite
+      + serializer/privacy boundary suite + health probe suite)
 - [x] `node scripts/parse-audit.cjs` — every `.ts/.tsx` file parses clean
 - [x] `bun scripts/seed-integrity-check.mts` — all 11 seed quotes verbatim-consistent
       with the source corpus (claim_04 intentionally a paraphrase → `quoted_unverified`)
@@ -91,9 +92,10 @@ server, Prisma + SQLite dev database; production target Neon Postgres per
 
 ## 9. Pre-submission checklist (re-run on production)
 
-- [x] All section 1 commands green on the final commit (re-run 2026-11-14:
-      `tsc --noEmit` 0 errors · ESLint 0 warnings · `npm test` 33/33 ·
-      seed-integrity check consistent)
+- [x] All section 1 commands green on the final commit (re-run 2026-11-16:
+      `tsc --noEmit` 0 errors · `npm test` 46/46 · `next build` succeeds;
+      the 2026-11-14 run recorded 33/33 before the serializer and health
+      suites were added)
 - [x] Core journey re-verified against `https://www.gitlostbaton.xyz` on
       2026-11-14 via API-level probes (12/12 pass — see §10); all three demo
       seats rendered on `/signin`; workspace loads for the successor seat
