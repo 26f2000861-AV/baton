@@ -1,5 +1,7 @@
 # Baton — Accountable Engineering Handover Platform
 
+[![CI](https://github.com/26f2000861-AV/baton/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/26f2000861-AV/baton/actions/workflows/ci.yml)
+
 > **CodersInPune Hackathon (Round 3 — The Final Product)**  
 > **Team Name:** GIT LOST  
 > **Team Leader:** Aditya Verma (adityaverma200911@gmail.com)  

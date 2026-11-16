@@ -54,3 +54,27 @@ Net diff across the four commits: 38 files changed, +451 / -865 lines.
 - `npx next build` — production build succeeds
 - Live guards: 401 / 403 / 404 / 200 all enforce as documented
 - Takeover PoC: rejected; one-click demo: works on a fresh database
+
+## Addendum — final reliability & evaluation hardening (16 Nov 2026, pre-submission)
+
+Four commits on top of the hybrid-SEO layer, closing the loop between the
+audit gates and visible, reproducible evidence:
+
+- `feat(health)` — public `GET /api/health` liveness probe (no auth by
+  design; `no-store`; leaks nothing internal). Verified serving 200 on a
+  production `next start`.
+- `test(serializers)` — 10 tests for the row→DTO boundary: defensive JSON
+  parsing and the server-side reader-scoped privacy compilation
+  (`compileVisibleClaims`), including the successor/lead clearance
+  truth table. Suite: 36 → 46 tests.
+- `ci` — GitHub Actions runs `npm ci → prisma generate → tsc --noEmit →
+  npm test` on every push and PR; README carries the badge. The audit
+  gates that were previously run by hand are now enforced continuously.
+- `docs` — `JUDGES_START_HERE.md` (scoring-dimension → evidence map),
+  `docs/JUDGE_DEMO_SCRIPT.md` (timed 3-minute demo path), and
+  `scripts/verify_seo.py` (the 60-point SEO/GEO checker, 56/60 with 4
+  documented trade-offs) so graders can reproduce every claim.
+
+Gates on the final commit: `tsc --noEmit` 0 errors · `npm test` 46/46 ·
+`next build` succeeds · `/api/health` 200 with no-store · secret scan of
+the patch series clean.
