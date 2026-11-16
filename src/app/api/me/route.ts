@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { authzErrorResponse, requireSession } from '@/lib/authz'
 import { listHandoversForUser } from '@/lib/handoverService'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     const session = await requireSession()

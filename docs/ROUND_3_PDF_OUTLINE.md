@@ -47,7 +47,7 @@ docs/TESTING_NOTES.md, docs/AI_DISCLOSURE.md.
 10. **Round-wise plan recap & what moved** — R1 plan → R2 demo → R3 upgrades;
     honest "changes from original plan" (pgvector/Slack integrations deferred)
 11. **Testing & quality** — summarize docs/TESTING_NOTES.md (typecheck, lint,
-    13 unit tests, browser E2E incl. 401/403 checks, seed integrity check)
+    33 unit tests, browser E2E incl. 401/403 checks, seed integrity check)
 12. **Contributions & disclosure**
     - Aditya: architecture, backend, integration, deploy
     - Manas: documentation, testing protocol, submission PDF

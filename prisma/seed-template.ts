@@ -1,5 +1,5 @@
 /**
- * Seed script — ensures the FinTrack template handover exists.
+ * Seed script — ensures the Baton sample template handover exists.
  * Run with: bun prisma/seed-template.ts   (or `npm run db:seed`)
  * Idempotent: safe to run repeatedly.
  */

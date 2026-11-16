@@ -1,9 +1,16 @@
 import { NextResponse } from 'next/server'
 import { RAW_SOURCES } from '../../../data/rawSources'
 import { verifyQuoteAgainstSource } from '../../../lib/verifier'
+import { checkRateLimit, getClientIp, rateLimitResponse } from '../../../lib/rateLimit'
 
 export async function POST(req: Request) {
   try {
+    const ip = getClientIp(req)
+    const rl = checkRateLimit(`verify:${ip}`, 20, 60_000)
+    if (!rl.success) {
+      return rateLimitResponse(rl.retryAfterSeconds, 20, rl.reset)
+    }
+
     const body: unknown = await req.json()
     if (!body || typeof body !== 'object') {
       return NextResponse.json({ error: 'Expected a JSON object.' }, { status: 400 })

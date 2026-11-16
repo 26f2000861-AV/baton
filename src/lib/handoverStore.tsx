@@ -99,6 +99,7 @@ interface HandoverContextType {
   resetHandover: () => Promise<boolean>
   runImport: (repo: string) => Promise<{ ok: boolean; message?: string }>
   inviteMember: (githubLogin: string, role: PersonaRole) => Promise<{ ok: boolean; message?: string }>
+  claimLead: () => Promise<boolean>
   refresh: () => Promise<void>
   fetchSourceContent: (
     legacyId: string
@@ -111,9 +112,9 @@ interface HandoverContextType {
 
 const HandoverContext = createContext<HandoverContextType | null>(null)
 
-async function postJson(url: string, body: unknown): Promise<Response> {
+async function postJson(url: string, body: unknown, method: 'POST' | 'PATCH' = 'POST'): Promise<Response> {
   return fetch(url, {
-    method: 'POST',
+    method,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   })
@@ -130,8 +131,16 @@ export function HandoverProvider({
   const [loading, setLoading] = useState<boolean>(Boolean(handoverId))
   const [pending, setPending] = useState<string | null>(null)
   const [syncError, setSyncError] = useState<string | null>(null)
+  const [trackedId, setTrackedId] = useState<string | null>(handoverId)
   const handoverIdRef = useRef(handoverId)
   handoverIdRef.current = handoverId
+
+  if (handoverId !== trackedId) {
+    setTrackedId(handoverId)
+    if (handoverId) {
+      setLoading(true)
+    }
+  }
 
   const hydrate = useCallback(async (id: string) => {
     setLoading(true)
@@ -166,17 +175,23 @@ export function HandoverProvider({
    * truth — no optimistic local writes that could drift from role rules.
    */
   const runMutation = useCallback(
-    async (action: string, url: string, body: unknown): Promise<boolean> => {
+    async (action: string, url: string, body: unknown, method: 'POST' | 'PATCH' = 'POST'): Promise<boolean> => {
       setPending(action)
       setSyncError(null)
       try {
-        const response = await postJson(url, body)
+        const response = await postJson(url, body, method)
         const payload = await response.json().catch(() => null)
         if (!response.ok) {
           setSyncError(payload?.error?.message ?? 'The change could not be saved.')
           return false
         }
-        setState(payload as HandoverState)
+        // Role-change endpoints return { ok: true } instead of full state —
+        // rehydrate from the server so the roster reflects the change.
+        if (payload && typeof payload === 'object' && 'handover' in payload) {
+          setState(payload as HandoverState)
+        } else {
+          await hydrate(url.split('/api/handovers/')[1]?.split('/')[0] ?? '')
+        }
         return true
       } catch {
         setSyncError('Network problem — the change could not be saved. Check your connection and retry.')
@@ -185,7 +200,7 @@ export function HandoverProvider({
         setPending(null)
       }
     },
-    []
+    [hydrate]
   )
 
   const api = useMemo<Omit<HandoverContextType, 'state' | 'loading' | 'pending' | 'syncError' | 'handoverId'>>(
@@ -315,6 +330,17 @@ export function HandoverProvider({
         } finally {
           setPending(null)
         }
+      },
+      claimLead: () => {
+        const id = handoverIdRef.current
+        const userId = state?.me.userId
+        if (!id || !userId) return Promise.resolve(false)
+        return runMutation(
+          'claim-lead',
+          `/api/handovers/${id}/members/${encodeURIComponent(userId)}`,
+          { role: 'lead' },
+          'PATCH'
+        )
       },
       refresh: async () => {
         const id = handoverIdRef.current

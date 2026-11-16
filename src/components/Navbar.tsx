@@ -27,22 +27,8 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* Right Section: Understated Status Capsule & GitHub Pill CTA */}
+        {/* Right Section: GitHub CTA */}
         <div className="flex items-center gap-3 sm:gap-5">
-          {/* Understated, elegant status tag */}
-          <div
-            className="hidden md:inline-flex items-center gap-2 rounded-full border border-white/[0.07] bg-white/[0.03] px-3 py-1 text-[11.5px] font-medium text-neutral-400 select-none shadow-[0_1px_2px_rgba(0,0,0,0.2)]"
-            title="Demonstration environment using synthetic data"
-          >
-            <span
-              className="h-1.5 w-1.5 rounded-full bg-emerald-400/80 shadow-[0_0_6px_rgba(52,211,153,0.4)]"
-              aria-hidden="true"
-            />
-            <span>Synthetic data</span>
-            <span className="text-neutral-600 font-light" aria-hidden="true">·</span>
-            <span>no live sources</span>
-          </div>
-
           {/* GitHub Sign-in / Workspace Pill Button */}
           <GitHubSignInButton
             href={entryHref}

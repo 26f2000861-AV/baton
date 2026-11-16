@@ -20,10 +20,10 @@ export default function PillarOwnership({
     <section id="ownership" className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="mt-0.5 text-xl font-semibold tracking-tight text-[#0A0A0A]">
+          <h2 className="mt-0.5 text-xl font-semibold tracking-tight text-white">
             Ownership matrix
           </h2>
-          <p className="mt-1 text-xs text-[#6B6B6B]">
+          <p className="mt-1 text-xs text-zinc-400">
             What must transfer, who can do it, and by when?
           </p>
         </div>
@@ -31,8 +31,8 @@ export default function PillarOwnership({
           onClick={isAccepted ? onUndo : onAccept}
           className={`min-hit flex items-center gap-1.5 rounded-[6px] px-3 py-2 text-xs font-semibold transition ${
             isAccepted
-              ? 'border border-[#E6E6E6] bg-[#EEEEEE] text-[#0A0A0A]'
-              : 'border border-[#0A0A0A] bg-[#141414] text-white hover:bg-[#2a2a2a]'
+              ? 'border border-white/20 bg-white/10 text-white'
+              : 'border border-white/10 bg-[#18181c] text-white hover:bg-[#242428]'
           }`}
           aria-pressed={isAccepted}
           aria-label={isAccepted ? 'Undo ownership review' : 'Mark ownership reviewed'}
@@ -43,34 +43,34 @@ export default function PillarOwnership({
       </div>
 
       {/* Critical Deadlines Callout - Strictly distinguishing Nov 10/11 transfer from Dec 1 rotation */}
-      <div className="rounded-[8px] border border-[#E6E6E6] bg-[#FFFFFF] p-4">
-        <div className="flex items-center gap-2 border-b border-[#F0F0F0] pb-2.5">
-          <Calendar size={16} className="text-[#0A0A0A]" />
-          <h3 className="text-sm font-semibold text-[#0A0A0A]">
+      <div className="rounded-[8px] border border-[#26262a] bg-[#18181c] p-4 text-[#eeeeee]">
+        <div className="flex items-center gap-2 border-b border-white/[0.08] pb-2.5">
+          <Calendar size={16} className="text-zinc-300" />
+          <h3 className="text-sm font-semibold text-white">
             Access transfer deadlines vs. Credential rotation schedule
           </h3>
         </div>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          <div className="rounded-[6px] border border-[#E6E6E6] bg-[#F2F4F7]/50 p-3">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#6B6B6B]">
+          <div className="rounded-[6px] border border-white/[0.08] bg-[#0c0c0e] p-3">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
               Handover Access Transfer Deadlines
             </span>
-            <p className="mt-1 font-mono text-sm font-bold text-[#0A0A0A]">
+            <p className="mt-1 font-mono text-sm font-bold text-white">
               November 10 & 11, 2026
             </p>
-            <p className="mt-1 text-xs text-[#6B6B6B]">
+            <p className="mt-1 text-xs text-zinc-400">
               Grafana org admin access transfers to Priya on Nov 10; Alex Chen offboarding completes on Nov 11.
             </p>
           </div>
-          <div className="rounded-[6px] border border-[#E6E6E6] bg-[#F2F4F7]/50 p-3">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#6B6B6B]">
+          <div className="rounded-[6px] border border-white/[0.08] bg-[#0c0c0e] p-3">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
               Scheduled Credential Rotation Date
             </span>
-            <p className="mt-1 font-mono text-sm font-bold text-[#0A0A0A]">
+            <p className="mt-1 font-mono text-sm font-bold text-white">
               December 5, 2026
             </p>
-            <p className="mt-1 text-xs text-[#6B6B6B]">
-              Vault bi-annual Grafana org admin token rotation (<code className="font-mono text-[11px]">kv/helios/prod/grafana-admin</code>).
+            <p className="mt-1 text-xs text-zinc-400">
+              Vault bi-annual Grafana org admin token rotation (<code className="font-mono text-[11px] text-zinc-300">kv/helios/prod/grafana-admin</code>).
             </p>
           </div>
         </div>
@@ -82,40 +82,40 @@ export default function PillarOwnership({
           return (
             <article
               key={asset.id}
-              className="ledger-panel flex flex-col justify-between transition hover:border-[#0A0A0A]"
+              className="ledger-panel flex flex-col justify-between transition hover:border-zinc-500"
             >
               <div>
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <span className="rounded bg-[#EEEEEE] px-2 py-0.5 font-mono text-[11px] font-semibold text-[#0A0A0A]">
+                    <span className="rounded bg-white/10 px-2 py-0.5 font-mono text-[11px] font-semibold text-white">
                       {asset.assetType.replaceAll('_', ' ')}
                     </span>
-                    <h3 className="mt-2 text-base font-semibold text-[#0A0A0A]">
+                    <h3 className="mt-2 text-base font-semibold text-white">
                       {asset.assetName}
                     </h3>
                   </div>
                   <div className="text-right">
-                    <span className="block max-w-[180px] text-xs font-semibold leading-snug text-[#0A0A0A]">
+                    <span className="block max-w-[180px] text-xs font-semibold leading-snug text-white">
                       Owner concentration · {Math.round(asset.ownershipIndex * 100)}%
                     </span>
-                    <span className="mt-1 block max-w-[180px] text-[10px] leading-snug text-[#6B6B6B]">
+                    <span className="mt-1 block max-w-[180px] text-[10px] leading-snug text-zinc-400">
                       {isConcentratedWithOneOwner ? 'Knowledge concentrated with one maintainer' : 'Shared across maintainers'}
                     </span>
                   </div>
                 </div>
 
                 <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
-                  <div className="rounded-[6px] border border-[#E6E6E6] bg-[#F2F4F7]/40 p-3">
-                    <span className="text-[11px] font-semibold text-[#6B6B6B]">Current custodian</span>
-                    <p className="mt-1 flex items-center gap-1.5 font-medium text-[#0A0A0A]">
-                      <User size={14} className="text-[#6B6B6B]" />
+                  <div className="rounded-[6px] border border-white/[0.08] bg-[#0c0c0e] p-3">
+                    <span className="text-[11px] font-semibold text-zinc-400">Current custodian</span>
+                    <p className="mt-1 flex items-center gap-1.5 font-medium text-white">
+                      <User size={14} className="text-zinc-400" />
                       {asset.currentOwner.name} ({asset.currentOwner.status})
                     </p>
                   </div>
-                  <div className="rounded-[6px] border border-[#E6E6E6] bg-[#F2F4F7]/40 p-3">
-                    <span className="text-[11px] font-semibold text-[#6B6B6B]">Escalation / Who to ask</span>
-                    <p className="mt-1 flex items-center gap-1.5 font-medium text-[#0A0A0A]">
-                      <MessageCircle size={14} className="text-[#6B6B6B]" />
+                  <div className="rounded-[6px] border border-white/[0.08] bg-[#0c0c0e] p-3">
+                    <span className="text-[11px] font-semibold text-zinc-400">Escalation / Who to ask</span>
+                    <p className="mt-1 flex items-center gap-1.5 font-medium text-white">
+                      <MessageCircle size={14} className="text-zinc-400" />
                       {asset.escalationContact.name} ({asset.escalationContact.slackChannel})
                     </p>
                   </div>
@@ -124,10 +124,10 @@ export default function PillarOwnership({
                 {asset.credentialsAndAccess.adminAccessRequiresTransfer && (
                   <div className="mt-3 rounded-[6px] border border-[#363636] bg-[#181818] p-3 text-xs text-[#eeeeee]">
                     <div className="flex items-center gap-2 font-semibold">
-                      <KeyRound size={14} className="text-[#0A0A0A]" />
+                      <KeyRound size={14} className="text-amber-400" />
                       <span>Admin access transfer deadline: {asset.credentialsAndAccess.transferDeadlineDate}</span>
                     </div>
-                    <p className="mt-1 font-mono text-[11px] text-[#6B6B6B]">
+                    <p className="mt-1 font-mono text-[11px] text-zinc-400">
                       Vault: {asset.credentialsAndAccess.credentialVaultPath}
                     </p>
                   </div>

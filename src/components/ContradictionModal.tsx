@@ -46,7 +46,7 @@ export default function ContradictionModal({
     <div
       ref={containerRef}
       tabIndex={-1}
-      className={`fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 backdrop-blur-[2px]${isClosing ? ' is-closing' : ''}`}
+      className={`fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-[4px]${isClosing ? ' is-closing' : ''}`}
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -54,29 +54,29 @@ export default function ContradictionModal({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="my-auto w-full max-w-4xl rounded-[8px] border border-[#E6E6E6] bg-[#FFFFFF] p-6 shadow-2xl"
+        className="my-auto w-full max-w-4xl rounded-[12px] border border-[#2a2a2e] bg-[#141416] p-6 text-[#f4f4f5] shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
       >
-        <div className="flex items-start justify-between border-b border-[#F0F0F0] pb-4">
+        <div className="flex items-start justify-between border-b border-white/[0.08] pb-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-[#6B6B6B]">
+              <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
                 Contradiction Settlement Queue
               </span>
               <span className="monochrome-pill">
                 {isAlreadySettled ? 'Settled' : 'Critical Conflict'}
               </span>
             </div>
-            <h2 id="contradiction-modal-title" className="mt-1 text-lg font-semibold text-[#0A0A0A]">
+            <h2 id="contradiction-modal-title" className="mt-1 text-lg font-semibold text-white">
               {item.entityName} — {item.attributeName}
             </h2>
-            <p className="mt-1 text-xs text-[#6B6B6B]">
+            <p className="mt-1 text-xs text-zinc-400">
               The sample records show different states. Compare their dates and context before recording a human decision.
             </p>
           </div>
           <button
             ref={closeButtonRef}
             onClick={onClose}
-            className="min-hit flex h-11 w-11 items-center justify-center rounded-[6px] border border-[#D4D4D4] bg-white text-[#6B6B6B] hover:border-[#0A0A0A] hover:text-[#0A0A0A] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+            className="min-hit flex h-10 w-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-[8px] border border-white/[0.1] bg-white/[0.04] text-zinc-400 hover:border-white/[0.2] hover:bg-white/[0.08] hover:text-white focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
             aria-label="Close contradiction modal"
           >
             <X size={18} />
@@ -104,7 +104,7 @@ export default function ContradictionModal({
         </div>
 
         {item.settlement && (
-          <section className="mt-5 rounded-[6px] border border-[#245237] bg-[#14281c] p-4" aria-label="Saved human decision">
+          <section className="mt-5 rounded-[8px] border border-[#245237] bg-[#14281c] p-4" aria-label="Saved human decision">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-sm font-semibold text-[#eeeeee]">{resolutionLabels[item.settlement.resolutionType]}</p>
               <time className="text-xs text-[#b8c7bc]" dateTime={item.settlement.resolutionTimestamp}>
@@ -121,8 +121,8 @@ export default function ContradictionModal({
         )}
 
         {/* Settlement Input and Choices */}
-        {!isAlreadySettled && <div className="mt-6 rounded-[6px] border border-[#E6E6E6] bg-[#F2F4F7]/50 p-4">
-          <label htmlFor="settlement-note" className="block text-xs font-semibold text-[#0A0A0A]">
+        {!isAlreadySettled && <div className="mt-6 rounded-[8px] border border-[#26262a] bg-[#18181c]/70 p-4">
+          <label htmlFor="settlement-note" className="block text-xs font-semibold text-zinc-200">
             Decision note (required):
           </label>
           <textarea
@@ -138,11 +138,11 @@ export default function ContradictionModal({
                   : 'Only the lead seat can record a decision here. The lead can sign in and open this conflict to settle it.'
             }
             rows={2}
-            className="mt-2 w-full rounded-[6px] border border-[#D4D4D4] bg-white p-3 text-xs text-[#0A0A0A] placeholder-[#767676] outline-none transition focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 focus-visible:border-[var(--accent)]"
+            className="mt-2 w-full rounded-[8px] border border-white/[0.1] bg-[#0c0c0e] p-3 text-xs text-white placeholder-zinc-500 outline-none transition focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 focus-visible:border-[var(--accent)]"
           />
 
           {!isAlreadySettled && !canResolve && (
-            <p className="mt-3 text-xs leading-relaxed text-[#6B6B6B]" role="status">
+            <p className="mt-3 text-xs leading-relaxed text-zinc-400" role="status">
               Only the engineering lead can record a resolution. Decisions persist in the shared history for every member.
             </p>
           )}
@@ -178,7 +178,7 @@ export default function ContradictionModal({
           )}
 
           {isAlreadySettled && (
-            <div className="mt-3 flex items-center gap-2 text-xs font-semibold text-[#0A0A0A]">
+            <div className="mt-3 flex items-center gap-2 text-xs font-semibold text-emerald-400">
               <Check size={14} />
               <span>Decision saved to the shared handover history. It is visible to every member.</span>
             </div>
@@ -211,21 +211,21 @@ function EvidenceBlock({
   quote: string
 }) {
   return (
-    <div className="flex flex-col justify-between rounded-[6px] border border-[#E6E6E6] bg-white p-4">
+    <div className="flex flex-col justify-between rounded-[8px] border border-[#26262a] bg-[#18181c] p-4 text-[#eeeeee]">
       <div>
         <div className="flex items-center justify-between">
-          <span className="font-mono text-[10px] font-bold tracking-wider text-[#6B6B6B]">
+          <span className="font-mono text-[10px] font-bold tracking-wider text-zinc-400">
             {badge}
           </span>
-          <span className="text-[#6B6B6B]">{icon}</span>
+          <span className="text-zinc-400">{icon}</span>
         </div>
-        <p className="mt-2 text-xs font-medium text-[#6B6B6B]">{title} • {author}</p>
-        <p className="mt-2 text-sm font-semibold text-[#0A0A0A]">{extractedValue}</p>
-        <blockquote className="mt-3 rounded-[4px] border border-[#363636] bg-[#181818] p-2.5 font-mono text-[11px] leading-relaxed text-[#eeeeee]">
+        <p className="mt-2 text-xs font-medium text-zinc-300">{title} • {author}</p>
+        <p className="mt-2 text-sm font-semibold text-white">{extractedValue}</p>
+        <blockquote className="mt-3 rounded-[6px] border border-white/[0.08] bg-[#0c0c0e] p-2.5 font-mono text-[11px] leading-relaxed text-zinc-200">
           &ldquo;{quote}&rdquo;
         </blockquote>
       </div>
-      <p className="mt-3 pt-2 text-[11px] text-[#6B6B6B]">Illustrative source · synthetic, not connected</p>
+      <p className="mt-3 pt-2 text-[11px] text-zinc-400">Illustrative source · synthetic, not connected</p>
     </div>
   )
 }

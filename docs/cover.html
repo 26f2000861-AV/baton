@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    @page { size: 794px 1123px; margin: 0; }
+    :root {
+      --c-bg: #141413;
+      --c-accent: #d3b86a;
+      --c-text: #e9e8e6;
+      --c-muted: #918f88;
+      --c-footer: #6f6d66;
+    }
+    html, body { margin: 0; padding: 0; width: 794px; height: 1123px; background: var(--c-bg); color: var(--c-text); font-family: 'Inter', sans-serif; }
+    @media screen {
+      html { height: auto; display: flex; justify-content: center; min-height: 100vh; background: var(--c-bg); }
+      body { transform-origin: top center; scale: min(1, calc(100vw / 794), calc(100vh / 1123)); margin: 0 auto; box-shadow: 0 0 60px rgba(0,0,0,0.3); }
+    }
+    .cover { width: 794px; height: 1123px; position: relative; box-sizing: border-box; }
+    .bg-layer { position: absolute; inset: 0; overflow: hidden; z-index: 1; }
+    .bg-glow {
+      position: absolute; right: 0; bottom: 0; width: 70%; height: 55%;
+      background: radial-gradient(closest-side at 78% 82%, rgba(211, 184, 106, 0.05), rgba(211, 184, 106, 0) 70%);
+    }
+    .vline { position: absolute; left: 57px; top: 76px; bottom: 76px; width: 2.5px; background: var(--c-accent); z-index: 2; }
+    .content { position: absolute; left: 105px; right: 76px; top: 0; bottom: 0; z-index: 3; }
+    .label {
+      position: absolute; top: 132px; font-size: 10pt; color: var(--c-accent);
+      letter-spacing: 3px; text-transform: uppercase; font-weight: 500;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+    .title {
+      position: absolute; top: 228px; font-size: 34pt; font-weight: 700; line-height: 1.25;
+      font-family: 'Playfair Display', serif; color: var(--c-text); max-width: 560px;
+    }
+    .subtitle {
+      position: absolute; top: 540px; font-size: 12pt; line-height: 1.6;
+      color: var(--c-muted); max-width: 500px; font-weight: 300;
+    }
+    .authors { position: absolute; top: 792px; font-size: 12.5pt; color: var(--c-text); font-weight: 400; }
+    .institution { position: absolute; top: 838px; font-size: 10pt; color: var(--c-muted); line-height: 1.6; max-width: 520px; }
+    .footer {
+      position: absolute; bottom: 76px; left: 0; right: 0; display: flex; justify-content: space-between;
+      font-size: 9pt; color: var(--c-footer); font-family: 'IBM Plex Mono', monospace;
+      letter-spacing: 1.5px; text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div class="cover">
+    <div class="bg-layer"><div class="bg-glow"></div></div>
+    <div class="vline"></div>
+    <div class="content">
+      <div class="label">Round 3 &mdash; The Final Product</div>
+      <div class="title">Baton &mdash;<br>Accountable<br>Engineering Handover<br>Platform</div>
+      <div class="subtitle">
+        Every claim carries its evidence. Baton replaces vanishing tribal knowledge with an
+        auditable handover workspace: decisions with rationale, unfinished work with owners,
+        contradictions settled by humans, and quotes verified by deterministic character
+        offsets &mdash; no LLM anywhere in the evidence path.
+      </div>
+      <div class="authors">Team GIT LOST &mdash; Aditya Verma (Team Leader) &middot; Manas Kapoor</div>
+      <div class="institution">
+        CodersInPune 2026 &middot; Final Round<br>
+        gitlostbaton.xyz &middot; github.com/26f2000861-AV/baton
+      </div>
+      <div class="footer">
+        <span>Final Product Dossier</span>
+        <span>November 2026</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

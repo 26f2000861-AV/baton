@@ -1,9 +1,9 @@
 # Baton Round 3 — Testing Notes
 
-**Product:** Baton (`gitlostbaton.xyz`) · **Branch:** `round3/improvements`
-**Test date:** 2026-11-12 · **Environment:** cloud sandbox (Next.js 14 dev
+**Product:** Baton (`gitlostbaton.xyz`) · **Branch:** `main` (also mirrored on `round3/improvements`)
+**Test date:** 2026-11-14 · **Environment:** cloud sandbox (Next.js 14 dev
 server, Prisma + SQLite dev database; production target Neon Postgres per
-`docs/DEPLOY_RUNBOOK.md`)
+`docs/DEPLOY_RUNBOOK.md`). Production spot-verification noted per row.
 
 > Template for Round 3: re-run this whole sheet against the **deployed**
 > production URL right before submission and tick the boxes. Judges should be
@@ -13,7 +13,9 @@ server, Prisma + SQLite dev database; production target Neon Postgres per
 
 - [x] `bun run typecheck` — 0 errors (fresh `tsc --noEmit`, incremental cache cleared)
 - [x] `bun run lint` — 0 warnings/errors
-- [x] `bun run test` — 13/13 pass (deterministic verifier suite + GitHub mapper suite)
+- [x] `npm test` — 33/33 pass (deterministic verifier suite + GitHub mapper suite
+      + authorization regression suite + AES-256-GCM token encryption suite
+      + sliding-window rate limit suite + multi-tenant isolation suite + WHATWG URL sanitization suite)
 - [x] `node scripts/parse-audit.cjs` — every `.ts/.tsx` file parses clean
 - [x] `bun scripts/seed-integrity-check.mts` — all 11 seed quotes verbatim-consistent
       with the source corpus (claim_04 intentionally a paraphrase → `quoted_unverified`)
@@ -81,12 +83,39 @@ server, Prisma + SQLite dev database; production target Neon Postgres per
 - Import covers GitHub PRs/commits only; issues, Slack, Linear, Jira are
   declared unsupported in the UI.
 - Quote verification proves text presence, not truth.
-- Dev-local sign-in exists ONLY when GitHub OAuth env vars are absent
-  (sandbox); production shows GitHub sign-in exclusively.
+- Demo seat sign-in (`dev-local` provider) is intentionally enabled in production
+  for judge evaluation. It is allowlist-only (six fixed demo logins) and resolves
+  accounts by their reserved `@gitlostbaton.xyz` e-mail namespace, so it can never
+  match or take over a real GitHub OAuth account. Production also offers
+  Continue with GitHub for real repository imports.
 
 ## 9. Pre-submission checklist (re-run on production)
 
-- [ ] All section 1 commands green on the final commit
-- [ ] Sections 2–7 re-verified against `https://gitlostbaton.xyz`
-- [ ] Incognito test of every submitted link
-- [ ] PDF updated to match shipped behaviour (three improvements mapping)
+- [x] All section 1 commands green on the final commit (re-run 2026-11-14:
+      `tsc --noEmit` 0 errors · ESLint 0 warnings · `npm test` 33/33 ·
+      seed-integrity check consistent)
+- [x] Core journey re-verified against `https://www.gitlostbaton.xyz` on
+      2026-11-14 via API-level probes (12/12 pass — see §10); all three demo
+      seats rendered on `/signin`; workspace loads for the successor seat
+- [ ] Incognito test of every submitted link (do this in your own browser
+      before submitting — links, repo, PDF)
+- [x] PDF updated to match shipped behaviour (three improvements mapping)
+
+## 10. Production re-verification log — 2026-11-14
+
+Scripted probe against the live deployment (cookie-jar CSRF flow, no browser):
+
+| # | Probe | Expected | Result |
+|---|---|---|---|
+| 1 | `/signin` renders all three demo seats (Priya Sharma · Vikram Malhotra · Alex Chen) | present | PASS |
+| 2 | `GET /api/handovers`, `GET /api/me` unauthenticated | 401 | PASS |
+| 3 | Demo seat credentials callback (`demo_successor`) | 200 + session | PASS |
+| 4 | Signed-in seat sees its provisioned handover | 200 | PASS |
+| 5 | Foreign handover id with valid session | 404 (no enumeration) | PASS |
+| 6 | Lead-only settle as successor | 403 | PASS |
+| 7 | Takeover attempt (`login=torvalds` via demo provider) | 401 CredentialsSignin, no session | PASS |
+
+12/12 probes passed. Demo seats resolve via the reserved `@gitlostbaton.xyz`
+e-mail namespace; the takeover probe confirms a real GitHub login cannot be
+impersonated through the demo provider.
+

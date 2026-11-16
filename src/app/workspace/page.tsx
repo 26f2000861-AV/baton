@@ -27,7 +27,7 @@ import MembersPanel from '../../components/MembersPanel'
 import NewHandoverModal from '../../components/NewHandoverModal'
 import { HandoverProvider, useHandover } from '../../lib/handoverStore'
 import { CLAIM_STATUS_COPY } from '../../lib/claimStatus'
-import type { PersonaRole, SuccessorQuery } from '../../lib/types'
+import type { HandoverState, PersonaRole, SuccessorQuery } from '../../lib/types'
 
 const routes = [
   { id: 'overview', label: 'Overview', hash: '#/', icon: LayoutDashboard },
@@ -70,7 +70,12 @@ interface HandoverSummary {
 export default function WorkspacePage() {
   const { data: session, status } = useSession()
   const router = useRouter()
-  const [handoverId, setHandoverId] = useState<string | null>(null)
+  const [handoverId, setHandoverId] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      return new URLSearchParams(window.location.search).get('h')
+    }
+    return null
+  })
   const [handovers, setHandovers] = useState<HandoverSummary[]>([])
   const [booting, setBooting] = useState(true)
 
@@ -128,17 +133,11 @@ export default function WorkspacePage() {
     }
   }, [status, router])
 
-  if (status === 'loading' || (booting && !handoverId)) {
-    return <WorkspaceLoadingScreen message="Loading your handover…" />
-  }
-
-  if (status === 'authenticated' && !handoverId) {
-    return <WorkspaceLoadingScreen message="Preparing your workspace…" />
-  }
-
   return (
     <HandoverProvider handoverId={handoverId}>
-      <WorkspaceInner
+      <WorkspaceLoader
+        status={status}
+        booting={booting}
         handovers={handovers}
         activeHandoverId={handoverId}
         onSwitchHandover={switchHandover}
@@ -148,22 +147,88 @@ export default function WorkspacePage() {
   )
 }
 
-function WorkspaceInner({
+function WorkspaceLoader({
+  status,
+  booting,
   handovers,
   activeHandoverId,
   onSwitchHandover,
   sessionName,
 }: {
+  status: 'loading' | 'authenticated' | 'unauthenticated'
+  booting: boolean
+  handovers: HandoverSummary[]
+  activeHandoverId: string | null
+  onSwitchHandover: (id: string) => void
+  sessionName: string | null
+}) {
+  const { state, loading, syncError } = useHandover()
+
+  if (status === 'loading' || booting || (!state && !syncError)) {
+    return <WorkspaceLoadingScreen message="Loading your handover…" />
+  }
+
+  if (!state) {
+    return (
+      <div className="framed-app framed-app-single workspace-loading-shell" role="status">
+        <div className="workspace-loading" style={{ minHeight: 'auto', gap: 18 }}>
+          <div className="workspace-loading-logo">
+            <BatonMark size="medium" />
+          </div>
+          <div className="workspace-loading-copy">
+            <p style={{ fontSize: 18, color: 'var(--text)' }}>Handover Not Found</p>
+            <span className="workspace-loading-subtitle">
+              {syncError || 'This handover could not be loaded or may have been removed.'}
+            </span>
+          </div>
+          <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+            <button
+              type="button"
+              className="primary-action"
+              onClick={() => {
+                window.location.href = '/workspace'
+              }}
+            >
+              Go to my handovers
+            </button>
+            <Link href="/" className="secondary-action">
+              Landing page
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <WorkspaceInner
+      state={state}
+      handovers={handovers}
+      activeHandoverId={activeHandoverId}
+      onSwitchHandover={onSwitchHandover}
+      sessionName={sessionName}
+    />
+  )
+}
+
+function WorkspaceInner({
+  state,
+  handovers,
+  activeHandoverId,
+  onSwitchHandover,
+  sessionName,
+}: {
+  state: HandoverState
   handovers: HandoverSummary[]
   activeHandoverId: string | null
   onSwitchHandover: (id: string) => void
   sessionName: string | null
 }) {
   const {
-    state, loading, pending, syncError, clearSyncError, viewer, visibleClaims, withheldCount, withheldDetails,
+    loading, pending, syncError, clearSyncError, viewer, visibleClaims, withheldCount, withheldDetails,
     decisions, workUpdates, unfinished, ownership, contradictions, questions, queries, sectionStates,
     answerInterviewQuestion, resolveContradiction, adoptUnfinishedItem, acceptSection, undoSectionAcceptance,
-    submitSuccessorQuery, resolveSuccessorQuery, captureWorkUpdate, resetHandover, runImport, inviteMember,
+    submitSuccessorQuery, resolveSuccessorQuery, captureWorkUpdate, resetHandover, runImport, inviteMember, claimLead,
   } = useHandover()
 
   const [route, setRoute] = useState('overview')
@@ -377,9 +442,9 @@ function WorkspaceInner({
   const conflictSettled = overviewConflict?.status === 'settled_by_human'
   const conflictResolutionSummary = overviewConflict?.settlement?.resolutionType === 'clarification_note'
     ? 'A lead recorded a clarification; source precedence remains open for review.'
-    : overviewConflict?.settlement?.resolutionType === 'accept_dual_scope'
-      ? 'A lead resolved the scope: VM stays dual-write for ingest; Thanos keeps serving dashboard reads until the cutover completes.'
-      : 'A lead recorded a decision and rationale for the next owner.'
+    : overviewConflict?.settlement
+      ? 'A lead recorded a decision and rationale for the next owner.'
+      : 'Compare the two source records and record the authoritative decision.'
   const reviewedCount = Object.values(sectionStates).filter((item) => item.isAccepted).length
   const exactQuoteCount = visibleClaims.filter((item) => item.status === 'quoted_verified').length
   const importedClaimCount = visibleClaims.filter((item) => item.id.startsWith('claim_gh_')).length
@@ -519,13 +584,12 @@ function WorkspaceInner({
           </div>
         )}
         <main className="sheet">
+          {loading && (
+            <div className="workspace-sheet-loading-bar" aria-hidden="true">
+              <span />
+            </div>
+          )}
           <div className="sheet-content">
-            {loading ? (
-              <div className="workspace-loading" aria-busy="true"><p>Loading handover…</p></div>
-            ) : !state ? (
-              <div className="workspace-loading"><p>This handover could not be loaded. It may have been removed.</p></div>
-            ) : (
-            <>
             <div className="sample-workspace-note"><span className="sample-indicator" />{state.handover.isTemplate ? 'TEMPLATE' : 'SHARED HANDOVER'}<span className="sample-note-copy" role="status" aria-live="polite">Saved on the server · visible to every member across devices · your role ({viewer?.role ?? 'member'}) comes from your membership, not a switch.</span></div>
             <div className="page-heading">
             <div><p className="breadcrumb">Engineering <span aria-hidden="true">/</span> {state.handover.name}</p><h1>{title}</h1></div>
@@ -621,7 +685,7 @@ function WorkspaceInner({
                       <strong>{source.extractedValue}</strong><span>{source.title}</span><small>{source.author} · {new Date(source.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}</small><p>{source.exactQuote}</p>
                     </div>)}
                   </div>)}
-                  <p className="source-key"><code>claim_09</code></p>
+                  <p className="source-key"><code>{overviewConflict?.associatedClaimId ?? 'no linked claim'}</code></p>
                 </Card>
                 <Card title="Successor sign-off" action="Review sections" onAction={() => navigate('signoff')}>
                   <div className="mini-rows">{(['decisions', 'unfinished', 'ownership', 'risks'] as const).map((id) => <div className="mini-row" key={id}><span>{sectionName(id)}</span><span className={`state-label ${sectionStates[id]?.isAccepted ? 'accepted' : ''}`}>{sectionStates[id]?.isAccepted ? 'Reviewed' : 'Needs review'}</span></div>)}</div>
@@ -644,7 +708,7 @@ function WorkspaceInner({
               </div>
             </div>}
 
-            {route === 'claims' && <div className="view-stack"><div className="view-intro"><p>{visibleClaims.length} visible claims for {viewer?.name ?? sessionName ?? 'you'}</p><button className="secondary-action" onClick={() => navigate('exposure')}>View access visibility</button></div><section className={`data-card claims-card${claimsUpdating ? ' is-updating' : ''}`}><div className="card-heading"><div><h2>Claims</h2><p>{filteredClaims.length} matching claims</p></div><button className="icon-action" aria-label="Sort claims by ID" aria-pressed={sortDescending} onClick={() => updateClaims(() => setSortDescending((value) => !value))}><ArrowDownUp size={16} /></button></div><label className="claims-mobile-search"><span className="sr-only">Search claims and sources</span><Search size={16} aria-hidden="true" /><input className="claims-search-input" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search claims and sources" /></label><p className="evidence-clarifier">“Quote found” means the source contains that text; it does not confirm the claim is true. Counts can overlap: a quoted claim may still need a lead review.</p><div className="filter-tabs" role="group" aria-label="Filter claims by evidence state">
+            {route === 'claims' && <div className="view-stack"><div className="view-intro"><p>{withheldCount > 0 ? `${visibleClaims.length} visible to your seat · ${withheldCount} withheld` : 'Every claim in this handover is visible to your seat'}</p><button className="secondary-action" onClick={() => navigate('exposure')}>View access visibility</button></div><section className={`data-card claims-card${claimsUpdating ? ' is-updating' : ''}`}><div className="card-heading"><div><h2>Claims</h2><p>{filteredClaims.length} of {visibleClaims.length} shown</p></div><button className="icon-action" aria-label="Sort claims by ID" aria-pressed={sortDescending} onClick={() => updateClaims(() => setSortDescending((value) => !value))}><ArrowDownUp size={16} /></button></div><label className="claims-mobile-search"><span className="sr-only">Search claims and sources</span><Search size={16} aria-hidden="true" /><input className="claims-search-input" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search claims and sources" /></label><p className="evidence-clarifier">“Quote found” means the source contains that text; it does not confirm the claim is true. Counts can overlap: a quoted claim may still need a lead review.</p><div className="filter-tabs" role="group" aria-label="Filter claims by evidence state">
                   <button type="button" aria-pressed={filter === 'all'} className={filter === 'all' ? 'active' : ''} onClick={() => updateClaims(() => setFilter('all'))}>All {filterCounts.all}</button>
                   <button type="button" aria-pressed={filter === 'needs_review'} className={filter === 'needs_review' ? 'active' : ''} onClick={() => updateClaims(() => setFilter('needs_review'))}>Needs review {filterCounts.needs_review}</button>
                   <button type="button" aria-pressed={filter === 'verified'} className={filter === 'verified' ? 'active' : ''} onClick={() => updateClaims(() => setFilter('verified'))}>Quote found {filterCounts.verified}</button>
@@ -662,7 +726,7 @@ function WorkspaceInner({
             {route === 'unfinished' && <div className="native-component"><PillarUnfinished items={unfinished} isAccepted={sectionStates.unfinished?.isAccepted ?? false} onAdopt={adoptUnfinishedItem} onInspect={openSource} onAccept={() => acceptSection('unfinished')} onUndo={() => undoSectionAcceptance('unfinished')} /></div>}
             {route === 'sources' && <ImportPanel viewer={viewer} sources={state.sources} imports={state.imports} pending={pending} onImport={runImport} />}
             {route === 'history' && <HistoryView workUpdates={workUpdates} activity={state.activity} />}
-            {route === 'members' && <MembersPanel members={state.members} viewer={viewer} pending={pending} onInvite={inviteMember} />}
+            {route === 'members' && <MembersPanel members={state.members} viewer={viewer} isCreator={isCreator} pending={pending} onInvite={inviteMember} onClaimLead={claimLead} />}
 
             {route === 'signoff' && <div className="view-stack"><div className="view-intro"><p>{reviewedCount} of 4 sections reviewed · {queries.length} successor questions raised</p></div><section className="data-card"><div className="card-heading"><div><h2>Handover sections</h2><p>Mark a section reviewed after checking it. This records your review; it does not certify every claim as correct. You can undo it at any time.</p></div></div><div className="mini-rows">{(['decisions', 'unfinished', 'ownership', 'risks'] as const).map((id) => { const reviewed = sectionStates[id]?.isAccepted ?? false; return <div className="signoff-row" key={id}><div><strong>{sectionName(id)}</strong><small>{sectionDetail(id)}</small></div><div className="signoff-actions"><span className={`state-label ${reviewed ? 'accepted' : ''}`}>{reviewed ? 'Reviewed' : 'Needs review'}</span><button className="secondary-action" aria-pressed={reviewed} onClick={() => reviewed ? undoSectionAcceptance(id) : acceptSection(id)}>{reviewed ? 'Undo review' : 'Mark reviewed'}</button></div></div>})}</div></section><section className="data-card"><div className="card-heading"><div><h2>Successor questions</h2><p>Ask the engineering lead about unclear evidence. Replies are recorded in the shared history; no message is sent.</p></div></div>{role !== 'successor' && <p className="sample-notice">Only the successor seat can ask handover questions. Your seat: {role ?? 'member'}.</p>}<form className="query-form" onSubmit={(event) => { event.preventDefault(); if (queryText.trim() && queryClaimId && visibleClaims.some((claim) => claim.id === queryClaimId) && role === 'successor') { submitSuccessorQuery(queryClaimId, 'unclear_rationale', queryText.trim()); setQueryText('') } }}>
                   <label htmlFor="query-claim-search">Find a claim</label>
@@ -681,8 +745,6 @@ function WorkspaceInner({
             {route === 'interview' && <div className="view-stack"><div className="view-intro"><p>{pendingQuestions.length} questions awaiting an answer</p><button className="primary-action" onClick={() => { rememberFocus(); setInterviewOpen(true) }} disabled={role !== 'leaver'}>{role === 'leaver' ? 'Answer questions' : 'View questions'}</button></div><section className="data-card"><div className="card-heading"><div><h2>Pending questions</h2><p>Context from the departing engineer · only the leaver seat can record answers</p></div></div>{questions.map((question) => <button key={question.id} className="question-row" onClick={() => { rememberFocus(); setInterviewOpen(true) }}><span className="question-priority">{question.priorityRank}</span><span><strong>{question.promptText}</strong><small>Claim {question.associatedClaimId} · {statusLabels[visibleClaims.find((claim) => claim.id === question.associatedClaimId)?.status ?? '']?.label ?? 'Pending'}</small></span><span className="state-label">{question.status === 'pending_answer' ? 'Pending' : question.status === 'answered' ? 'Answered' : 'Escalated'}</span></button>)}</section></div>}
 
             {route === 'exposure' && <div className="view-stack"><div className="view-intro"><p>Reviewer: {viewer?.name ?? 'you'} · clearance from your membership role</p><button className="secondary-action" onClick={() => { rememberFocus(); setExposureOpen(true) }}>Open visibility details</button></div><section className="data-card"><div className="card-heading"><div><h2>Visible claims</h2><p>{visibleClaims.length} claims available in this view</p></div></div><div className="claim-list">{renderClaimRows(visibleClaims.slice(0, 5), true)}</div></section><section className="data-card"><div className="card-heading"><div><h2>Withheld claims</h2><p>{withheldCount} claims hidden from this view</p></div></div>{withheldDetails.length ? withheldDetails.map((item) => <div className="withheld-row" key={item.claimId}><strong>{item.claimId}</strong><span>{item.reason}</span><small>Visible to: {({ public_open: 'Open to the team', team_internal: 'Team members', confidential_lead: 'Team leads', restricted_hr_legal: 'Restricted HR or legal roles' } as Record<string, string>)[item.requiredClearance] ?? item.requiredClearance.replaceAll('_', ' ')}</small></div>) : <p className="empty-state">No claims are withheld for this reviewer.</p>}</section></div>}
-            </>
-            )}
           </div>
         </main>
       </div>

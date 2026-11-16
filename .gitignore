@@ -38,6 +38,7 @@ next-env.d.ts
 .impeccable/
 .taste-skill/
 tmp/
+scripts/run-sql.mjs
 
 
 # round 3 working docs (temp, stripped before submission)
@@ -61,3 +62,6 @@ tmp/
 # sandbox-only local postgres runtime
 /.localpg/
 /.localpg-runtime/
+
+# local dev database (recreated by scripts/dev-db.sh)
+prisma/db/*.db

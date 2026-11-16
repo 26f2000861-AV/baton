@@ -53,18 +53,27 @@ export async function ensureTemplate(): Promise<string> {
   })
   if (template) return template.id
 
-  template = await prisma.handover.create({
-    data: {
-      name: 'Helios Observability Platform — Sample Template',
-      description:
-        'Synthetic engineering handover case used to provision new workspaces. Not for real data.',
-      isTemplate: true,
-      templateKey: TEMPLATE_KEY,
-      createdById: systemUser.id,
-    },
-  })
-  await seedTemplateContent(template.id)
-  return template.id
+  try {
+    template = await prisma.handover.create({
+      data: {
+        name: 'Helios Observability Platform — Sample Template',
+        description:
+          'Synthetic engineering handover case used to provision new workspaces. Not for real data.',
+        isTemplate: true,
+        templateKey: TEMPLATE_KEY,
+        createdById: systemUser.id,
+      },
+    })
+    await seedTemplateContent(template.id)
+    return template.id
+  } catch {
+    // Concurrent first-login resilience: if another process created it simultaneously, return the existing row
+    const existing = await prisma.handover.findFirst({
+      where: { isTemplate: true, templateKey: TEMPLATE_KEY },
+    })
+    if (existing) return existing.id
+    throw new Error('Failed to initialize template handover.')
+  }
 }
 
 /** Writes the canonical seed content (from src/data) into a handover. */

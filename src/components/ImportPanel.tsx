@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Download, RefreshCw, AlertCircle, CheckCircle2, ExternalLink } from 'lucide-react'
 import type { ImportJobDTO, SourceMeta, ViewerIdentity } from '@/lib/types'
+import { sanitizeSafeUrl } from '@/lib/utils'
 
 /** How the import reached GitHub — shown per job so the fallback chain is visible. */
 const TIER_COPY: Record<NonNullable<ImportJobDTO['authTier']>, string> = {
@@ -163,8 +164,8 @@ export default function ImportPanel({
                     </span>
                   </small>
                 </div>
-                {source.uri.startsWith('http') && (
-                  <a href={source.uri} target="_blank" rel="noopener noreferrer" className="text-action">
+                {sanitizeSafeUrl(source.uri) && (
+                  <a href={sanitizeSafeUrl(source.uri)!} target="_blank" rel="noopener noreferrer" className="text-action">
                     Open origin <ExternalLink size={11} aria-hidden="true" />
                   </a>
                 )}
