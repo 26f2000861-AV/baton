@@ -8,26 +8,30 @@ import { prisma } from './db'
 /**
  * Baton auth — Improvement 1.
  *
- * Production: GitHub OAuth is the ONLY provider (team decision). Judges and
- * users sign in with their real GitHub identity; that identity is their seat
- * at the handover table and the token used by the GitHub import engine.
+ * Production: GitHub OAuth is the ONLY provider. Judges and users sign in with
+ * their real GitHub identity; that identity is their seat at the handover table
+ * and the token used by the GitHub repository import engine.
  *
- * Non-production local development: when GITHUB_ID / GITHUB_SECRET are not
- * set, a clearly-labeled local dev sign-in replaces the GitHub button so the
- * full authenticated flow can be built and tested before the OAuth app exists.
+ * Supports both AUTH_* (Auth.js modern standard) and NEXTAUTH_* / GITHUB_* variables:
+ * - AUTH_GITHUB_ID or GITHUB_ID
+ * - AUTH_GITHUB_SECRET or GITHUB_SECRET
+ * - AUTH_SECRET or NEXTAUTH_SECRET
+ *
+ * Non-production local development: when GitHub credentials are not set,
+ * a clearly-labeled local dev sign-in replaces the GitHub button so the full
+ * authenticated flow can be built and tested before the OAuth app exists.
  * Production never enables the local provider.
  */
 
-const hasGitHubApp = Boolean(process.env.GITHUB_ID && process.env.GITHUB_SECRET)
+const githubId = process.env.AUTH_GITHUB_ID || process.env.GITHUB_ID
+const githubSecret = process.env.AUTH_GITHUB_SECRET || process.env.GITHUB_SECRET
+const authSecret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET
+
+const hasGitHubApp = Boolean(githubId && githubSecret)
 const allowDevProvider = process.env.NODE_ENV !== 'production'
 
-// Sandbox/preview resilience: the sandbox boot may rewrite .env and drop
-// NEXTAUTH_SECRET. NextAuth v4 then silently falls back to a RANDOM
-// per-process secret, so the session JWE encrypted by one dev worker cannot
-// be decrypted by another ("decryption operation failed"). A pinned,
-// dev-only fallback keeps local/preview sessions stable. Production always
-// sets NEXTAUTH_SECRET via Vercel env vars, so this fallback never applies
-// there (and NextAuth still refuses to run without a secret in production).
+// Sandbox/preview resilience: a pinned fallback keeps local dev sessions stable.
+// Production always sets AUTH_SECRET / NEXTAUTH_SECRET, so this fallback never applies there.
 const DEV_FALLBACK_SECRET =
   process.env.NODE_ENV === 'production'
     ? undefined
@@ -35,7 +39,7 @@ const DEV_FALLBACK_SECRET =
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
-  secret: process.env.NEXTAUTH_SECRET || DEV_FALLBACK_SECRET,
+  secret: authSecret || DEV_FALLBACK_SECRET,
   session: {
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60, // 30 days
@@ -43,8 +47,8 @@ export const authOptions: NextAuthOptions = {
   providers: hasGitHubApp
     ? [
         GitHubProvider({
-          clientId: process.env.GITHUB_ID as string,
-          clientSecret: process.env.GITHUB_SECRET as string,
+          clientId: githubId as string,
+          clientSecret: githubSecret as string,
           // The import flow supports private repositories, which require the
           // repo scope in addition to the user's GitHub identity.
           authorization: { params: { scope: 'read:user repo' } },
@@ -76,27 +80,45 @@ export const authOptions: NextAuthOptions = {
       ]
       : [],
   callbacks: {
-    async jwt({ token, user, profile }) {
+    async jwt({ token, user, profile, account }) {
       if (user) {
         token.userId = user.id
-        // First GitHub sign-in: persist the GitHub username for invites.
-        const ghProfile = profile as (Profile & { login?: string }) | undefined
+        // GitHub sign-in: persist the GitHub username and avatar for invites and display.
+        const ghProfile = profile as (Profile & { login?: string; avatar_url?: string }) | undefined
         if (ghProfile?.login) {
           token.githubLogin = ghProfile.login
           await prisma.user.update({
             where: { id: user.id },
-            data: { githubLogin: ghProfile.login },
-          }).catch(() => undefined) // user row may already carry the login
+            data: {
+              githubLogin: ghProfile.login,
+              ...(ghProfile.avatar_url && !user.image ? { image: ghProfile.avatar_url } : {}),
+            },
+          }).catch(() => undefined)
         } else if ('githubLogin' in user && typeof user.githubLogin === 'string') {
           token.githubLogin = user.githubLogin // dev-local provider path
         }
       }
+
+      // Keep the Account table's access_token up to date so imports work even after token renewal
+      if (account && account.provider === 'github' && account.access_token && token.userId) {
+        await prisma.account.updateMany({
+          where: { userId: token.userId as string, provider: 'github' },
+          data: {
+            access_token: account.access_token,
+            scope: account.scope,
+          },
+        }).catch(() => undefined)
+      }
+
       return token
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = (token.userId as string) ?? token.sub ?? ''
         session.user.githubLogin = (token.githubLogin as string | undefined) ?? null
+        if (token.picture && !session.user.image) {
+          session.user.image = token.picture as string
+        }
       }
       return session
     },

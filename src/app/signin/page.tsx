@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession, signIn, signOut } from 'next-auth/react'
 import Link from 'next/link'
@@ -10,9 +10,11 @@ export default function SignInPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [devMode, setDevMode] = useState(false)
-  const [githubConfigured, setGithubConfigured] = useState(false)
+  const [githubConfigured, setGithubConfigured] = useState(true) // default to true to prevent UI flicker
   const [devLogin, setDevLogin] = useState('')
   const [isHovered, setIsHovered] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [authError, setAuthError] = useState<string | null>(null)
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -21,6 +23,25 @@ export default function SignInPage() {
   }, [status, router])
 
   useEffect(() => {
+    // Check for OAuth error query parameter
+    if (typeof window !== 'undefined') {
+      const errorParam = new URLSearchParams(window.location.search).get('error')
+      if (errorParam) {
+        if (errorParam === 'OAuthCallback') {
+          setAuthError('GitHub OAuth callback failed. Please verify your credentials and try again.')
+        } else if (errorParam === 'OAuthSignin') {
+          setAuthError('Could not construct OAuth authorization URL. Check your GitHub App settings.')
+        } else if (errorParam === 'AccessDenied') {
+          setAuthError('Access was canceled or denied on GitHub.')
+        } else if (errorParam === 'Configuration') {
+          setAuthError('Authentication configuration error on the server.')
+        } else {
+          setAuthError(`Sign-in error: ${errorParam}. Please try again.`)
+        }
+      }
+    }
+
+    // Check available providers
     fetch('/api/auth/providers')
       .then((response) => response.json())
       .then((providers: Record<string, unknown>) => {
@@ -28,8 +49,21 @@ export default function SignInPage() {
         setGithubConfigured(configured)
         setDevMode(!configured && 'dev-local' in providers)
       })
-      .catch(() => setDevMode(false))
+      .catch(() => {
+        // Keep default state
+      })
   }, [])
+
+  const handleGitHubSignIn = async () => {
+    try {
+      setIsSubmitting(true)
+      setAuthError(null)
+      await signIn('github', { callbackUrl: '/workspace' })
+    } catch {
+      setIsSubmitting(false)
+      setAuthError('Failed to start GitHub sign in. Please try again.')
+    }
+  }
 
   return (
     <div className="relative flex min-h-screen min-h-dvh items-center justify-center overflow-hidden bg-[#0a0a0a] px-5 py-8">
@@ -74,6 +108,13 @@ export default function SignInPage() {
             GitHub verifies your identity and helps you access your repositories, issues, and more.
           </p>
 
+          {/* OAuth Error Alert */}
+          {authError && (
+            <div className="mb-6 rounded-xl border border-red-500/30 bg-red-950/40 p-3.5 text-center text-[12.5px] leading-relaxed text-red-300">
+              {authError}
+            </div>
+          )}
+
           {/* Auth section */}
           {devMode ? (
             <form
@@ -111,10 +152,13 @@ export default function SignInPage() {
           ) : githubConfigured ? (
             <button
               type="button"
+              disabled={isSubmitting}
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
-              onClick={() => signIn('github', { callbackUrl: '/workspace' })}
-              className="group relative flex w-full items-center justify-center gap-3 rounded-[14px] border border-[#3a3a3a] bg-transparent px-5 py-3.5 text-[15px] font-semibold text-white transition-all duration-[250ms] ease-out hover:scale-[1.01] hover:border-white hover:bg-white hover:text-black hover:shadow-[0_4px_16px_rgba(255,255,255,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#141414] active:scale-[0.99]"
+              onClick={handleGitHubSignIn}
+              className={`group relative flex w-full items-center justify-center gap-3 rounded-[14px] border border-[#3a3a3a] bg-transparent px-5 py-3.5 text-[15px] font-semibold text-white transition-all duration-[250ms] ease-out hover:scale-[1.01] hover:border-white hover:bg-white hover:text-black hover:shadow-[0_4px_16px_rgba(255,255,255,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#141414] active:scale-[0.99] ${
+                isSubmitting ? 'opacity-70 cursor-wait' : ''
+              }`}
               aria-label="Continue with GitHub"
             >
               {/* GitHub icon — transitions to black on hover */}
@@ -124,7 +168,7 @@ export default function SignInPage() {
                 height="20"
                 xmlns="http://www.w3.org/2000/svg"
                 className="transition-[fill] duration-[250ms]"
-                style={{ fill: isHovered ? '#000' : '#fff' }}
+                style={{ fill: isHovered && !isSubmitting ? '#000' : '#fff' }}
                 aria-hidden="true"
               >
                 <path
@@ -134,7 +178,7 @@ export default function SignInPage() {
                 />
               </svg>
 
-              <span>Continue with GitHub</span>
+              <span>{isSubmitting ? 'Connecting to GitHub...' : 'Continue with GitHub'}</span>
 
               {/* Arrow — slides right on hover */}
               <ArrowRight
