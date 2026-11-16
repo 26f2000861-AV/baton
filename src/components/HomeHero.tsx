@@ -11,7 +11,7 @@ import HeroScrollVideoReveal from '@/components/ui/hero-scroll-video-pin-reveal'
 import PushpinTearFooter from '@/components/ui/pushpin-tear-footer'
 import { ArrowRight, ShieldCheck, GitPullRequest, FileText } from 'lucide-react'
 
-export default function HomeHero() {
+export default function HomeHero({ children }: { children?: React.ReactNode }) {
   const router = useRouter()
   const { status } = useSession()
   const workflowRef = useRef<HTMLElement>(null)
@@ -152,6 +152,9 @@ export default function HomeHero() {
           </div>
         </div>
       </section>
+
+      {/* Server-rendered crawlable content (capabilities + FAQ) */}
+      {children}
 
       {/* 3. Interactive Pushpin Tear Footer */}
       <PushpinTearFooter email="adityaverma200911@gmail.com" socials={[]} timeZone="" />
