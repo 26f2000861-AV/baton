@@ -145,7 +145,7 @@ export default function GitHubRepoSelector({
                 onSelectRepo(e.target.value)
               }}
               placeholder="e.g. facebook/react or vercel/next.js"
-              className="flex-1 rounded-xl border border-white/[0.1] bg-[#0c0c0e] px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder:text-zinc-600 focus:border-teal-500/50 focus:outline-none focus:ring-1 focus:ring-teal-500/50"
+              className="flex-1 rounded-xl border border-white/[0.1] bg-[#0c0c0e] px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder:text-zinc-600 focus:border-[#E89A52]/70 focus:outline-none focus:ring-1 focus:ring-[#E89A52]/40"
               disabled={disabled}
             />
           </div>
@@ -170,7 +170,7 @@ export default function GitHubRepoSelector({
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search your repositories by name or language…"
                 disabled={loading || disabled}
-                className="w-full rounded-xl border border-white/[0.08] bg-[#0c0c0e] pl-10 pr-4 py-2.5 text-xs sm:text-sm text-white placeholder:text-zinc-500 focus:border-teal-500/50 focus:outline-none focus:ring-1 focus:ring-teal-500/50 transition-all"
+                className="w-full rounded-xl border border-white/[0.08] bg-[#0c0c0e] pl-10 pr-4 py-2.5 text-xs sm:text-sm text-white placeholder:text-zinc-500 focus:border-[#E89A52]/70 focus:outline-none focus:ring-1 focus:ring-[#E89A52]/40 transition-all"
               />
               {search && (
                 <button
@@ -248,7 +248,7 @@ export default function GitHubRepoSelector({
                       <button
                         type="button"
                         onClick={() => setSearch('')}
-                        className="mt-2 text-teal-400 hover:underline"
+                        className="mt-2 text-[#E89A52] hover:underline"
                       >
                         Reset search
                       </button>
@@ -259,7 +259,7 @@ export default function GitHubRepoSelector({
                       <button
                         type="button"
                         onClick={() => setManualMode(true)}
-                        className="mt-2 text-teal-400 hover:underline"
+                        className="mt-2 text-[#E89A52] hover:underline"
                       >
                         Enter repository name manually
                       </button>
@@ -277,7 +277,7 @@ export default function GitHubRepoSelector({
                       onClick={() => onSelectRepo(repo.fullName)}
                       className={`w-full group text-left flex items-start justify-between gap-3 p-3 sm:p-3.5 rounded-xl border transition-all duration-150 ${
                         isSelected
-                          ? 'border-teal-500/60 bg-teal-500/[0.08] shadow-[0_0_16px_rgba(45,212,191,0.12)]'
+                          ? 'border-[#E89A52]/75 bg-[#E89A52]/[0.035]'
                           : 'border-white/[0.06] bg-[#0c0c0e]/60 hover:bg-white/[0.03] hover:border-white/[0.12]'
                       }`}
                     >
@@ -285,7 +285,7 @@ export default function GitHubRepoSelector({
                         <div className="flex items-center gap-2 flex-wrap">
                           <span
                             className={`text-xs sm:text-sm font-semibold tracking-tight truncate ${
-                              isSelected ? 'text-teal-300' : 'text-zinc-200 group-hover:text-white'
+                              isSelected ? 'text-[#E89A52]' : 'text-zinc-200 group-hover:text-white'
                             }`}
                           >
                             {repo.fullName}
@@ -330,7 +330,7 @@ export default function GitHubRepoSelector({
                       <div
                         className={`flex h-5 w-5 flex-none items-center justify-center rounded-full border transition-all ${
                           isSelected
-                            ? 'border-teal-400 bg-teal-400 text-black'
+                            ? 'border-[#E89A52] bg-[#E89A52] text-black'
                             : 'border-white/[0.15] bg-transparent text-transparent group-hover:border-white/30'
                         }`}
                       >
@@ -345,12 +345,12 @@ export default function GitHubRepoSelector({
 
           {/* Active Selection Display */}
           {selectedRepo && (
-            <div className="flex items-center justify-between rounded-xl border border-teal-500/30 bg-teal-950/20 px-3.5 py-2 text-xs text-teal-300">
+            <div className="flex items-center justify-between rounded-xl border border-[#E89A52]/35 bg-[#E89A52]/[0.04] px-3.5 py-2 text-xs text-[#E89A52]">
               <span className="flex items-center gap-1.5 truncate">
-                <Check size={14} className="text-teal-400" />
+                <Check size={14} className="text-[#E89A52]" />
                 Selected: <strong className="font-semibold text-white truncate">{selectedRepo}</strong>
               </span>
-              <span className="text-[10px] text-teal-400/80 uppercase tracking-wider font-mono">Ready to import</span>
+              <span className="text-[10px] text-[#E89A52]/80 uppercase tracking-wider font-mono">Ready to import</span>
             </div>
           )}
         </div>

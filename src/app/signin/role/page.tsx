@@ -10,7 +10,7 @@ import {
   FlaskConical,
   GitBranch,
   LogOut,
-  ShieldCheck,
+  UsersRound,
   ArrowRight,
   Sparkles,
 } from 'lucide-react'
@@ -53,7 +53,7 @@ const ROLE_DEFINITIONS: RoleDefinition[] = [
     title: 'Lead',
     description: 'Settle contradictions with decision notes, invite the team, import real GitHub repositories.',
     picks: 'Natural importer seat — create handover and pull in real repo.',
-    icon: ShieldCheck,
+    icon: UsersRound,
   },
 ]
 
@@ -196,7 +196,7 @@ export default function StartingPointPage() {
         <div className="relative z-10 flex flex-col items-center gap-4 rounded-2xl border border-white/[0.08] bg-[#141416]/90 p-8 shadow-2xl backdrop-blur-xl">
           <BatonMark size="medium" />
           <div className="flex items-center gap-2 text-xs text-zinc-400">
-            <RefreshCw size={13} className="animate-spin text-teal-400" />
+            <RefreshCw size={13} className="animate-spin text-[#E89A52]" />
             <span>Preparing your workspace…</span>
           </div>
         </div>
@@ -212,9 +212,9 @@ export default function StartingPointPage() {
     <div
       ref={containerRef}
       tabIndex={-1}
-      className="relative flex min-h-screen min-h-dvh flex-col items-center justify-center overflow-x-hidden bg-[#0a0a0a] px-4 py-8 sm:px-6 sm:py-12"
+      className="relative flex min-h-screen min-h-dvh flex-col items-center justify-center overflow-x-hidden bg-[#080808] px-4 py-8 sm:px-6 sm:py-12"
     >
-      {/* Dynamic, lightweight ambient particle canvas */}
+      {/* Dynamic, lightweight ambient white particle canvas */}
       <ParticleBackground />
 
       {/* Main Onboarding Container */}
@@ -233,7 +233,7 @@ export default function StartingPointPage() {
                 <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
                   Pick your starting point
                 </h1>
-                <span className="hidden sm:inline-flex items-center gap-1 rounded-full border border-teal-500/20 bg-teal-500/10 px-2.5 py-0.5 text-[11px] font-medium text-teal-300">
+                <span className="hidden sm:inline-flex items-center gap-1 rounded-full border border-[#E89A52]/25 bg-[#E89A52]/10 px-2.5 py-0.5 text-[11px] font-medium text-[#E89A52]">
                   <Sparkles size={11} /> Onboarding
                 </span>
               </div>
@@ -262,10 +262,10 @@ export default function StartingPointPage() {
                 aria-checked={startingPoint === 'sample'}
                 onClick={() => selectStartingPoint('sample')}
                 disabled={busy}
-                className={`group relative flex flex-col justify-between text-left p-5 rounded-2xl border transition-all duration-200 ${
+                className={`group relative flex flex-col justify-between text-left p-5 sm:p-6 rounded-[20px] border transition-all duration-200 ${
                   startingPoint === 'sample'
-                    ? 'border-teal-500/70 bg-gradient-to-b from-teal-500/[0.08] to-transparent shadow-[0_0_24px_rgba(45,212,191,0.12)]'
-                    : 'border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.15] hover:-translate-y-0.5'
+                    ? 'border-[#E89A52]/75 bg-[#E89A52]/[0.035]'
+                    : 'border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.14] hover:-translate-y-0.5'
                 }`}
               >
                 <div>
@@ -273,7 +273,7 @@ export default function StartingPointPage() {
                     <div
                       className={`flex h-10 w-10 items-center justify-center rounded-xl border transition-colors ${
                         startingPoint === 'sample'
-                          ? 'border-teal-400/40 bg-teal-400/15 text-teal-300'
+                          ? 'border-[#E89A52]/40 bg-[#E89A52]/15 text-[#E89A52]'
                           : 'border-white/[0.08] bg-white/[0.03] text-zinc-400 group-hover:text-white group-hover:border-white/20'
                       }`}
                     >
@@ -283,7 +283,7 @@ export default function StartingPointPage() {
                     <div
                       className={`flex h-5 w-5 items-center justify-center rounded-full border transition-all ${
                         startingPoint === 'sample'
-                          ? 'border-teal-400 bg-teal-400 text-black'
+                          ? 'border-[#E89A52] bg-[#E89A52] text-black'
                           : 'border-white/[0.15] bg-transparent text-transparent group-hover:border-white/30'
                       }`}
                     >
@@ -301,7 +301,7 @@ export default function StartingPointPage() {
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between">
-                  <span className="text-[11px] font-medium text-teal-400/90 font-mono">
+                  <span className="text-[11px] font-medium text-[#E89A52] font-mono">
                     Recommended for reviewing the workflow
                   </span>
                 </div>
@@ -314,10 +314,10 @@ export default function StartingPointPage() {
                 aria-checked={startingPoint === 'real'}
                 onClick={() => selectStartingPoint('real')}
                 disabled={busy}
-                className={`group relative flex flex-col justify-between text-left p-5 rounded-2xl border transition-all duration-200 ${
+                className={`group relative flex flex-col justify-between text-left p-5 sm:p-6 rounded-[20px] border transition-all duration-200 ${
                   startingPoint === 'real'
-                    ? 'border-teal-500/70 bg-gradient-to-b from-teal-500/[0.08] to-transparent shadow-[0_0_24px_rgba(45,212,191,0.12)]'
-                    : 'border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.15] hover:-translate-y-0.5'
+                    ? 'border-[#E89A52]/75 bg-[#E89A52]/[0.035]'
+                    : 'border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.14] hover:-translate-y-0.5'
                 }`}
               >
                 <div>
@@ -325,7 +325,7 @@ export default function StartingPointPage() {
                     <div
                       className={`flex h-10 w-10 items-center justify-center rounded-xl border transition-colors ${
                         startingPoint === 'real'
-                          ? 'border-teal-400/40 bg-teal-400/15 text-teal-300'
+                          ? 'border-[#E89A52]/40 bg-[#E89A52]/15 text-[#E89A52]'
                           : 'border-white/[0.08] bg-white/[0.03] text-zinc-400 group-hover:text-white group-hover:border-white/20'
                       }`}
                     >
@@ -347,7 +347,7 @@ export default function StartingPointPage() {
                     <div
                       className={`flex h-5 w-5 items-center justify-center rounded-full border transition-all ${
                         startingPoint === 'real'
-                          ? 'border-teal-400 bg-teal-400 text-black'
+                          ? 'border-[#E89A52] bg-[#E89A52] text-black'
                           : 'border-white/[0.15] bg-transparent text-transparent group-hover:border-white/30'
                       }`}
                     >
@@ -421,12 +421,12 @@ export default function StartingPointPage() {
                     aria-disabled={blocked}
                     disabled={busy || blocked}
                     onClick={() => !blocked && setRole(card.role)}
-                    className={`group relative flex flex-col justify-between text-left p-5 rounded-2xl border transition-all duration-200 ${
+                    className={`group relative flex flex-col justify-between text-left p-5 sm:p-6 rounded-[20px] border transition-all duration-200 ${
                       blocked
                         ? 'opacity-40 border-white/[0.04] bg-white/[0.01] cursor-not-allowed'
                         : isSelected
-                        ? 'border-teal-500/70 bg-gradient-to-b from-teal-500/[0.09] to-transparent shadow-[0_0_24px_rgba(45,212,191,0.12)]'
-                        : 'border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.15] hover:-translate-y-0.5'
+                        ? 'border-[#E89A52]/75 bg-[#E89A52]/[0.035]'
+                        : 'border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.14] hover:-translate-y-0.5'
                     }`}
                   >
                     <div>
@@ -437,7 +437,7 @@ export default function StartingPointPage() {
                             blocked
                               ? 'border-zinc-800 bg-zinc-900 text-zinc-600'
                               : isSelected
-                              ? 'border-teal-400/40 bg-teal-400/15 text-teal-300 scale-105'
+                              ? 'border-[#E89A52]/40 bg-[#E89A52]/15 text-[#E89A52] scale-105'
                               : 'border-white/[0.08] bg-white/[0.03] text-zinc-400 group-hover:text-white group-hover:border-white/20'
                           }`}
                         >
@@ -449,7 +449,7 @@ export default function StartingPointPage() {
                             blocked
                               ? 'border-transparent bg-transparent text-transparent'
                               : isSelected
-                              ? 'border-teal-400 bg-teal-400 text-black'
+                              ? 'border-[#E89A52] bg-[#E89A52] text-black'
                               : 'border-white/[0.15] bg-transparent text-transparent group-hover:border-white/30'
                           }`}
                         >
@@ -461,13 +461,13 @@ export default function StartingPointPage() {
                       <div className="flex items-center gap-2 mb-1.5">
                         <h4
                           className={`text-base font-bold tracking-tight ${
-                            isSelected ? 'text-teal-200' : 'text-white'
+                            isSelected ? 'text-[#E89A52]' : 'text-white'
                           }`}
                         >
                           {card.title}
                         </h4>
                         {card.role === 'successor' && (
-                          <span className="rounded-md border border-teal-500/30 bg-teal-500/10 px-1.5 py-0.5 text-[10px] font-medium text-teal-300">
+                          <span className="rounded-md border border-[#E89A52]/30 bg-[#E89A52]/10 px-1.5 py-0.5 text-[10px] font-medium text-[#E89A52]">
                             Core
                           </span>
                         )}
@@ -540,13 +540,13 @@ export default function StartingPointPage() {
                 onClick={start}
                 className={`group relative flex w-full items-center justify-center gap-2.5 rounded-2xl py-3.5 px-6 text-sm font-semibold transition-all duration-200 ${
                   isCtaDisabled
-                    ? 'cursor-not-allowed border border-white/[0.06] bg-zinc-900/60 text-zinc-400'
-                    : 'bg-white text-black hover:bg-zinc-100 hover:shadow-[0_8px_24px_rgba(255,255,255,0.12)] active:scale-[0.99]'
+                    ? 'cursor-not-allowed border border-white/[0.06] bg-zinc-900/60 text-zinc-500'
+                    : 'border border-[#E89A52]/90 bg-[#E89A52] text-[#0a0a0a] hover:bg-[#D98B43] hover:border-[#D98B43] shadow-[0_4px_16px_rgba(0,0,0,0.4)] active:scale-[0.99]'
                 }`}
               >
                 {busy ? (
                   <>
-                    <RefreshCw size={16} className="animate-spin text-teal-600" />
+                    <RefreshCw size={16} className="animate-spin text-[#0a0a0a]" />
                     <span>
                       {phase === 'creating'
                         ? 'Creating your handover…'

@@ -10,7 +10,8 @@ interface Particle {
   radius: number
   alpha: number
   baseAlpha: number
-  isTeal: boolean
+  pulseSpeed: number
+  pulsePhase: number
 }
 
 export default function ParticleBackground({ className = '' }: { className?: string }) {
@@ -30,9 +31,10 @@ export default function ParticleBackground({ className = '' }: { className?: str
     let width = (canvas.width = window.innerWidth)
     let height = (canvas.height = window.innerHeight)
 
+    // Adaptive particle count based on screen viewport area
     const getParticleCount = () => {
       const area = width * height
-      return Math.min(60, Math.max(24, Math.floor(area / 30000)))
+      return Math.min(75, Math.max(30, Math.floor(area / 24000)))
     }
 
     let particles: Particle[] = []
@@ -41,17 +43,25 @@ export default function ParticleBackground({ className = '' }: { className?: str
       const count = getParticleCount()
       particles = []
       for (let i = 0; i < count; i++) {
-        const isTeal = Math.random() < 0.35
-        const baseAlpha = isTeal ? Math.random() * 0.25 + 0.12 : Math.random() * 0.2 + 0.08
+        // Subtle depth: varied radius and opacity
+        const depth = Math.random()
+        const radius = 0.75 + depth * 1.35 // 0.75px to 2.1px
+        const baseAlpha = 0.15 + depth * 0.38 // 0.15 to 0.53
+
+        // Very slow, natural floating drift in different directions
+        const angle = Math.random() * Math.PI * 2
+        const speed = 0.12 + Math.random() * 0.18 // slow speed
+
         particles.push({
           x: Math.random() * width,
           y: Math.random() * height,
-          vx: (Math.random() - 0.5) * 0.22,
-          vy: (Math.random() - 0.5) * 0.22,
-          radius: Math.random() * 1.0 + 0.9,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          radius,
           alpha: baseAlpha,
           baseAlpha,
-          isTeal,
+          pulseSpeed: 0.5 + Math.random() * 1.0,
+          pulsePhase: Math.random() * Math.PI * 2,
         })
       }
     }
@@ -84,53 +94,50 @@ export default function ParticleBackground({ className = '' }: { className?: str
     let lastTime = performance.now()
 
     const drawFrame = () => {
-      // Clean obsidian background
-      ctx.fillStyle = '#0a0a0a'
+      // Deep matte black canvas background
+      ctx.fillStyle = '#080808'
       ctx.fillRect(0, 0, width, height)
 
-      // Subtle ambient vignette
+      // Atmospheric radial gradient for rich depth without glowing neon
       const gradient = ctx.createRadialGradient(
         width / 2,
         height / 2,
-        Math.min(width, height) * 0.2,
+        Math.min(width, height) * 0.25,
         width / 2,
         height / 2,
-        Math.max(width, height) * 0.8
+        Math.max(width, height) * 0.85
       )
-      gradient.addColorStop(0, 'rgba(15, 18, 20, 0.4)')
-      gradient.addColorStop(1, 'rgba(10, 10, 10, 0.85)')
+      gradient.addColorStop(0, 'rgba(16, 16, 19, 0.5)')
+      gradient.addColorStop(1, 'rgba(8, 8, 8, 0.95)')
       ctx.fillStyle = gradient
       ctx.fillRect(0, 0, width, height)
 
-      // Connect nearby particles with subtle faint lines
-      const maxDist = 85
+      // Extremely subtle, thin white connecting lines between nearby particles
+      const maxDist = 95
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x
           const dy = particles[i].y - particles[j].y
           const dist = Math.sqrt(dx * dx + dy * dy)
           if (dist < maxDist) {
-            const lineAlpha = (1 - dist / maxDist) * 0.06
+            // Keep connections very delicate and understated
+            const lineAlpha = (1 - dist / maxDist) * 0.055
             ctx.beginPath()
             ctx.moveTo(particles[i].x, particles[i].y)
             ctx.lineTo(particles[j].x, particles[j].y)
-            ctx.strokeStyle = particles[i].isTeal || particles[j].isTeal
-              ? `rgba(45, 212, 191, ${lineAlpha * 1.2})`
-              : `rgba(220, 225, 230, ${lineAlpha})`
-            ctx.lineWidth = 0.75
+            ctx.strokeStyle = `rgba(255, 255, 255, ${lineAlpha})`
+            ctx.lineWidth = 0.65
             ctx.stroke()
           }
         }
       }
 
-      // Draw particles
+      // Draw pure white particles with varied opacity
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i]
         ctx.beginPath()
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
-        ctx.fillStyle = p.isTeal
-          ? `rgba(45, 212, 191, ${p.alpha})`
-          : `rgba(240, 240, 245, ${p.alpha})`
+        ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`
         ctx.fill()
       }
     }
@@ -141,13 +148,19 @@ export default function ParticleBackground({ className = '' }: { className?: str
       const dt = Math.min((currentTime - lastTime) / 1000, 0.1)
       lastTime = currentTime
 
-      // Move particles
+      // Move particles with gentle breathing/pulsing alpha
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i]
         p.x += p.vx * dt * 60
         p.y += p.vy * dt * 60
 
-        // Wrap around borders smoothly
+        // Gentle subtle opacity variation
+        p.pulsePhase += p.pulseSpeed * dt
+        p.alpha = p.baseAlpha + Math.sin(p.pulsePhase) * 0.08
+        if (p.alpha < 0.08) p.alpha = 0.08
+        if (p.alpha > 0.6) p.alpha = 0.6
+
+        // Smooth wrap-around screen boundaries
         if (p.x < -10) p.x = width + 10
         else if (p.x > width + 10) p.x = -10
 
@@ -180,4 +193,3 @@ export default function ParticleBackground({ className = '' }: { className?: str
     />
   )
 }
-
