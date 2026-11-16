@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { authzErrorResponse, requireSession } from '@/lib/authz'
-import { listHandoversForUser } from '@/lib/handoverService'
+import { deleteUserAccount, listHandoversForUser } from '@/lib/handoverService'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,6 +17,16 @@ export async function GET() {
       },
       handovers,
     })
+  } catch (error) {
+    return authzErrorResponse(error)
+  }
+}
+
+export async function DELETE() {
+  try {
+    const session = await requireSession()
+    const result = await deleteUserAccount(session.userId)
+    return NextResponse.json(result)
   } catch (error) {
     return authzErrorResponse(error)
   }
