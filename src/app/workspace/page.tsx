@@ -252,33 +252,6 @@ function WorkspaceInner({
   const dialogCloseTimerRef = useRef<number | null>(null)
   const claimsUpdateTimerRef = useRef<number | null>(null)
   const claimsUpdateFrameRef = useRef<number | null>(null)
-  const sidebarRef = useRef<HTMLElement | null>(null)
-  const isHoveringSidebarRef = useRef(false)
-
-  useEffect(() => {
-    let ticking = false
-    const handleScroll = () => {
-      if (ticking) return
-      ticking = true
-      window.requestAnimationFrame(() => {
-        const sidebar = sidebarRef.current
-        if (sidebar && !isHoveringSidebarRef.current) {
-          const maxScroll = document.documentElement.scrollHeight - window.innerHeight
-          if (maxScroll > 0) {
-            const scrollFraction = Math.min(1, Math.max(0, window.scrollY / maxScroll))
-            const sidebarMaxScroll = sidebar.scrollHeight - sidebar.clientHeight
-            if (sidebarMaxScroll > 0) {
-              sidebar.scrollTop = scrollFraction * sidebarMaxScroll
-            }
-          }
-        }
-        ticking = false
-      })
-    }
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
 
   const role = viewer?.role ?? null
   const isCreator = state?.handover.isCreator ?? false
@@ -587,15 +560,7 @@ function WorkspaceInner({
 
   return (
     <div className="framed-app">
-      <aside
-        ref={sidebarRef}
-        className="sidebar"
-        aria-label="Baton workspace"
-        onMouseEnter={() => { isHoveringSidebarRef.current = true }}
-        onMouseLeave={() => { isHoveringSidebarRef.current = false }}
-        onTouchStart={() => { isHoveringSidebarRef.current = true }}
-        onTouchEnd={() => { isHoveringSidebarRef.current = false }}
-      >
+      <aside className="sidebar" aria-label="Baton workspace">
         <Link className="brand-lockup" href="/" title="Return to landing page" aria-label="Baton - Return to landing page">
           <BatonMark />
           <span><strong>Baton</strong><small>Engineering handover</small></span>

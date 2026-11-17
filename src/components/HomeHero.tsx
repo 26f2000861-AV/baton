@@ -2,32 +2,22 @@
 
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import InkOrbitHero from '@/components/ui/ink-orbit-hero'
 import Navbar from '@/components/Navbar'
 import GitHubSignInButton from '@/components/GitHubSignInButton'
 import HeroScrollVideoReveal from '@/components/ui/hero-scroll-video-pin-reveal'
 import PushpinTearFooter from '@/components/ui/pushpin-tear-footer'
-import { ArrowRight, ShieldCheck, GitPullRequest, FileText, CheckCircle2, X } from 'lucide-react'
+import { ArrowRight, ShieldCheck, GitPullRequest, FileText } from 'lucide-react'
 
 export default function HomeHero({ children }: { children?: React.ReactNode }) {
   const router = useRouter()
   const { status } = useSession()
   const workflowRef = useRef<HTMLElement>(null)
-  const [offboardedBanner, setOffboardedBanner] = useState(false)
   const signedIn = status === 'authenticated'
   const entryHref = signedIn ? '/workspace' : '/signin'
   const entryLabel = signedIn ? 'Open my workspace' : 'Sign in with GitHub'
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search)
-      if (params.get('offboarded') === 'true') {
-        setOffboardedBanner(true)
-      }
-    }
-  }, [])
 
   const scrollToWorkflow = () => {
     const workflow = workflowRef.current
@@ -42,32 +32,6 @@ export default function HomeHero({ children }: { children?: React.ReactNode }) {
     <div className="flex min-h-screen flex-col bg-[#0b0b0b] text-[#eeeeee]">
       {/* Brand Navigation Header */}
       <Navbar />
-
-      {/* Offboarded Departure Alert */}
-      {offboardedBanner && (
-        <div
-          role="status"
-          aria-live="polite"
-          className="relative z-40 border-b border-emerald-500/30 bg-emerald-950/40 px-4 py-3 text-center text-xs text-emerald-200 backdrop-blur-md"
-        >
-          <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" aria-hidden="true" />
-              <span>
-                <strong>Departure complete:</strong> Your account, GitHub tokens, and sessions have been permanently deleted from Baton. Handover decisions remain preserved with your successors.
-              </span>
-            </div>
-            <button
-              type="button"
-              onClick={() => setOffboardedBanner(false)}
-              className="rounded p-1 text-emerald-300 hover:bg-emerald-900/50 hover:text-white"
-              aria-label="Dismiss message"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* 1. Scroll Reveal with Center Artifact & Workspace Section */}
       <HeroScrollVideoReveal

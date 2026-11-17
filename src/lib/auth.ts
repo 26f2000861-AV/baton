@@ -214,45 +214,27 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user, profile, account }) {
+    async jwt({ token, user, profile }) {
       if (user) {
         token.userId = user.id
-        // GitHub sign-in: persist the GitHub username and avatar for invites and display.
-        const ghProfile = profile as (Profile & { login?: string; avatar_url?: string }) | undefined
+        // First GitHub sign-in: persist the GitHub username for invites.
+        const ghProfile = profile as (Profile & { login?: string }) | undefined
         if (ghProfile?.login) {
           token.githubLogin = ghProfile.login
           await prisma.user.update({
             where: { id: user.id },
-            data: {
-              githubLogin: ghProfile.login,
-              ...(ghProfile.avatar_url && !user.image ? { image: ghProfile.avatar_url } : {}),
-            },
+            data: { githubLogin: ghProfile.login },
           }).catch(() => undefined) // user row may already carry the login
         } else if ('githubLogin' in user && typeof user.githubLogin === 'string') {
           token.githubLogin = user.githubLogin // dev-local provider path
         }
       }
-
-      // Keep the Account table's access_token up to date so imports work even after token renewal
-      if (account && account.provider === 'github' && account.access_token && token.userId) {
-        await prisma.account.updateMany({
-          where: { userId: token.userId as string, provider: 'github' },
-          data: {
-            access_token: encryptToken(account.access_token),
-            scope: account.scope,
-          },
-        }).catch(() => undefined)
-      }
-
       return token
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = (token.userId as string) ?? token.sub ?? ''
         session.user.githubLogin = (token.githubLogin as string | undefined) ?? null
-        if (token.picture && !session.user.image) {
-          session.user.image = token.picture as string
-        }
       }
       return session
     },
